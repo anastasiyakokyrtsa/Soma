@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soma — UI Kit</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="kit-shell">
+
+  <aside class="kit-sidebar">
+    <div class="kit-brand">
+      <div class="kit-brand-mark"></div>
+      <div>
+        <div class="kit-brand-name">Soma</div>
+        <div class="kit-brand-tag">UI Kit</div>
+      </div>
+    </div>
+
+    <div class="kit-nav-group">
+      <p class="kit-nav-group-title">Foundations</p>
+      <a class="kit-nav-link" href="#colors">Colors</a>
+      <a class="kit-nav-link" href="#typography">Typography</a>
+      <a class="kit-nav-link" href="#spacing">Spacing</a>
+      <a class="kit-nav-link" href="#radius">Radius</a>
+    </div>
+
+    <div class="kit-nav-group">
+      <p class="kit-nav-group-title">Assets</p>
+      <a class="kit-nav-link" href="#icons">Icons</a>
+      <a class="kit-nav-link" href="#illustrations">Illustrations</a>
+    </div>
+
+    <div class="kit-nav-group">
+      <p class="kit-nav-group-title">Components</p>
+      <a class="kit-nav-link" href="#buttons">Buttons</a>
+      <a class="kit-nav-link" href="#chips-badges">Chips &amp; Badges</a>
+      <a class="kit-nav-link" href="#inputs">Inputs &amp; Controls</a>
+      <a class="kit-nav-link" href="#navigation">Navigation</a>
+      <a class="kit-nav-link" href="#cards">Cards</a>
+      <a class="kit-nav-link" href="#dataviz">Data Visualization</a>
+    </div>
+
+    <div class="kit-nav-group">
+      <p class="kit-nav-group-title">Patterns</p>
+      <a class="kit-nav-link" href="#mood-scale">Mood Scale</a>
+      <a class="kit-nav-link" href="#breathing">Breathing Session</a>
+    </div>
+  </aside>
+
+  <main class="kit-content">
+
+    <header class="kit-cover">
+      <h1 class="kit-cover-title">Soma — UI Kit</h1>
+      <p class="kit-cover-sub">Version 2.0 · Dark</p>
+    </header>
+
+    <!-- ============ COLORS ============ -->
+    <section class="kit-section" id="colors">
+      <div class="kit-section-head"><h2 class="kit-section-title">Colors</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Background &amp; Surface</p>
+        <div class="kit-grid kit-grid-4">
+          <div class="color-swatch"><div class="color-chip" style="background:#050816"></div><div class="swatch-label">bg/0 — only background<small>#050816</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:var(--card-fill)"></div><div class="swatch-label">surface / Gradient card<small>radial 20% + white 2%</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:linear-gradient(#050816,#050816) padding-box, var(--border-gradient) border-box; border:1px solid transparent"></div><div class="swatch-label">border/violet<small>#A89CF8 100%→80% · linear</small></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Violet</p>
+        <div class="kit-grid kit-grid-6">
+          <div class="color-swatch"><div class="color-chip" style="background:#C9BBFA"></div><div class="swatch-label">violet/200 · generated<small>#C9BBFA</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#A89CF8"></div><div class="swatch-label">violet/300 · confirmed<small>#A89CF8</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#8B7CF6"></div><div class="swatch-label">violet/400 · confirmed<small>#8B7CF6</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#7B6FF0"></div><div class="swatch-label">violet/500 · generated<small>#7B6FF0</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#4C41B0"></div><div class="swatch-label">violet/700 · generated<small>#4C41B0</small></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Pink &amp; Green</p>
+        <div class="kit-grid kit-grid-6">
+          <div class="color-swatch"><div class="color-chip" style="background:#FBD3F1"></div><div class="swatch-label">pink/300<small>#FBD3F1</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#F3A6E0"></div><div class="swatch-label">pink/400<small>#F3A6E0</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#E285D1"></div><div class="swatch-label">pink/500<small>#E285D1</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#B7F5D8"></div><div class="swatch-label">green/300<small>#B7F5D8</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#6EE7B7"></div><div class="swatch-label">green/400<small>#6EE7B7</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#4ADE9A"></div><div class="swatch-label">green/500<small>#4ADE9A</small></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Text</p>
+        <div class="kit-grid kit-grid-5">
+          <div class="color-swatch"><div class="color-chip" style="background:#FFFFFF"></div><div class="swatch-label">text/primary<small>#FFFFFF</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#A6ABC6"></div><div class="swatch-label">text/secondary<small>#A6ABC6</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#6E7390"></div><div class="swatch-label">text/tertiary<small>#6E7390</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#454A63"></div><div class="swatch-label">text/disabled<small>#454A63</small></div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:#A89CF8"></div><div class="swatch-label">text/violet<small>#A89CF8</small></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Gradients</p>
+        <div class="kit-grid kit-grid-4">
+          <div class="color-swatch"><div class="color-chip" style="background:linear-gradient(90deg,#C9BBFA,#F3A6E0)"></div><div class="swatch-label">gradient/heading</div></div>
+          <div class="color-swatch"><div class="color-chip" style="background:var(--card-fill)"></div><div class="swatch-label">gradient/card<small>radial #000→#A89CF8 20% + white 2%</small></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Glow — outward, like drop shadow</p>
+        <div class="kit-grid kit-grid-4">
+          <div class="color-swatch"><div class="glow-chip"><div class="glow-dot" style="box-shadow:var(--glow-btn)"></div></div><div class="swatch-label">glow/button<small>#8B7CF6 · blur 15</small></div></div>
+          <div class="color-swatch"><div class="glow-chip"><div class="glow-dot" style="box-shadow:var(--glow-chart-green);background:#7DE8C4"></div></div><div class="swatch-label">glow/chart-green<small>#7DE8C4 · blur 6</small></div></div>
+          <div class="color-swatch"><div class="glow-chip"><div class="glow-dot" style="box-shadow:var(--glow-chart-pink);background:#FFD8F6"></div></div><div class="swatch-label">glow/chart-pink<small>#FFD8F6 · blur 6</small></div></div>
+          <div class="color-swatch"><div class="glow-chip"><div class="glow-dot" style="box-shadow:var(--glow-chart-violet);background:#B6ABFF"></div></div><div class="swatch-label">glow/chart-violet<small>#B6ABFF · blur 6</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TYPOGRAPHY ============ -->
+    <section class="kit-section" id="typography">
+      <div class="kit-section-head"><h2 class="kit-section-title">Typography</h2></div>
+      <p class="kit-block-sub">Font: Nunito Sans</p>
+      <div class="kit-block">
+        <div class="type-row">
+          <span class="type-sample t-display">Aa</span>
+          <span class="type-name">Display</span>
+          <span class="type-meta">48 / 300 / 1.0</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-h1">Aa</span>
+          <span class="type-name">H1</span>
+          <span class="type-meta">32 / 400 / 1.0</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-h2">Aa</span>
+          <span class="type-name">H2</span>
+          <span class="type-meta">26 / 800 / 1.2</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-h3">Aa</span>
+          <span class="type-name">H3</span>
+          <span class="type-meta">22 / 700 / 1.2</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-body-l">Aa</span>
+          <span class="type-name">Body L</span>
+          <span class="type-meta">16 / 500 / 1.3</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-body-m">Aa</span>
+          <span class="type-name">Body M</span>
+          <span class="type-meta">14 / 400 / 1.3</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-body-s">Aa</span>
+          <span class="type-name">Body S</span>
+          <span class="type-meta">13 / 400 / 1.3</span>
+        </div>
+        <div class="type-row">
+          <span class="type-sample t-caption">Aa</span>
+          <span class="type-name">Caption</span>
+          <span class="type-meta">12 / 600 / uppercase</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SPACING ============ -->
+    <section class="kit-section" id="spacing">
+      <div class="kit-section-head"><h2 class="kit-section-title">Spacing</h2></div>
+      <div class="kit-block" id="space-rows"></div>
+    </section>
+
+    <!-- ============ RADIUS ============ -->
+    <section class="kit-section" id="radius">
+      <div class="kit-section-head"><h2 class="kit-section-title">Radius</h2></div>
+      <div class="kit-block">
+        <div class="kit-row">
+          <div><div class="radius-box" style="border-radius:10px"></div><div class="swatch-label">xs / 10</div></div>
+          <div><div class="radius-box" style="border-radius:14px"></div><div class="swatch-label">sm / 14</div></div>
+          <div><div class="radius-box" style="border-radius:20px"></div><div class="swatch-label">md / 20</div></div>
+          <div><div class="radius-box" style="border-radius:28px"></div><div class="swatch-label">lg / 28</div></div>
+          <div><div class="radius-box" style="border-radius:30px"></div><div class="swatch-label">card / 30</div></div>
+          <div><div class="radius-box" style="border-radius:36px"></div><div class="swatch-label">xl / 36</div></div>
+          <div><div class="radius-box" style="border-radius:999px"></div><div class="swatch-label">pill</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ICONS ============ -->
+    <section class="kit-section" id="icons">
+      <div class="kit-section-head"><h2 class="kit-section-title">Icons</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Gradient</p>
+        <div class="kit-grid kit-grid-icons" id="icon-grid"></div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Outline</p>
+        <div class="kit-grid kit-grid-icons" id="icon-grid-outline"></div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Toggle — default / selected</p>
+        <div class="kit-grid kit-grid-icons" id="icon-grid-toggle"></div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Status</p>
+        <div class="kit-grid kit-grid-icons" id="icon-grid-status"></div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Navigation Bar — default / active</p>
+        <div class="kit-grid kit-grid-icons" id="icon-grid-nav"></div>
+      </div>
+    </section>
+
+    <!-- ============ ILLUSTRATIONS ============ -->
+    <section class="kit-section" id="illustrations">
+      <div class="kit-section-head"><h2 class="kit-section-title">Illustrations</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Mood Shapes</p>
+        <div class="kit-grid kit-grid-5">
+          <div><div class="illus-tile"><img src="assets/mood/picture-mood-scala-very-bad.png" alt=""></div><div class="swatch-label">Very Bad</div></div>
+          <div><div class="illus-tile"><img src="assets/mood/picture-mood-scala-bad.png" alt=""></div><div class="swatch-label">Bad</div></div>
+          <div><div class="illus-tile"><img src="assets/mood/picture-mood-scala-neutral.png" alt=""></div><div class="swatch-label">Neutral</div></div>
+          <div><div class="illus-tile"><img src="assets/mood/picture-mood-scala-good.png" alt=""></div><div class="swatch-label">Good</div></div>
+          <div><div class="illus-tile"><img src="assets/mood/picture-mood-scala-very-good.png" alt=""></div><div class="swatch-label">Very Good</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Tea Botanicals</p>
+        <div class="kit-grid kit-grid-6">
+          <div><div class="illus-tile"><img src="assets/tea/camomille.svg" alt=""></div><div class="swatch-label">Camomile</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/lavender.svg" alt=""></div><div class="swatch-label">Lavender</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/linden.svg" alt=""></div><div class="swatch-label">Linden</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/melissa.svg" alt=""></div><div class="swatch-label">Melissa</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/valeriana.svg" alt=""></div><div class="swatch-label">Valerian</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/picture-for-1-screen.svg" alt=""></div><div class="swatch-label">Herbal Blend</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Personalization Space</p>
+        <div class="kit-grid kit-grid-5">
+          <div><div class="illus-tile"><img src="assets/personalization/picture-1.svg" alt=""></div><div class="swatch-label">Step 1</div></div>
+          <div><div class="illus-tile"><img src="assets/personalization/picture-2.svg" alt=""></div><div class="swatch-label">Step 2</div></div>
+          <div><div class="illus-tile"><img src="assets/personalization/picture-3.svg" alt=""></div><div class="swatch-label">Step 3</div></div>
+          <div><div class="illus-tile"><img src="assets/personalization/picture-4.svg" alt=""></div><div class="swatch-label">Step 4</div></div>
+          <div><div class="illus-tile"><img src="assets/personalization/picture-5.svg" alt=""></div><div class="swatch-label">Step 5</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Tea Category Symbols</p>
+        <div class="kit-grid kit-grid-5">
+          <div><div class="illus-tile"><img src="assets/tea/category-calming.png" alt=""></div><div class="swatch-label">Calming</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/category-soft-energy.png" alt=""></div><div class="swatch-label">Soft Energy</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/category-focus.png" alt=""></div><div class="swatch-label">Focus</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/category-warmth.png" alt=""></div><div class="swatch-label">Warmth</div></div>
+          <div><div class="illus-tile"><img src="assets/tea/category-intuitive-choice.png" alt=""></div><div class="swatch-label">Intuitive Choice</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Onboarding</p>
+        <div class="kit-grid kit-grid-4">
+          <div><div class="illus-tile photo"><img src="assets/illustrations/picture-for-onboarding-screen-1.png" alt=""></div><div class="swatch-label">Onboarding 1</div></div>
+          <div><div class="illus-tile photo"><img src="assets/illustrations/picture-for-onboarding-screen-2.png" alt=""></div><div class="swatch-label">Onboarding 2</div></div>
+          <div><div class="illus-tile photo"><img src="assets/illustrations/picture-for-onboarding-screen-3.png" alt=""></div><div class="swatch-label">Onboarding 3</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Article</p>
+        <div class="kit-grid kit-grid-4">
+          <div><div class="illus-tile photo"><img src="assets/illustrations/picture-article-water.png" alt=""></div><div class="swatch-label">Article / Water</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BUTTONS ============ -->
+    <section class="kit-section" id="buttons">
+      <div class="kit-section-head"><h2 class="kit-section-title">Buttons</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Primary</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="btn btn-primary">Далее</button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="btn btn-primary force-pressed">Далее</button><span class="state-item-label">Pressed</span></div>
+          <div class="state-item"><button class="btn btn-primary" disabled>Далее</button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Secondary</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="btn btn-secondary">Пропустить</button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="btn btn-secondary force-pressed">Пропустить</button><span class="state-item-label">Pressed</span></div>
+          <div class="state-item"><button class="btn btn-secondary" disabled>Пропустить</button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Ghost</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="btn btn-ghost">Все статьи</button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="btn btn-ghost force-pressed">Все статьи</button><span class="state-item-label">Pressed</span></div>
+          <div class="state-item"><button class="btn btn-ghost" disabled>Все статьи</button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Icon Button</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="btn-icon"><img src="assets/icons-clean/forward-arrow.svg" alt=""></button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="btn-icon force-pressed"><img src="assets/icons-clean/forward-arrow.svg" alt=""></button><span class="state-item-label">Pressed</span></div>
+          <div class="state-item"><button class="btn-icon" disabled><img src="assets/icons-clean/forward-arrow.svg" alt=""></button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ CHIPS & BADGES ============ -->
+    <section class="kit-section" id="chips-badges">
+      <div class="kit-section-head"><h2 class="kit-section-title">Chips &amp; Badges</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Navigation Chip — taps through to another screen</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="nav-chip"><img src="assets/icons-clean/sea-waves.svg" alt="">Звуки природы</button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="nav-chip force-pressed"><img src="assets/icons-clean/meditation.svg" alt="">Медитации</button><span class="state-item-label">Pressed</span></div>
+          <div class="state-item"><button class="nav-chip" disabled><img src="assets/icons-clean/pegasus.svg" alt="">Сказки</button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Selection Chip — onboarding multi-select, no icon</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="select-chip">Телесное напряжение</button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="select-chip is-selected">Телесное напряжение</button><span class="state-item-label">Selected</span></div>
+          <div class="state-item"><button class="select-chip" disabled>Телесное напряжение</button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Tag Pill</p>
+        <div class="kit-row"><span class="tag-pill">• Основы восстановления •</span></div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Step Badge</p>
+        <div class="state-strip">
+          <div class="state-item"><span class="step-badge">1</span><span class="state-item-label">Pending</span></div>
+          <div class="state-item"><span class="step-badge is-active">1</span><span class="state-item-label">Active</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INPUTS ============ -->
+    <section class="kit-section" id="inputs">
+      <div class="kit-section-head"><h2 class="kit-section-title">Inputs &amp; Controls</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Text Field</p>
+        <div class="kit-grid kit-grid-2">
+          <div class="field"><span class="field-label">Default</span><input class="field-input" placeholder="Имя"></div>
+          <div class="field"><span class="field-label">Focus</span><input class="field-input force-focus" placeholder="Имя" value="Анастасия"></div>
+          <div class="field"><span class="field-label">Error</span><input class="field-input force-error" value="ana@"><span class="field-hint is-error">Проверь адрес почты</span></div>
+          <div class="field"><span class="field-label">Disabled</span><input class="field-input" value="Недоступно" disabled></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Toggle — click to switch</p>
+        <div class="state-strip">
+          <div class="state-item"><div class="toggle" data-toggle-switch></div><span class="state-item-label">Off</span></div>
+          <div class="state-item"><div class="toggle is-on" data-toggle-switch></div><span class="state-item-label">On</span></div>
+          <div class="state-item"><div class="toggle is-disabled"></div><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Checkbox — click to check</p>
+        <div class="state-strip">
+          <div class="state-item"><div class="checkbox" data-toggle-check></div><span class="state-item-label">Unchecked</span></div>
+          <div class="state-item"><div class="checkbox is-checked" data-toggle-check></div><span class="state-item-label">Checked</span></div>
+          <div class="state-item"><div class="checkbox is-disabled"></div><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Radio Group — click to select</p>
+        <div class="kit-row" data-radio-group>
+          <label class="option-row"><span class="radio is-checked" data-toggle-radio></span><span class="option-row-label">Женский</span></label>
+          <label class="option-row"><span class="radio" data-toggle-radio></span><span class="option-row-label">Мужской</span></label>
+          <label class="option-row"><span class="radio" data-toggle-radio></span><span class="option-row-label">Не указывать</span></label>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Segmented Control — click to switch</p>
+        <div class="segmented" id="segmented1">
+          <div class="segmented-thumb"></div>
+          <button class="is-active">Неделя</button>
+          <button>Месяц</button>
+          <button>Год</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ NAVIGATION ============ -->
+    <section class="kit-section" id="navigation">
+      <div class="kit-section-head"><h2 class="kit-section-title">Navigation</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Bottom Tab Bar — click a tab</p>
+        <nav class="bottombar" id="bottomNav">
+          <svg class="bottombar-svg" viewBox="0 0 412 125" preserveAspectRatio="none">
+            <path d="M 6,50
+L 140.12,50
+C 159.30,50 158.02,48.79 166.12,31.40
+A 44,44 0 0,1 245.88,31.40
+C 253.98,48.79 252.70,50 271.88,50
+L 406,50
+Q 412,50 412,56
+L 412,99
+Q 412,125 386,125
+L 26,125
+Q 0,125 0,99
+L 0,56
+Q 0,50 6,50
+Z" fill="#0C0D1B"/>
+          </svg>
+          <div class="bottombar-content">
+            <button class="bottombar-item is-active" data-tab="home">
+              <img class="icon-default" src="assets/icons-clean/home.svg" alt="" style="display:none">
+              <img class="icon-active" src="assets/icons-clean/home-alt.svg" alt="">
+              <span>Home</span>
+            </button>
+            <button class="bottombar-item" data-tab="care">
+              <img class="icon-default" src="assets/icons-clean/care.svg" alt="">
+              <img class="icon-active" src="assets/icons-clean/care-alt.svg" alt="" style="display:none">
+              <span>Care</span>
+            </button>
+            <div style="width:68px" aria-hidden="true"></div>
+            <button class="bottombar-item" data-tab="journal">
+              <img class="icon-default" src="assets/icons-clean/journal.svg" alt="">
+              <img class="icon-active" src="assets/icons-clean/journal-alt.svg" alt="" style="display:none">
+              <span>Journal</span>
+            </button>
+            <button class="bottombar-item" data-tab="analytics">
+              <img class="icon-default" src="assets/icons-clean/analytics-tab.svg" alt="">
+              <img class="icon-active" src="assets/icons-clean/analytics-tab-alt.svg" alt="" style="display:none">
+              <span>Analytics</span>
+            </button>
+          </div>
+          <div class="bottombar-fab"><span class="icon-plus"></span></div>
+        </nav>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Progress Dots — click a dot</p>
+        <div class="dots-row" id="dotsDemo">
+          <span class="dot is-active" data-dot></span>
+          <span class="dot" data-dot></span>
+          <span class="dot" data-dot></span>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Progress Steps</p>
+        <div class="progress-steps">
+          <span class="is-done"></span><span class="is-done"></span><span class="is-current"></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Personalization Steps</p>
+        <div class="state-strip">
+          <div class="state-item">
+            <div class="pstep-row is-active">
+              <span class="step-badge is-active">1</span>
+              <div class="pstep-text">
+                <p class="pstep-title">Настраиваем пространство</p>
+                <p class="pstep-sub">Подбираем визуальный ритм</p>
+              </div>
+              <img class="pstep-ring" src="assets/icons-clean/progress-circle.svg" alt="">
+            </div>
+            <span class="state-item-label">In progress</span>
+          </div>
+          <div class="state-item">
+            <div class="pstep-row is-inactive">
+              <span class="step-badge">2</span>
+              <div class="pstep-text">
+                <p class="pstep-title">Анализируем данные</p>
+                <p class="pstep-sub">Обрабатываем первые данные</p>
+              </div>
+            </div>
+            <span class="state-item-label">Upcoming</span>
+          </div>
+          <div class="state-item">
+            <div class="pstep-row is-done">
+              <span class="step-badge is-active">1</span>
+              <div class="pstep-text">
+                <p class="pstep-title">Настраиваем пространство</p>
+                <p class="pstep-sub">Подбираем визуальный ритм</p>
+              </div>
+              <img class="pstep-ring" src="assets/icons-clean/progress-circle-alt.svg" alt="">
+            </div>
+            <span class="state-item-label">Done</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CARDS ============ -->
+    <section class="kit-section" id="cards">
+      <div class="kit-section-head"><h2 class="kit-section-title">Cards</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Analytics Stat Card</p>
+        <div class="state-strip">
+          <div class="state-item">
+            <div class="stat-card"><div class="stat-icon-ring"><img src="assets/icons-clean/pulse.svg" alt=""></div><p class="stat-title">Биоритмы</p><p class="stat-value">68% сегодня</p></div>
+            <span class="state-item-label">Default</span>
+          </div>
+          <div class="state-item">
+            <div class="stat-card force-pressed"><div class="stat-icon-ring"><img src="assets/icons-clean/pulse.svg" alt=""></div><p class="stat-title">Биоритмы</p><p class="stat-value">68% сегодня</p></div>
+            <span class="state-item-label">Pressed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Moon and Sun Activity</p>
+        <div class="moonsun-cards">
+          <div class="moonsun-card">
+            <p class="moonsun-title">Лунная активность</p>
+            <div class="moonsun-img"><img src="assets/illustrations/moon-cutout.png" alt=""></div>
+            <p class="moonsun-date">14 марта, 18:07</p>
+            <p class="moonsun-phase">Убывающая луна</p>
+            <div class="moonsun-rows">
+              <div class="moonsun-row"><span>Освещенность</span><span>24%</span></div>
+              <div class="moonsun-row"><span>Восход</span><span>4:32 утра</span></div>
+              <div class="moonsun-row"><span>Закат</span><span>12:15 дня</span></div>
+              <div class="moonsun-row"><span>До новолуния</span><span>6 дней</span></div>
+            </div>
+            <p class="moonsun-note">Конец лунного цикла. В ближайшие дни рекомендуется снизить нагрузку и сфокусироваться на отдыхе и восстановлении ресурса.</p>
+          </div>
+          <div class="moonsun-card">
+            <p class="moonsun-title">Солнечная активность</p>
+            <div class="moonsun-img"><img src="assets/illustrations/sun-cutout.png" alt=""></div>
+            <p class="moonsun-date">14 марта, 18:07</p>
+            <p class="moonsun-phase">Умеренная солнечная активность</p>
+            <div class="moonsun-rows">
+              <div class="moonsun-row"><span>Индекс</span><span>Кп 3/9</span></div>
+              <div class="moonsun-row"><span>Восход</span><span>7:12 утра</span></div>
+              <div class="moonsun-row"><span>Закат</span><span>18:41 дня</span></div>
+              <div class="moonsun-row"><span style="width:111px">Световой день</span><span>11 ч 26 мин</span></div>
+            </div>
+            <p class="moonsun-note">Солнечная активность умеренная — день подойдёт для спокойной и сосредоточенной работы.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Mini Ritual Tile</p>
+        <div class="kit-row">
+          <div class="mini-tile"><div class="mt-icon-frame"><img src="assets/icons-clean/circle.svg" alt=""></div><div class="mt-text"><p class="mt-title">Дыхание</p><p class="mt-time">3 мин</p></div></div>
+          <div class="mini-tile"><div class="mt-icon-frame" style="margin-bottom:26px"><img src="assets/icons-clean/sea-waves.svg" alt=""></div><div class="mt-text"><p class="mt-title">Звуки природы</p><p class="mt-time">10 мин</p></div></div>
+          <div class="mini-tile"><div class="mt-icon-frame"><img src="assets/icons-clean/lotus.svg" alt=""></div><div class="mt-text"><p class="mt-title">Медитация</p><p class="mt-time">10 мин</p></div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Article Link Row</p>
+        <div class="state-strip">
+          <div class="state-item">
+            <div class="list-row"><span class="list-row-icon"><img src="assets/icons-clean/water.svg" alt=""></span><div class="list-row-text"><p class="list-row-title">Вода как основа баланса</p><p class="list-row-sub">Коротко о том, как тело сигнализирует о жажде</p></div><img class="list-row-arrow" src="assets/icons-clean/forward-gradient.svg" alt=""></div>
+            <span class="state-item-label">Default</span>
+          </div>
+          <div class="state-item">
+            <div class="list-row force-pressed"><span class="list-row-icon"><img src="assets/icons-clean/water.svg" alt=""></span><div class="list-row-text"><p class="list-row-title">Вода как основа баланса</p><p class="list-row-sub">Коротко о том, как тело сигнализирует о жажде</p></div><img class="list-row-arrow" src="assets/icons-clean/forward-gradient.svg" alt=""></div>
+            <span class="state-item-label">Pressed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Article Reader</p>
+        <div class="kit-row" style="align-items:flex-start; flex-wrap:nowrap; overflow-x:auto; padding-bottom:8px">
+
+          <div class="state-item">
+            <div class="article-screen">
+              <div class="article-back"><img src="assets/icons-clean/forward.svg" alt=""></div>
+              <span class="article-nav-label" style="left:48px">Все статьи</span>
+              <span class="article-nav-label" style="left:338px">Закрыть</span>
+              <div class="article-photo is-cover">
+                <img src="assets/article/cover-water.png" alt="">
+              </div>
+              <span class="article-tag tag-pill">• ОСНОВЫ ВОССТАНОВЛЕНИЯ •</span>
+              <div class="article-page-counter"><span>01</span><span class="rule"></span><span>07</span></div>
+              <p class="article-title">Вода<br>как основа баланса</p>
+              <p class="article-desc">Почему вода - не просто часть жизни, а ключевой элемент нашего здоровья, энергии и внутреннего равновесия.</p>
+              <div class="article-readtime"><img src="assets/article/hourglass.svg" alt=""><span>5 минут чтения</span></div>
+              <div class="article-swipe-hint"><div class="hand-wrap"><img src="assets/article/hand-swipe.svg" alt=""><span class="rule"></span></div><span>Свайпни влево</span></div>
+            </div>
+            <span class="state-item-label">Cover</span>
+          </div>
+
+          <div class="state-item">
+            <div class="article-screen">
+              <div class="article-back"><img src="assets/icons-clean/forward.svg" alt=""></div>
+              <span class="article-nav-label" style="left:48px">Все статьи</span>
+              <span class="article-nav-label" style="left:338px">Закрыть</span>
+              <div class="article-photo is-dimmed">
+                <img src="assets/illustrations/picture-article-water.png" alt="">
+              </div>
+              <div class="article-page-counter"><span>02</span><span class="rule"></span><span>07</span></div>
+              <p class="article-pullquote">Мы часто ищем сложные решения, не&nbsp;замечая базовых потребностей тела.</p>
+              <p class="article-body" style="top:412.5px">Вода — один из&nbsp;самых простых способов мягко поддержать состояние в&nbsp;течение&nbsp;дня.</p>
+              <p class="article-body" style="top:536px">Мы часто воспринимаем воду как&nbsp;нечто само собой разумеющееся. Однако с&nbsp;точки зрения физиологии, водный баланс напрямую связан с&nbsp;работой нервной системы, уровнем энергии и&nbsp;способностью концентрироваться.</p>
+              <div class="article-swipe-hint"><div class="hand-wrap"><img src="assets/article/hand-swipe.svg" alt=""><span class="rule"></span></div><span>Свайпни влево</span></div>
+            </div>
+            <span class="state-item-label">Start</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Quote Card</p>
+        <div class="quote-card">
+          <img class="quote-card-bg" src="assets/article/quote-nightscape.png" alt="">
+          <div class="quote-card-content">
+            <p class="quote-card-text">Важно не то, как ты идёшь, а то, что ты не останавливаешься</p>
+            <cite class="quote-card-author">Конфуций</cite>
+            <div class="quote-card-actions">
+              <span class="quote-card-icon"><img src="assets/icons-clean/bookmark.svg" alt=""></span>
+              <span class="quote-card-icon"><img src="assets/icons-clean/forward-arrow.svg" alt=""></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Tea Category Card</p>
+        <div class="kit-row">
+          <div class="tea-category-card">
+            <p class="tcc-title">Мягкая энергия</p>
+            <img class="tcc-illustration" src="assets/tea/category-soft-energy.png" alt="">
+            <p class="tcc-desc">Для спокойного пробуждения и постепенного наполнения энергией</p>
+            <button class="tcc-btn">Выбрать</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DATA VIZ ============ -->
+    <section class="kit-section" id="dataviz">
+      <div class="kit-section-head"><h2 class="kit-section-title">Data Visualization</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Biorhythm Chart</p>
+        <div class="biorhythm">
+          <div class="biorhythm-axis">
+            <span style="left:10px">10</span><span style="left:55px">11</span><span style="left:100px">12</span><span style="left:145px">13</span><span class="is-today" style="left:190px">14</span><span style="left:235px">15</span><span style="left:280px">16</span><span style="left:325px">17</span><span style="left:370px">18</span>
+          </div>
+          <svg class="biorhythm-chart" viewBox="0 0 360 200" style="overflow:visible">
+            <line x1="0" y1="0" x2="0" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="45" y1="0" x2="45" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="90" y1="0" x2="90" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="135" y1="0" x2="135" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="180" y1="0" x2="180" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.9"/>
+            <line x1="225" y1="0" x2="225" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="270" y1="0" x2="270" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="315" y1="0" x2="315" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="360" y1="0" x2="360" y2="200" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.3"/>
+            <line x1="0" y1="100" x2="360" y2="100" stroke="#B7B7B7" stroke-opacity=".35" stroke-width="0.9"/>
+            <path d="M0.0,150.2 C3.8,146.6 15.0,136.2 22.5,128.8 C30.0,121.4 37.5,113.7 45.0,106.0 C52.5,98.3 60.0,90.4 67.5,82.8 C75.0,75.2 82.5,67.6 90.0,60.5 C97.5,53.4 105.0,46.5 112.5,40.3 C120.0,34.1 127.5,28.3 135.0,23.4 C142.5,18.5 150.0,14.1 157.5,10.7 C165.0,7.2 172.5,4.5 180.0,2.7 C187.5,0.9 195.0,0.0 202.5,0.0 C210.0,0.0 217.5,0.9 225.0,2.7 C232.5,4.5 240.0,7.2 247.5,10.7 C255.0,14.1 262.5,18.5 270.0,23.4 C277.5,28.3 285.0,34.1 292.5,40.3 C300.0,46.5 307.5,53.4 315.0,60.5 C322.5,67.6 330.0,75.2 337.5,82.8 C345.0,90.4 356.2,102.1 360.0,106.0" fill="none" stroke="#5BC4A0" stroke-width="2" style="filter:drop-shadow(0 0 8px #5BC4A0)"/>
+            <path d="M0.0,77.9 C3.8,81.0 15.0,90.1 22.5,96.2 C30.0,102.3 37.5,108.5 45.0,114.6 C52.5,120.7 60.0,126.8 67.5,132.6 C75.0,138.4 82.5,144.1 90.0,149.4 C97.5,154.7 105.0,159.9 112.5,164.6 C120.0,169.3 127.5,173.6 135.0,177.5 C142.5,181.4 150.0,184.9 157.5,187.8 C165.0,190.7 172.5,193.2 180.0,195.1 C187.5,197.0 195.0,198.4 202.5,199.2 C210.0,200.0 217.5,200.2 225.0,199.8 C232.5,199.5 240.0,198.6 247.5,197.1 C255.0,195.6 262.5,193.6 270.0,191.1 C277.5,188.6 285.0,185.5 292.5,182.0 C300.0,178.5 307.5,174.4 315.0,170.0 C322.5,165.6 330.0,160.8 337.5,155.7 C345.0,150.6 356.2,142.2 360.0,139.5" fill="none" stroke="#FFC6F1" stroke-width="2" style="filter:drop-shadow(0 0 8px #FFC6F1)"/>
+            <path d="M0.0,162.8 C3.8,164.7 15.0,170.7 22.5,174.2 C30.0,177.7 37.5,180.9 45.0,183.7 C52.5,186.5 60.0,189.1 67.5,191.2 C75.0,193.3 82.5,195.1 90.0,196.5 C97.5,197.9 105.0,198.8 112.5,199.4 C120.0,200.0 127.5,200.2 135.0,199.9 C142.5,199.7 150.0,199.0 157.5,197.9 C165.0,196.8 172.5,195.4 180.0,193.6 C187.5,191.8 195.0,189.6 202.5,187.0 C210.0,184.4 217.5,181.4 225.0,178.2 C232.5,175.0 240.0,171.4 247.5,167.6 C255.0,163.8 262.5,159.6 270.0,155.3 C277.5,151.0 285.0,146.3 292.5,141.6 C300.0,136.9 307.5,131.9 315.0,126.9 C322.5,121.9 330.0,116.8 337.5,111.6 C345.0,106.4 356.2,98.6 360.0,96.0" fill="none" stroke="#8B7CF6" stroke-width="2" style="filter:drop-shadow(0 0 8px #8B7CF6)"/>
+          </svg>
+          <div class="biorhythm-rings">
+            <div class="br-ring-item">
+              <svg class="br-ring-svg" viewBox="0 0 84 84" width="84" height="84" style="overflow:visible">
+                <defs>
+                  <linearGradient id="ringGradGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#7DE8C4"/>
+                    <stop offset="50%" stop-color="#5DC2A3"/>
+                    <stop offset="100%" stop-color="#4BA78D"/>
+                  </linearGradient>
+                </defs>
+                <circle class="ring-anim" cx="42" cy="42" r="34" fill="none" stroke="url(#ringGradGreen)" stroke-width="8" stroke-linecap="butt" stroke-dasharray="213.63" stroke-dashoffset="5.77" style="filter:drop-shadow(0 0 6px #5DC2A3)"/>
+              </svg>
+              <span class="br-pct">97,3%</span>
+              <span class="br-label">Физика</span>
+            </div>
+            <div class="br-ring-item">
+              <svg class="br-ring-svg" viewBox="0 0 84 84" width="84" height="84" style="overflow:visible">
+                <defs>
+                  <linearGradient id="ringGradPink" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFCBF2"/>
+                    <stop offset="50%" stop-color="#FFC6F1"/>
+                    <stop offset="100%" stop-color="#FBBDEC"/>
+                  </linearGradient>
+                </defs>
+                <circle class="ring-anim" cx="42" cy="42" r="34" fill="none" stroke="url(#ringGradPink)" stroke-width="8" stroke-linecap="butt" stroke-dasharray="213.63" stroke-dashoffset="10.47" style="filter:drop-shadow(0 0 6px #FFC6F1)"/>
+              </svg>
+              <span class="br-pct">-95,1%</span>
+              <span class="br-label">Эмоции</span>
+            </div>
+            <div class="br-ring-item">
+              <svg class="br-ring-svg" viewBox="0 0 84 84" width="84" height="84" style="overflow:visible">
+                <defs>
+                  <linearGradient id="ringGradViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#B6ABFF"/>
+                    <stop offset="50%" stop-color="#8B7CF6"/>
+                    <stop offset="100%" stop-color="#7060E8"/>
+                  </linearGradient>
+                </defs>
+                <circle class="ring-anim" cx="42" cy="42" r="34" fill="none" stroke="url(#ringGradViolet)" stroke-width="8" stroke-linecap="butt" stroke-dasharray="213.63" stroke-dashoffset="13.66" style="filter:drop-shadow(0 0 6px #8B7CF6)"/>
+              </svg>
+              <span class="br-pct">-93,6%</span>
+              <span class="br-label">Интеллект</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Resource Meter</p>
+        <div class="resource-ring">
+          <div class="rr-halo"></div>
+          <div class="rr-ring"></div>
+          <div class="rr-content">
+            <p class="rr-value">42<span class="rr-pct">%</span></p>
+            <p class="rr-caption">Низкий ресурс</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MOOD SCALE ============ -->
+    <section class="kit-section" id="mood-scale">
+      <div class="kit-section-head"><h2 class="kit-section-title">Mood Scale</h2></div>
+      <div class="mood-card">
+        <p class="mood-title" id="moodTitle">Хорошо</p>
+        <div class="mood-illustration"><img id="moodIllustration" src="assets/mood/picture-mood-scala-good.png" alt=""></div>
+        <div class="mood-track" id="moodTrack">
+          <div class="mood-track-fill" id="moodFill"></div>
+          <div class="mood-thumb" id="moodThumb"></div>
+        </div>
+        <div class="mood-icons">
+          <img class="mood-icon-mini" style="left:0%" src="assets/mood/picture-mood-scala-very-bad.png" alt="">
+          <img class="mood-icon-mini" style="left:25%" src="assets/mood/picture-mood-scala-bad.png" alt="">
+          <img class="mood-icon-mini" style="left:50%" src="assets/mood/picture-mood-scala-neutral.png" alt="">
+          <img class="mood-icon-mini" style="left:75%" src="assets/mood/picture-mood-scala-good.png" alt="">
+          <img class="mood-icon-mini" style="left:100%" src="assets/mood/picture-mood-scala-very-good.png" alt="">
+        </div>
+        <div class="mood-labels">
+          <span style="left:0%">Ужасно</span><span style="left:25%">Плохо</span><span style="left:50%">Нейтрально</span><span class="is-active" style="left:75%">Хорошо</span><span style="left:100%">Отлично</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BREATHING ============ -->
+    <section class="kit-section" id="breathing">
+      <div class="kit-section-head"><h2 class="kit-section-title">Breathing Session</h2></div>
+      <div class="breath-stage">
+        <div class="breath-orb-wrap">
+          <div class="breath-orb" id="breathOrb"></div>
+          <div class="breath-text">
+            <p class="breath-phase" id="breathPhase">Готов?</p>
+            <p class="breath-timer" id="breathTimer">Нажми play</p>
+          </div>
+        </div>
+        <div class="breath-controls">
+          <button class="btn-fab" id="breathPlay"><span class="icon-play" id="breathPlayIcon"></span></button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,900 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ============ TOKENS ============ */
+:root{
+  /* background — sampled from Home/Care/Analytics screen.png, one true bg */
+  --bg-0:#050816;
+
+  /* surface = Figma style "Gradient card": radial(50% #000 50%, 100% #A89CF8 100%) at 20% layer opacity + flat #FFFFFF 2% on top.
+     Centered at 50/50, sized to farthest-corner so the tint reads evenly around all edges, not pooled in one corner. */
+  --card-fill:
+    linear-gradient(rgba(255,255,255,.02), rgba(255,255,255,.02)),
+    radial-gradient(farthest-corner at 50% 50%, rgba(0,0,0,.10) 45%, rgba(168,156,248,.20) 100%);
+  /* "Gradient card small" — same construction, tuned for the smaller 184×184 stat card: black stop moves in to 30%, flat white layer 3% instead of 2% */
+  --card-fill-sm:
+    linear-gradient(rgba(255,255,255,.03), rgba(255,255,255,.03)),
+    radial-gradient(farthest-corner at 50% 50%, rgba(0,0,0,.10) 30%, rgba(168,156,248,.20) 100%);
+
+  --border-soft:rgba(255,255,255,.08);
+  /* quiet-but-enabled border for controls that read as present/interactive without going violet:
+     text field default, selection chip default, toggle off, segment control. One notch brighter
+     than --border-soft (which is reserved for disabled state everywhere, matching Personalization
+     Steps "Upcoming"), so disabled always reads as a visibly dimmer step down from default. */
+  --border-default:rgba(255,255,255,.24);
+  /* border/violet = your linear gradient spec: #A89CF8 100% → #A89CF8 80%. Used via background-clip dual-layer technique on resting borders. */
+  --border-gradient:linear-gradient(135deg, rgba(168,156,248,1) 0%, rgba(168,156,248,.8) 100%);
+  /* same border-gradient at 50% opacity — for chrome that needs a quieter ring (e.g. stat card icon frame) */
+  --border-gradient-50:linear-gradient(135deg, rgba(168,156,248,.5) 0%, rgba(168,156,248,.4) 100%);
+  /* flat stand-in of the same color, only for spots where CSS can't render a gradient border (hover/focus transitions on border-color) */
+  --border-violet-flat:rgba(168,156,248,.85);
+  --border-violet-strong:rgba(139,124,246,.55);
+
+  /* violet — 400 confirmed by pixel sample + your spec (#8B7CF6), 300 confirmed by your gradient-card/border stop (#A89CF8). 200/500/600/700 are generated tints, not individually sourced yet. */
+  --violet-200:#C9BBFA;
+  --violet-300:#A89CF8;
+  --violet-400:#8B7CF6;
+  --violet-500:#7B6FF0;
+  --violet-600:#6355D6;
+  --violet-700:#4C41B0;
+
+  /* pink */
+  --pink-300:#FBD3F1;
+  --pink-400:#F3A6E0;
+  --pink-500:#E285D1;
+
+  /* green */
+  --green-300:#B7F5D8;
+  --green-400:#6EE7B7;
+  --green-500:#4ADE9A;
+
+  /* status */
+  --red-400:#F0847F;
+
+  /* text */
+  --text-primary:#FFFFFF;
+  --text-secondary:#A6ABC6;
+  --text-tertiary:#6E7390;
+  --text-disabled:#454A63;
+
+  /* gradients — heading gradient, exact Figma stops (linear, 0°/horizontal): pink→violet */
+  --grad-heading:linear-gradient(90deg,#FFC6F1 25%,#A89CF8 70%,#8B7CF6 100%);
+
+  /* radius */
+  --r-xs:10px;
+  --r-sm:14px;
+  --r-md:20px;
+  --r-lg:28px;
+  --r-xl:36px;
+  --r-pill:999px;
+
+  /* spacing */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+  --sp-6:24px; --sp-7:32px; --sp-8:40px; --sp-9:48px; --sp-10:64px;
+
+  /* shadow / glow — all outward (no inset). button glow from your drop-shadow spec (blur 15, #8B7CF6, 100%); chart glows from the biorhythm chart drop-shadow specs (blur 6 each) */
+  --shadow-card:0 8px 30px rgba(0,0,0,.45);
+  --glow-btn:0 0 15px #8B7CF6;
+  --glow-chart-green:0 0 6px #7DE8C4;
+  --glow-chart-pink:0 0 6px #FFD8F6;
+  --glow-chart-violet:0 0 6px #B6ABFF;
+
+  --font:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-nunito:'Nunito Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg-0);
+  color:var(--text-primary);
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.5) 0, transparent 100%),
+    radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,.4) 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 60% 70%, rgba(255,255,255,.35) 0, transparent 100%),
+    radial-gradient(1px 1px at 30% 85%, rgba(255,255,255,.4) 0, transparent 100%),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,.3) 0, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 40%, rgba(255,255,255,.3) 0, transparent 100%);
+  background-size:600px 600px;
+  opacity:.5;
+  pointer-events:none;
+  z-index:0;
+}
+a{color:var(--violet-300);}
+img,svg{display:block;max-width:100%;}
+button{font-family:inherit;}
+
+::selection{background:var(--violet-400);color:#05060B;}
+
+/* ============ LAYOUT ============ */
+.kit-shell{display:flex; position:relative; z-index:1;}
+
+.kit-sidebar{
+  position:sticky; top:0; align-self:flex-start;
+  width:248px; height:100vh; overflow-y:auto;
+  padding:var(--sp-6) var(--sp-5) var(--sp-9);
+  border-right:1px solid var(--border-soft);
+  background:rgba(10,11,21,.6); backdrop-filter:blur(12px);
+}
+.kit-brand{display:flex; align-items:center; gap:10px; margin-bottom:var(--sp-7);}
+.kit-brand-mark{
+  width:34px; height:34px; border-radius:11px;
+  background:var(--violet-400); box-shadow:var(--glow-btn);
+}
+.kit-brand-name{font-weight:800; font-size:17px; letter-spacing:.01em;}
+.kit-brand-tag{font-size:11px; color:var(--text-tertiary); font-weight:600; text-transform:uppercase; letter-spacing:.08em;}
+
+.kit-nav-group{margin-bottom:var(--sp-6);}
+.kit-nav-group-title{
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--text-tertiary); margin:0 0 var(--sp-2) var(--sp-3);
+}
+.kit-nav-link{
+  display:block; padding:7px 12px; border-radius:var(--r-xs);
+  color:var(--text-secondary); text-decoration:none; font-size:13.5px; font-weight:600;
+  transition:background .15s ease,color .15s ease;
+}
+.kit-nav-link:hover{background:var(--bg-0); color:var(--text-primary);}
+.kit-nav-link.is-current{background:var(--bg-0); color:var(--violet-200);}
+
+.kit-content{flex:1; min-width:0; padding:var(--sp-9) var(--sp-10) 160px; max-width:1180px;}
+
+.kit-cover{padding:var(--sp-9) 0 var(--sp-8); border-bottom:1px solid var(--border-soft); margin-bottom:var(--sp-9);}
+.kit-cover-title{
+  font-size:44px; font-weight:800; margin:0 0 6px; letter-spacing:-.01em;
+  background:var(--grad-heading); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.kit-cover-sub{font-size:14px; color:var(--text-tertiary); font-weight:700; text-transform:uppercase; letter-spacing:.1em;}
+
+.kit-section{padding-top:var(--sp-9); margin-top:calc(-1 * var(--sp-9)); scroll-margin-top:24px;}
+.kit-section + .kit-section{border-top:1px solid var(--border-soft); margin-top:var(--sp-9);}
+.kit-section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:var(--sp-6);}
+.kit-section-title{font-size:26px; font-weight:800; margin:0;}
+.kit-section-index{font-size:13px; color:var(--text-tertiary); font-weight:700;}
+
+.kit-block{margin-bottom:var(--sp-8);}
+.kit-block-title{
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--text-secondary); margin:0 0 var(--sp-4);
+}
+.kit-block-sub{font-size:14px; color:var(--text-tertiary); font-weight:600; margin:0 0 var(--sp-6);}
+
+.kit-row{display:flex; flex-wrap:wrap; gap:var(--sp-4);}
+.kit-grid{display:grid; gap:var(--sp-4);}
+.kit-grid-2{grid-template-columns:repeat(2,1fr);}
+.kit-grid-3{grid-template-columns:repeat(3,1fr);}
+.kit-grid-4{grid-template-columns:repeat(4,1fr);}
+.kit-grid-5{grid-template-columns:repeat(5,1fr);}
+.kit-grid-6{grid-template-columns:repeat(6,1fr);}
+.kit-grid-icons{grid-template-columns:repeat(7,1fr);}
+
+.swatch-label{margin-top:var(--sp-2); font-size:12px; color:var(--text-secondary); font-weight:600;}
+.swatch-label small{display:block; color:var(--text-tertiary); font-weight:500; font-size:11px; margin-top:2px; font-family:monospace;}
+
+/* ============ FOUNDATIONS: COLOR ============ */
+.color-swatch{width:100%;}
+.color-chip{
+  height:76px; border-radius:var(--r-sm); border:1px solid var(--border-soft);
+  position:relative; overflow:hidden;
+}
+/* glow swatches need visible margin around the shape so the shadow can spread outward, unlike the flat/gradient chips above which are clipped */
+.glow-chip{
+  height:76px; border-radius:var(--r-sm); border:1px solid var(--border-soft);
+  background:var(--bg-0); display:flex; align-items:center; justify-content:center;
+}
+.glow-dot{width:26px; height:26px; border-radius:50%; background:var(--violet-400);}
+
+/* ============ FOUNDATIONS: TYPE ============ */
+/* Sizes/weights below are sourced from the components actually built in this kit (not an aspirational
+   scale) — Display = .article-title, H1 = .mood-title (largest 800-weight headline in use), H2 =
+   .article-pullquote, H3 = .moonsun-title, Body L = .list-row-sub/.pstep-sub, Body M = .article-desc/
+   .tcc-desc, Caption = .tag-pill/.mood-labels. Font is Nunito Sans throughout — it's what every real
+   title/body/label in the kit is set in (--font/Manrope is only used for a few interactive-chrome
+   controls: buttons, inputs, segmented control). */
+.type-row{
+  display:grid; grid-template-columns:120px 90px 1fr; align-items:center; gap:var(--sp-5);
+  padding:var(--sp-5) 0; border-bottom:1px solid var(--border-soft);
+}
+.type-sample{line-height:1; text-align:left; font-family:var(--font-nunito);}
+.type-sample.t-display{font-size:48px; font-weight:300;}
+.type-sample.t-h1{font-size:32px; font-weight:400;}
+.type-sample.t-h2{font-size:26px; font-weight:800;}
+.type-sample.t-h3{font-size:22px; font-weight:700;}
+.type-sample.t-body-l{font-size:16px; font-weight:500;}
+.type-sample.t-body-m{font-size:14px; font-weight:400;}
+.type-sample.t-body-s{font-size:13px; font-weight:400; color:var(--text-secondary);}
+.type-sample.t-caption{font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-tertiary);}
+.type-name{font-size:13px; font-weight:700; color:var(--text-primary);}
+.type-meta{font-size:12px; color:var(--text-tertiary); font-family:monospace; white-space:nowrap;}
+
+/* ============ FOUNDATIONS: SPACING / RADIUS ============ */
+.space-row{display:flex; align-items:center; gap:var(--sp-4); margin-bottom:var(--sp-3);}
+.space-bar{height:14px; background:var(--violet-400); border-radius:4px;}
+.space-label{width:120px; font-size:12px; font-family:monospace; color:var(--text-secondary);}
+
+.radius-box{
+  width:88px; height:88px; background:
+    linear-gradient(var(--bg-0),var(--bg-0)) padding-box,
+    var(--border-gradient) border-box;
+  border:1px solid transparent;
+}
+
+/* ============ ICONS / ILLUSTRATIONS ============ */
+.icon-tile{
+  aspect-ratio:1/1; border-radius:var(--r-sm); background:var(--bg-0);
+  border:1px solid var(--border-soft);
+  display:flex; align-items:center; justify-content:center; padding:16px;
+  transition:border-color .15s ease, transform .15s ease, background .15s ease;
+}
+.icon-tile img{width:36px; height:36px; object-fit:contain;}
+/* Glow effect spec (exact, from Figma): Drop Shadow X0 Y0 Blur5 Spread0 #8B7CF6 100% — applied to the
+   icon itself, not the tile frame. Scoped to the Gradient icon grid only (#icon-grid); Outline/Toggle/
+   Status/Nav icons share .icon-tile but don't get this treatment. */
+#icon-grid .icon-tile img{filter:drop-shadow(0 0 5px #8B7CF6);}
+.icon-tile:hover{border-color:var(--border-violet-strong); transform:translateY(-2px);}
+.icon-tile-label{margin-top:8px; font-size:11px; color:var(--text-tertiary); text-align:center; line-height:1.3;}
+
+/* pairs use the exact same tile + same 36px icon size as every other icon — just two tiles grouped together */
+.icon-pair-cell{grid-column:span 2;}
+.icon-pair-wrap{display:flex; gap:8px;}
+.icon-pair-wrap .icon-tile{flex:1;}
+.icon-pair-wrap .icon-tile.is-alt{background:rgba(139,124,246,.08); border-color:var(--border-violet-strong);}
+/* same exact glow spec as the Gradient icons (drop-shadow 0/0/5/#8B7CF6 100%) — the -alt SVGs used to
+   bake their own glow via an internal Figma-exported filter, which rendered less cleanly than a plain
+   CSS drop-shadow on the crisp vector; that internal filter has been stripped from the affected files. */
+.icon-pair-wrap .icon-tile.is-alt img{filter:drop-shadow(0 0 5px #8B7CF6);}
+
+.illus-tile{
+  border-radius:var(--r-md); background:var(--bg-0); border:1px solid var(--border-soft);
+  display:flex; align-items:center; justify-content:center; padding:var(--sp-5); aspect-ratio:1/1;
+  overflow:hidden;
+}
+.illus-tile img{max-width:100%; max-height:100%; object-fit:contain;}
+.illus-tile.photo img{width:100%; height:100%; object-fit:cover;}
+
+/* ============ MOON & SUN ACTIVITY CARDS ============ */
+/* two separate cards, fixed to the real component size: 336×487 */
+.moonsun-cards{display:flex; gap:var(--sp-5); flex-wrap:wrap;}
+.moonsun-card{
+  position:relative; width:336px; height:487px; box-sizing:border-box;
+  display:flex; flex-direction:column; align-items:center;
+  padding:var(--sp-6); border-radius:var(--r-lg); background:var(--card-fill);
+  cursor:pointer; transition:transform .15s ease;
+}
+/* no border at rest — pressed gets the same gradient ring as the Analytics Stat Card,
+   via mask-composite (not padding-box/border-box) so the card-fill gradient stays visible underneath */
+.moonsun-card::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .15s ease; pointer-events:none;
+}
+.moonsun-card:active{transform:scale(.98);}
+.moonsun-card:active::before, .moonsun-card.force-pressed::before{opacity:1;}
+.moonsun-title{align-self:flex-start; font-family:var(--font-nunito); font-size:22px; font-weight:700; line-height:1.2; color:var(--text-primary); margin:0 0 var(--sp-4);}
+.moonsun-img{width:110px; height:110px; margin-bottom:var(--sp-4); border-radius:var(--r-sm); overflow:hidden;}
+.moonsun-img img{width:100%; height:100%; object-fit:cover;}
+.moonsun-date{font-family:var(--font-nunito); font-size:14px; font-weight:300; line-height:1.5; color:var(--text-primary); margin:0 0 4px; text-align:center;}
+.moonsun-phase{font-family:var(--font-nunito); font-size:16px; font-weight:600; line-height:1.5; color:var(--text-primary); margin:0 0 var(--sp-4); text-align:center;}
+.moonsun-rows{width:100%; display:flex; flex-direction:column; gap:8px; margin-bottom:var(--sp-4);}
+.moonsun-row{display:flex; gap:28px; font-family:var(--font-nunito); font-size:16px;}
+/* fixed-width label container so every value column lines up instead of scattering per label length */
+.moonsun-row span:first-child{width:110px; flex-shrink:0; font-weight:500; line-height:1.5; color:var(--text-primary);}
+.moonsun-row span:last-child{font-weight:300; line-height:1.5; color:var(--text-primary);}
+.moonsun-note{font-family:var(--font-nunito); font-size:16px; font-weight:400; color:var(--text-primary); line-height:1.3; margin:0;}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  border:none; cursor:pointer; font-family:var(--font); font-weight:700; font-size:15px;
+  border-radius:var(--r-pill); padding:0 26px; height:52px;
+  transition:transform .12s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease, border-color .15s ease, color .15s ease, filter .15s ease;
+  user-select:none;
+}
+.btn:active{transform:scale(.97);}
+
+/* app surface, not a website — no hover state, only default/pressed/disabled */
+.btn-primary{
+  background:var(--violet-400); color:#0B0C18; box-shadow:var(--glow-btn); box-sizing:border-box;
+  border-radius:var(--r-md); width:380px; height:62px; padding:0 28px;
+  font-family:var(--font-nunito); font-weight:600; font-size:20px; line-height:1.1;
+}
+.btn-primary:active, .btn-primary.force-pressed{background:var(--violet-300); box-shadow:0 0 15px var(--violet-300); transform:scale(.97);}
+.btn-primary:disabled, .btn-primary.force-disabled{background:transparent; border:1.5px solid var(--border-soft); color:var(--text-disabled); box-shadow:none; cursor:not-allowed;}
+
+/* same footprint as Primary (width/height/radius/padding/type) — differ only in fill treatment. App surface, no hover. */
+.btn-secondary{
+  background:transparent; color:var(--violet-400); border:1.5px solid var(--violet-400); box-sizing:border-box;
+  border-radius:var(--r-md); width:380px; height:62px; padding:0 28px;
+  font-family:var(--font-nunito); font-weight:600; font-size:20px; line-height:1.1;
+}
+.btn-secondary:active, .btn-secondary.force-pressed{background:rgba(139,124,246,.23); border-color:var(--violet-400); color:var(--violet-400); transform:scale(.97);}
+.btn-secondary:disabled, .btn-secondary.force-disabled{background:transparent; border:1.5px solid var(--border-soft); color:var(--text-disabled); cursor:not-allowed;}
+
+.btn-ghost{background:transparent; color:var(--violet-300); padding:0 8px; height:auto; font-size:14px;}
+.btn-ghost:active, .btn-ghost.force-pressed{color:var(--violet-300); text-decoration:underline;}
+.btn-ghost:disabled, .btn-ghost.force-disabled{color:var(--text-disabled); cursor:not-allowed;}
+
+/* no border/fill chrome at rest — matches real screens (profile icon, save/share on the quote card
+   are bare glyphs, not bordered circles). Press reveals a soft violet fill so the tap always gets
+   an immediate acknowledgment, independent of whatever the icon's own toggle state does. No hover — app surface. */
+.btn-icon{
+  width:44px; height:44px; border-radius:50%; background:transparent;
+  border:none; color:var(--text-primary);
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:all .15s ease;
+}
+.btn-icon img{width:20px; height:20px;}
+.btn-icon:active, .btn-icon.force-pressed{transform:scale(.92); background:rgba(139,124,246,.28);}
+.btn-icon.is-selected{background:rgba(139,124,246,.18);}
+.btn-icon.is-selected img{filter:none;}
+.btn-icon:disabled, .btn-icon.force-disabled{opacity:.35; cursor:not-allowed;}
+
+.btn-fab{
+  width:64px; height:64px; border-radius:50%; background:var(--violet-400);
+  box-shadow:var(--glow-btn); border:none; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-fab img{width:24px; height:24px;}
+.btn-fab:hover, .btn-fab.force-hover{transform:scale(1.05);}
+.btn-fab:active, .btn-fab.force-pressed{transform:scale(.92);}
+
+.state-strip{display:flex; align-items:center; gap:var(--sp-5); flex-wrap:wrap;}
+.state-item{display:flex; flex-direction:column; align-items:center; gap:10px;}
+.state-item-label{font-size:11px; color:var(--text-tertiary); font-weight:600;}
+
+/* ============ CHIPS / BADGES ============ */
+
+/* Navigation Chip — tapping it navigates to another screen (e.g. Home "Восстановление ресурса" row).
+   No selected state: it doesn't stay toggled, it just takes you elsewhere. Uses the same translucent
+   "Gradient card" surface as real cards (var(--card-fill)), r=30, 16/24 padding, 6px icon-text gap per spec.
+   No border by default; pressed just gets the same gradient ring as the other cards/chips (mask-composite
+   ::before, no background tint) — min-height not height: at 16px vertical padding the icon+text row is
+   under 60 on its own, so min-height:60 actually renders at exactly 60. */
+.nav-chip{
+  position:relative; display:inline-flex; align-items:center; gap:6px; min-height:60px; padding:16px 24px; box-sizing:border-box;
+  border-radius:30px; background:var(--card-fill); border:none; outline:none;
+  color:var(--text-primary); font-size:14px; font-weight:600; cursor:pointer;
+  transition:transform .15s ease; user-select:none;
+}
+.nav-chip::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .15s ease; pointer-events:none;
+}
+.nav-chip img{width:20px; height:20px;}
+.nav-chip:active, .nav-chip.force-pressed{transform:scale(.98);}
+.nav-chip:active::before, .nav-chip.force-pressed::before{opacity:1;}
+.nav-chip:disabled, .nav-chip.force-disabled{opacity:.35; cursor:not-allowed;}
+
+/* Selection Chip — onboarding multi-select ("В чем тебе больше всего нужна поддержка?"), text-only,
+   stays toggled once picked. Own design (this onboarding screen had no existing Figma spec to match).
+   Selected = thin border only, no fill/glow — kept deliberately quiet since several of these can be
+   selected at once on screen. */
+.select-chip{
+  display:inline-flex; align-items:center; height:48px; padding:0 20px;
+  border-radius:var(--r-pill); background:var(--bg-0); border:1px solid var(--border-default);
+  color:var(--text-primary); font-size:14px; font-weight:600; cursor:pointer;
+  transition:all .15s ease; user-select:none;
+}
+.select-chip.is-selected, .select-chip.force-selected{
+  border-color:transparent;
+  background:linear-gradient(var(--bg-0),var(--bg-0)) padding-box, var(--border-gradient) border-box;
+}
+.select-chip:disabled, .select-chip.force-disabled{border-color:var(--border-soft); color:var(--text-disabled); cursor:not-allowed;}
+
+/* hug sizing, padding 10 all sides, gap 10, radius 12 (not full pill), stroke 1px var(--border-gradient),
+   truly transparent interior (not just "same color as page bg"). The padding-box/border-box dual-layer
+   trick used elsewhere in the kit only fakes this by masking the center with an opaque fill — it still
+   paints something, so it breaks the moment the pill sits on a different surface. A real hollow ring needs
+   mask-composite: the ::before is a filled rounded rect, then the padding-box layer is subtracted out of
+   its own mask, leaving only the 1px edge painted — that's genuine transparency underneath. */
+.tag-pill{
+  position:relative; display:inline-flex; align-items:center; gap:10px; padding:10px;
+  border-radius:12px; border:none; background:none; color:#FFFFFF;
+  font-family:var(--font-nunito); font-size:12px; font-weight:600; text-transform:uppercase;
+}
+.tag-pill::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none;
+}
+/* bullets are real characters in the markup now, not ::after content — ::before is spoken for by the ring mask above */
+
+/* Pending = 8B7CF6 at 50%, Active = 8B7CF6 solid — same dark text (bg-0) both times, no stroke, no glow */
+.step-badge{
+  width:38px; height:38px; border-radius:200px; display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-nunito); font-size:18px; font-weight:600; line-height:1; background:rgba(139,124,246,.5); color:var(--bg-0);
+  border:none; flex-shrink:0;
+}
+.step-badge.is-active{background:var(--violet-400); color:var(--bg-0);}
+
+/* ============ INPUTS ============ */
+.field{display:flex; flex-direction:column; gap:8px; width:100%;}
+.field-label{font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.06em;}
+/* Default border uses --border-default (shared with Selection Chip / Toggle Off / Segment control)
+   so it reads as present/interactive without going all the way to violet. Focus (typing) picks up the
+   Secondary-button violet-400 1.5px border. Disabled = border-soft 1.5px + muted text color only — no
+   opacity fade, that made the value unreadable; the dimmer text/border color already carries the
+   "disabled" signal here. */
+.field-input{
+  height:64px; border-radius:var(--r-sm); background:var(--bg-0); border:1.5px solid var(--border-default);
+  color:var(--text-primary); font-family:var(--font); font-size:18px; font-weight:500; padding:0 20px;
+  outline:none; transition:all .15s ease; width:100%;
+}
+.field-input::placeholder{color:var(--text-tertiary);}
+.field-input:focus, .field-input.force-focus{border-color:var(--violet-400);}
+.field-input.force-filled{border-color:var(--border-soft);}
+.field-input.force-error, .field-input.is-error{border-color:var(--red-400); box-shadow:0 0 0 3px rgba(240,132,127,.12);}
+.field-input:disabled, .field-input.force-disabled{background:var(--bg-0); border-color:var(--border-soft); color:var(--text-disabled); cursor:not-allowed;}
+.field-hint{font-size:12px; color:var(--text-tertiary);}
+.field-hint.is-error{color:var(--red-400);}
+
+.toggle{
+  --w:52px; --h:30px;
+  width:var(--w); height:var(--h); border-radius:var(--r-pill); background:var(--bg-0);
+  border:1px solid var(--border-default); position:relative; cursor:pointer; flex-shrink:0;
+  transition:background .2s ease, border-color .2s ease;
+}
+.toggle::after{
+  content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%;
+  background:var(--text-secondary); transition:transform .22s cubic-bezier(.4,0,.2,1), background .2s ease;
+}
+.toggle.is-on{background:var(--violet-400); border-color:transparent; box-shadow:var(--glow-btn);}
+.toggle.is-on::after{transform:translateX(22px); background:#0B0C18;}
+.toggle.is-disabled{border-color:var(--border-soft); cursor:not-allowed;}
+.toggle.is-disabled::after{background:var(--text-disabled);}
+
+.checkbox{
+  width:26px; height:26px; border-radius:8px; cursor:pointer; position:relative; flex-shrink:0; transition:all .15s ease;
+  background:linear-gradient(var(--bg-0),var(--bg-0)) padding-box, var(--border-gradient) border-box;
+  border:1.5px solid transparent;
+}
+.checkbox.is-checked{background:var(--violet-400); border-color:transparent; box-shadow:var(--glow-btn);}
+.checkbox.is-checked::after{
+  content:""; position:absolute; left:8px; top:4px; width:6px; height:11px;
+  border:solid #0B0C18; border-width:0 2.5px 2.5px 0; transform:rotate(45deg);
+}
+/* the base checkbox border is the violet gradient trick — disabled needs to drop that entirely for a
+   neutral border-soft outline (same recipe as Secondary button disabled), not just fade the violet via opacity */
+.checkbox.is-disabled{background:var(--bg-0); border:1.5px solid var(--border-soft); cursor:not-allowed;}
+
+.radio{
+  width:24px; height:24px; border-radius:50%; cursor:pointer; position:relative; flex-shrink:0; transition:all .15s ease;
+  background:linear-gradient(var(--bg-0),var(--bg-0)) padding-box, var(--border-gradient) border-box;
+  border:1.5px solid transparent;
+}
+.radio.is-checked{border-color:var(--violet-400); box-shadow:var(--glow-btn);}
+.radio.is-checked::after{content:""; position:absolute; inset:5px; border-radius:50%; background:var(--violet-400);}
+/* same recipe as checkbox.is-disabled: drop the gradient-border trick for a flat border-soft ring */
+.radio.is-disabled{background:var(--bg-0); border:1.5px solid var(--border-soft); cursor:not-allowed;}
+
+.option-row{display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 0;}
+.option-row-label{font-size:14.5px; font-weight:600; color:var(--text-primary);}
+
+.segmented{
+  display:inline-flex; padding:4px; border-radius:var(--r-pill); background:var(--bg-0);
+  border:1px solid var(--border-default); position:relative; gap:2px;
+}
+.segmented button{
+  position:relative; z-index:1; border:none; background:transparent; color:var(--text-secondary);
+  font-family:var(--font); font-weight:700; font-size:13.5px; padding:10px 22px; border-radius:var(--r-pill);
+  cursor:pointer; transition:color .2s ease;
+}
+.segmented button.is-active{color:#0B0C18;}
+.segmented-thumb{
+  position:absolute; top:4px; bottom:4px; left:4px; border-radius:var(--r-pill);
+  background:var(--violet-400); box-shadow:var(--glow-btn);
+  transition:transform .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ============ NAVIGATION ============ */
+
+/* 48×8 total (3 dots + 2×4px gaps): short dots #E0DBFF, current/longer dot #8B7CF6, no glow */
+.dots-row{display:flex; align-items:center; gap:4px; height:8px;}
+.dot{width:8px; height:8px; border-radius:var(--r-pill); background:#E0DBFF; border:none; cursor:pointer; transition:all .2s ease;}
+.dot.is-active{width:24px; background:var(--violet-400);}
+
+/* 380×8 total, gap 4 — same two colors as Progress Dots, no glow */
+.progress-steps{display:flex; gap:4px; width:380px; height:8px;}
+.progress-steps span{flex:1; height:8px; border-radius:var(--r-pill); background:#E0DBFF; border:none;}
+.progress-steps span.is-done{background:var(--violet-400);}
+.progress-steps span.is-current{background:var(--violet-400);}
+
+/* Bar shape is a real SVG path (not a CSS rounded-rect): the flat top edge runs to within 10px of the
+   FAB, then a cubic-bezier taper (not a circular-arc fillet) blends into the big dome arc over the FAB.
+   A circular fillet has *constant* curvature, so any radius big enough to look "smooth" also reads as
+   its own little ball glued on next to the FAB — a bezier eases from zero curvature (flat line) up to
+   the dome's curvature with no such lobe. The bezier control points are tangent-matched to the dome
+   arc's actual sweep direction at the join (verified numerically — an earlier version had the tangent
+   backwards, which showed up as a tiny cusp/fork right where the two curves met). Body 412×75 (bottom
+   corners r26, top corners r6, per spec) + 50px of headroom above for the domed FAB — viewBox 412×125,
+   scales with width.
+   No stroke on the path — the glow *is* the edge (fill only, drop-shadow does the outline). */
+.bottombar{position:relative; width:100%; max-width:412px; height:125px;}
+.bottombar-svg{
+  position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+  filter:drop-shadow(0 0 6px rgba(139,124,246,.7)) drop-shadow(0 0 6px rgba(139,124,246,.7));
+  transition:filter .2s ease;
+}
+.bottombar.is-fab-open .bottombar-svg{filter:none;}
+.bottombar-content{
+  position:absolute; left:0; top:50px; width:100%; height:75px; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:space-around; padding:0 var(--sp-3);
+}
+.bottombar-item{
+  display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; cursor:pointer;
+  padding:8px 12px; color:var(--text-secondary); flex:1;
+}
+.bottombar-item img{width:27px; height:27px;}
+.bottombar-item img.icon-active{filter:drop-shadow(0 0 5px #8B7CF6);}
+.bottombar-item span{font-size:10px; font-weight:700; height:12px; opacity:0; transform:translateY(2px); transition:all .2s ease;}
+.bottombar-item.is-active span{opacity:1; transform:translateY(0); color:var(--violet-300);}
+/* flat, no glow — the bar's own outline (above) is what glows now, not the button */
+.bottombar-fab{
+  position:absolute; left:50%; top:50px; transform:translate(-50%,-50%);
+  width:68px; height:68px; border-radius:50%; background:var(--violet-400); box-shadow:none;
+  display:flex; align-items:center; justify-content:center; border:none; cursor:pointer;
+  transition:background .15s ease;
+}
+.bottombar-fab img{width:22px; height:22px;}
+/* tapping the FAB opens a menu/sheet — the + morphs into a white circle with a dark X */
+.bottombar-fab.is-open{background:#FFFFFF;}
+.bottombar-fab.is-open .icon-plus{transform:rotate(45deg);}
+.bottombar-fab.is-open .icon-plus::before, .bottombar-fab.is-open .icon-plus::after{background:#0B0C18;}
+
+/* ============ CARDS ============ */
+
+/* 184×184, r30, "Gradient card small" fill. Two states: default has no border,
+   pressed gets the standard full-strength gradient ring (via a mask-composite ::before,
+   not the padding-box/border-box trick — that would flatten the radial fill behind it). */
+.stat-card{
+  position:relative; width:184px; height:184px; border-radius:30px; background:var(--card-fill-sm);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:0 var(--sp-5); text-align:center; cursor:pointer; transition:transform .15s ease;
+}
+.stat-card::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .15s ease; pointer-events:none;
+}
+.stat-card:active, .stat-card.force-pressed{transform:scale(.98);}
+.stat-card:active::before, .stat-card.force-pressed::before{opacity:1;}
+.stat-icon-ring{
+  width:70px; height:70px; border-radius:50%; margin:0 0 var(--sp-5);
+  background:linear-gradient(var(--bg-0),var(--bg-0)) padding-box, var(--border-gradient-50) border-box;
+  border:1px solid transparent;
+  display:flex; align-items:center; justify-content:center;
+}
+.stat-icon-ring img{width:44px; height:44px;}
+.stat-title{font-family:var(--font-nunito); font-size:20px; font-weight:600; line-height:20px; margin:0 0 6px;}
+.stat-value{font-family:var(--font-nunito); font-size:16px; font-weight:400; line-height:20px; color:rgba(255,255,255,.75); margin:0;}
+
+.mini-tile{
+  position:relative; box-sizing:border-box; width:116px; height:213px; border-radius:30px; background:var(--card-fill-sm);
+  display:flex; flex-direction:column; align-items:center; padding:36px 0;
+  cursor:pointer; transition:transform .15s ease;
+}
+/* no border at rest — pressed gets the same gradient ring as the other cards (mask-composite, keeps card-fill visible underneath) */
+.mini-tile::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0; transition:opacity .15s ease; pointer-events:none;
+}
+.mini-tile:active{transform:scale(.98);}
+.mini-tile:active::before, .mini-tile.force-pressed::before{opacity:1;}
+/* fixed 60×60 frame, image kept at its own intrinsic aspect ratio and flex-centered inside —
+   forcing width+height+object-fit:contain on a wide/short icon (sea-waves) doesn't reliably
+   center it vertically; auto-sized image in a centered flex box does. */
+.mt-icon-frame{width:60px; height:60px; margin:0 0 44px; display:flex; align-items:center; justify-content:center;}
+.mt-icon-frame img{width:60px; height:60px; object-fit:contain; display:block;}
+.mt-text{width:70px; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;}
+.mt-title{font-family:var(--font-nunito); font-weight:400; font-size:16px; line-height:1.1; margin:0; color:var(--text-primary);}
+.mt-time{font-family:var(--font-nunito); font-weight:400; font-size:14px; line-height:1.1; margin:0; color:rgba(255,255,255,.75);}
+
+/* Article link row — 380×112, transparent fill, gradient ring always on (not just pressed,
+   since there's no fill to read the card's edge otherwise). Ring via mask-composite, not the
+   padding-box/border-box trick — that trick needs an opaque inner layer to hide the border-box
+   gradient bleeding through, and this card's interior is genuinely transparent. */
+.list-row{
+  position:relative; box-sizing:border-box; width:380px; height:112px; border-radius:30px;
+  display:flex; align-items:center; padding:0 16px; background:transparent; cursor:pointer;
+  transition:background .15s ease, transform .15s ease;
+}
+.list-row::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none;
+}
+/* pressed — same violet-tint-fill pattern already used for selected/active chrome elsewhere in the kit, plus the usual scale-down press feedback */
+.list-row:active, .list-row.force-pressed{background:rgba(139,124,246,.12); transform:scale(.98);}
+.list-row-icon{width:48px; height:48px; margin-right:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.list-row-icon img{width:28px; height:28px;}
+.list-row-text{width:217px; flex-shrink:0;}
+.list-row-title{font-family:var(--font-nunito); font-weight:600; font-size:18px; line-height:32px; margin:0;}
+.list-row-sub{font-family:var(--font-nunito); font-weight:500; font-size:16px; line-height:1.3; margin:0;}
+.list-row-arrow{width:16px; margin-left:auto;}
+
+/* ============ PERSONALIZATION STEPS ============ */
+.pstep-row{
+  position:relative; display:flex; align-items:center; gap:10px; width:380px; height:78px; box-sizing:border-box;
+  padding:20px 16px; border-radius:20px;
+}
+/* current step: fill 8B7CF6 23% (a real translucent background-color, composited against the page
+   behind it) + the kit's usual gradient border as a separate masked ring on ::before — NOT the
+   padding-box/border-box dual-layer trick, which needs an *opaque* inner layer to hide the gradient;
+   a translucent inner layer just lets the bright gradient show through and washes the whole fill out. */
+.pstep-row.is-active{background:rgba(139,124,246,.23);}
+.pstep-row.is-active::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none;
+}
+/* next step: no fill, border only — placeholder color pending the real "Обводка неактивный" spec, see note */
+.pstep-row.is-inactive{background:none; border:1px solid var(--border-soft);}
+/* done step: same ring-border as active, no fill — just the gradient outline */
+.pstep-row.is-done{background:none; border:1px solid transparent;}
+.pstep-row.is-done::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:var(--border-gradient);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none;
+}
+/* text is flexible by default (Upcoming has no ring, so it can use the full width up to the padding);
+   Active/Done reserve the fixed 236 so there's room for the ring on the right. */
+.pstep-text{flex:1; min-width:0; height:38px; display:flex; flex-direction:column; justify-content:center; gap:4px;}
+.pstep-row.is-active .pstep-text, .pstep-row.is-done .pstep-text{width:236px; flex:none;}
+.pstep-title{font-family:var(--font-nunito); font-size:18px; font-weight:600; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
+.pstep-sub{font-family:var(--font-nunito); font-size:16px; font-weight:500; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
+.pstep-row.is-inactive .pstep-title, .pstep-row.is-inactive .pstep-sub{color:var(--text-tertiary);}
+/* the ring icon's own SVG crop has ~25% empty padding baked in around the visible circle (it's a
+   shared sprite-sheet asset), so sizing the <img> at 38px like the number circle actually renders the
+   *visible* ring noticeably smaller — scale the box up so the ring itself reads as the same size. */
+.pstep-ring{width:48px; height:48px; margin-left:auto; flex-shrink:0;}
+
+/* photo card with the same glow-ring effect as the Article Reader's empty photo slot:
+   inner shadow rgba(5,8,22,.8) blur10 + drop shadow rgba(139,124,246,.3) blur40 spread8 */
+.quote-card{
+  position:relative; width:380px; height:272px; border-radius:30px; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:inset 0 0 10px rgba(5,8,22,.8), 0 0 40px 8px rgba(139,124,246,.3);
+}
+.quote-card-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+.quote-card-content{position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 32px;}
+.quote-card-text{font-family:var(--font-nunito); font-weight:500; font-style:italic; font-size:22px; line-height:1.1; color:#fff; margin:0 0 16px;}
+.quote-card-author{font-family:var(--font-nunito); font-weight:400; font-style:italic; font-size:18px; color:rgba(255,255,255,.75); margin:0 0 10px;}
+.quote-card-actions{display:flex; align-items:center; gap:12px;}
+.quote-card-icon{width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+/* bookmark.svg (solid fill) and forward-arrow.svg (thin outline stroke) read as different visual
+   weights at the same box size — the outline needs to run larger to hold its own next to the solid shape. */
+.quote-card-icon img{width:24px; height:24px; object-fit:contain;}
+.quote-card-icon img[src*="forward-arrow"]{width:29px; height:29px;}
+
+/* Tea Category Card — wider than tall (380×302), standard var(--card-fill). No press-state ring on
+   the card itself anymore: now that it has its own button, the button is the interactive affordance
+   and the card doesn't need to double up with its own pressed treatment. */
+.tea-category-card{
+  box-sizing:border-box; width:380px; height:302px; border-radius:30px; background:var(--card-fill);
+  padding:28px 24px 24px; display:flex; flex-direction:column; align-items:center; text-align:center;
+}
+.tcc-title{font-family:var(--font-nunito); font-weight:700; font-size:19px; line-height:1.3; color:#fff; margin:0 0 12px;}
+.tcc-illustration{width:90px; height:90px; object-fit:contain; margin:0 0 12px;}
+.tcc-desc{font-family:var(--font-nunito); font-weight:400; font-size:14px; line-height:1.4; color:rgba(255,255,255,.75); margin:0 0 16px;}
+/* same recipe as .btn-primary (fill/glow/font-family/weight/line-height) just scaled down for a
+   card-embedded CTA — smaller font-size and a noticeably tighter radius, since r-md at this shorter
+   height read as an almost-full pill instead of a button. */
+.tcc-btn{
+  width:100%; height:44px; border-radius:var(--r-sm); border:none; margin-top:auto;
+  background:var(--violet-400); color:#0B0C18; box-shadow:var(--glow-btn);
+  font-family:var(--font-nunito); font-weight:600; font-size:16px; line-height:1.1;
+  cursor:pointer; transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+}
+.tcc-btn:active{background:var(--violet-300); box-shadow:0 0 15px var(--violet-300); transform:scale(.97);}
+
+/* ============ DATA VIZ ============ */
+/* Biorhythm — one composition, no card/border (sits directly on the app's own starfield background).
+   Axis numbers row, then the SVG curve chart, then the 3 rings row 40px below, rings 40px apart. */
+.biorhythm{width:380px;}
+/* numbers frame: 380×30, 2px above the chart; each number absolutely centered over its own gridline
+   (gridlines sit in the 360-wide chart, which is itself centered in this 380 frame, i.e. inset 10px each side) */
+.biorhythm-axis{position:relative; width:380px; height:30px; margin-bottom:2px;}
+.biorhythm-axis span{
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  font-family:var(--font-nunito); font-weight:600; font-size:16px; color:#FFFFFF; white-space:nowrap;
+}
+.biorhythm-axis .is-today{color:#8B7CF6; font-weight:700; font-size:20px;}
+.biorhythm-chart{display:block; width:360px; height:200px; margin:0 auto;}
+/* 332×112 total, centered under the chart (both share the same 380px-wide parent) — no card/track,
+   just the gradient arc + its own glow on a transparent background. overflow:visible on the ring svg
+   stops the glow from being clipped square against the SVG's own viewBox edges. */
+.biorhythm-rings{width:332px; display:flex; gap:40px; margin:40px auto 0;}
+.br-ring-item{position:relative; display:flex; flex-direction:column; align-items:center;}
+.br-ring-svg{display:block; overflow:visible; transform:rotate(-90deg);}
+.br-pct{
+  position:absolute; top:42px; left:42px; transform:translate(-50%,-50%);
+  font-family:var(--font-nunito); font-weight:500; font-size:16px; color:#fff; white-space:nowrap;
+}
+.br-label{margin-top:8px; font-family:var(--font-nunito); font-weight:400; font-size:16px; color:#FFFFFF;}
+
+/* Resource Meter — always the same violet/pink ring regardless of value (no progress-arc logic, no slider).
+   rr-halo = wide, soft, barely-there ambient glow both outside AND inside the ring (not clipped, so it can breathe)
+   rr-ring = the actual thin ring AND its rotating gradient live on the SAME element (mask + conic-gradient
+             background + the rotate animation, all on .rr-ring) — earlier this was a masked parent rotating
+             an oversized child underneath it, which some browsers fail to repaint per-frame (the mask gets
+             rasterized once and doesn't refresh as the child keeps transforming). Animating the element that
+             owns the mask directly sidesteps that: a circular mask is rotation-invariant, so the only thing
+             that visibly changes frame to frame is the gradient's angle. */
+.resource-ring{position:relative; width:244px; height:244px;}
+.rr-halo{
+  position:absolute; inset:0; border-radius:50%;
+  box-shadow:
+    0 0 50px 12px rgba(139,124,246,.16),
+    0 0 90px 26px rgba(255,198,241,.07),
+    inset 0 0 60px 22px rgba(139,124,246,.18),
+    inset 0 0 32px 8px rgba(255,198,241,.12);
+}
+.rr-ring{
+  position:absolute; inset:0; border-radius:50%; box-sizing:border-box; padding:2px;
+  /* base violet→pink ring with a light-pink (not pure white) glint sitting right in the middle of the
+     pink lobe, baked in as its own color stop — that contrast against the surrounding pink is what
+     reads as motion; the flat 2-colour gradient alone was too gradual to notice moving. */
+  background:conic-gradient(from 0deg,
+    #8B7CF6 0%, #FFC6F1 47%, #FFE3F6 50%, #FFC6F1 53%, #8B7CF6 100%);
+  -webkit-mask:linear-gradient(#fff,#fff) content-box, linear-gradient(#fff,#fff);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  box-shadow:inset 1px 1px 1px rgba(255,255,255,.55), inset -1px -1px 1px rgba(0,0,0,.4);
+  filter:blur(1.2px);
+  animation:rrSpin 5s linear infinite;
+}
+@keyframes rrSpin{ to{ transform:rotate(360deg); } }
+.rr-content{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+.rr-value{font-family:var(--font-nunito); font-weight:600; font-size:64px; line-height:1.1; color:#fff; margin:0 0 8px;}
+.rr-pct{font-size:36px;}
+.rr-caption{font-family:var(--font-nunito); font-weight:400; font-size:16px; line-height:1.1; color:#fff; margin:0;}
+
+/* ============ PATTERNS ============ */
+.mood-card{padding:var(--sp-7); text-align:center; max-width:460px;}
+.mood-title{
+  font-size:26px; font-weight:800; margin:0 0 var(--sp-5); background:var(--grad-heading);
+  -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+}
+/* the mood pictures (assets/mood/*.png) are hollow glow-outline shapes re-extracted from your own
+   Figma exports (clean source, no sprite-sheet grain) — one uniform violet, not tinted per position. */
+.mood-illustration{width:160px; height:160px; margin:0 auto var(--sp-6);}
+.mood-illustration img{width:100%; height:100%; object-fit:contain;}
+/* thumb + line only, no small dots. Everything below (thumb, icons, labels) is absolutely positioned
+   at true 0/25/50/75/100% with translateX(-50%), so every element's CENTRE lands exactly on its stop
+   regardless of its own width — flex space-between centers box EDGES, not centres, which is what
+   caused the icons/labels/thumb to drift out of alignment with each other before. */
+.mood-track{position:relative; margin:0 0 var(--sp-7); height:24px; cursor:pointer;}
+.mood-track::before{content:""; position:absolute; left:0; right:0; top:50%; height:2px; background:rgba(255,255,255,.18); transform:translateY(-50%);}
+.mood-track-fill{
+  position:absolute; left:0; top:50%; height:2px; background:#8B7CF6; transform:translateY(-50%); transition:width .25s ease;
+  box-shadow:0 0 8px #8B7CF6;
+}
+.mood-thumb{
+  position:absolute; top:50%; left:75%; width:22px; height:22px; border-radius:50%; background:#8B7CF6;
+  transform:translate(-50%,-50%); box-shadow:var(--glow-btn); transition:left .25s ease;
+}
+.mood-icons{position:relative; height:34px; margin:0 0 var(--sp-3);}
+.mood-icon-mini{position:absolute; top:0; width:30px; height:30px; object-fit:contain; transform:translateX(-50%);}
+.mood-labels{position:relative; height:16px;}
+.mood-labels span{position:absolute; top:0; transform:translateX(-50%); font-size:12px; color:rgba(255,255,255,.75); font-weight:600; white-space:nowrap;}
+.mood-labels span.is-active{color:#8B7CF6;}
+
+.breath-stage{
+  display:flex; flex-direction:column; align-items:flex-start; gap:var(--sp-1);
+}
+.breath-orb-wrap{width:340px; height:340px; display:flex; align-items:center; justify-content:center; position:relative;}
+/* the orb's own fill is nearly-invisible (#050816 at 3%) — every bit of the visible "glow ball"
+   comes from the effect stack: 1-2 inset shadows (huge blur, which is what fills the whole disc
+   with a soft glow from within) + one outer drop-shadow (the ambient halo). Exact blur/opacity per
+   step below is transcribed straight from your Figma effect panels, not eyeballed. */
+.breath-orb{
+  width:140px; height:140px; border-radius:50%; background:rgba(5,8,22,.03);
+  box-shadow:inset 0 0 24px rgba(139,124,246,.4), inset 0 0 192px rgba(139,124,246,.1), 0 0 80px rgba(139,124,246,.2);
+  transition:width 1s linear, height 1s linear, box-shadow 1s linear;
+}
+.breath-orb-wrap .breath-text{position:absolute; text-align:center; z-index:1;}
+.breath-phase{font-size:18px; font-weight:800;}
+.breath-timer{font-size:13px; color:var(--text-secondary); margin-top:2px;}
+.breath-controls{display:flex; align-items:center; justify-content:center; gap:var(--sp-4); width:340px;}
+
+/* ============ INLINE ICON SHAPES ============ */
+.icon-plus{position:relative; width:30px; height:30px; display:inline-block; transition:transform .2s ease;}
+.icon-plus::before, .icon-plus::after{content:""; position:absolute; background:#FFFFFF; border-radius:2px; transition:background .15s ease;}
+.icon-plus::before{left:0; right:0; top:50%; height:3px; transform:translateY(-50%);}
+.icon-plus::after{top:0; bottom:0; left:50%; width:3px; transform:translateX(-50%);}
+
+.icon-play{
+  width:0; height:0; margin-left:3px;
+  border-top:9px solid transparent; border-bottom:9px solid transparent; border-left:15px solid #0B0C18;
+  display:inline-block; transition:all .15s ease;
+}
+.icon-play.is-pause{
+  width:16px; height:18px; margin-left:0; border:none;
+  background:
+    linear-gradient(#0B0C18,#0B0C18) 0 0/5px 18px no-repeat,
+    linear-gradient(#0B0C18,#0B0C18) 11px 0/5px 18px no-repeat;
+}
+
+/* ============ ARTICLE READER ============ */
+/* Full reading screens, transcribed 1:1 from Figma "Article - Water 1/2/3" (402:2599 → node 605:549 / 627:4543 / 627:4611).
+   1 = cover (vibrant photo, big title over it), 2 = opening (same photo dimmed to 40% as ambient texture,
+   reading text on top), 3 = the recurring template every later page reuses (empty photo slot + paragraph
+   below) — Figma left that slot photo-less since each real page would carry a different image, so per your
+   instruction it's filled here with the article's own water photo, kept at the same dimmed treatment as page 2. */
+.article-screen{
+  position:relative; width:412px; height:849px; border-radius:28px; background:#050816; overflow:hidden; flex-shrink:0;
+}
+.article-back{position:absolute; left:16px; top:24px; width:28px; height:28px;}
+.article-back img{width:100%; height:100%; transform:scaleX(-1);}
+.article-nav-label{position:absolute; top:38px; transform:translateY(-50%); font-family:var(--font-nunito); font-size:14px; font-weight:600; color:#fff; white-space:nowrap;}
+.article-photo{position:absolute; left:16px; top:69px; width:380px; height:740px; border-radius:36px; overflow:hidden;}
+.article-photo img{width:100%; height:100%; object-fit:cover; object-position:bottom;}
+.article-photo.is-cover::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(5,8,22,.55) 0%, rgba(5,8,22,0) 45%);}
+.article-photo.is-dimmed{border:1px solid #515052; box-sizing:border-box;}
+.article-photo.is-dimmed img{opacity:.4;}
+.article-page-counter{
+  position:absolute; left:363px; top:101px; width:17px; display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-family:var(--font-nunito); font-size:14px; font-weight:600; color:#fff; text-align:center;
+}
+.article-page-counter .rule{width:100%; height:2px; background:var(--violet-300);}
+.article-swipe-hint{
+  position:absolute; left:50%; top:727px; transform:translateX(-50%); width:101px;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+.article-swipe-hint .hand-wrap{position:relative; width:28px; height:28px;}
+.article-swipe-hint .hand-wrap img{width:100%; height:100%;}
+.article-swipe-hint .hand-wrap .rule{position:absolute; top:2px; left:19px; width:17px; height:2px; background:var(--violet-300);}
+.article-swipe-hint span{font-family:var(--font-nunito); font-size:14px; font-weight:500; color:var(--violet-300);}
+.article-tag{position:absolute; left:32px; top:101px;}
+.article-title{
+  position:absolute; left:32px; top:345px; transform:translateY(-50%); width:323px;
+  font-family:var(--font-nunito); font-weight:300; font-size:48px; line-height:1; color:#fff; margin:0;
+}
+.article-desc{
+  position:absolute; left:32px; top:460px; transform:translateY(-50%); width:260px;
+  font-family:var(--font-nunito); font-weight:400; font-size:14px; line-height:1.3; color:#fff; margin:0;
+}
+.article-readtime{position:absolute; left:28px; top:511px; display:flex; align-items:center; gap:4px;}
+.article-readtime img{width:28px; height:28px;}
+.article-readtime span{font-family:var(--font-nunito); font-size:14px; color:var(--violet-300);}
+.article-pullquote{
+  position:absolute; left:32px; top:282px; transform:translateY(-50%); width:323px;
+  font-family:var(--font-nunito); font-weight:400; font-size:32px; line-height:1; color:#fff; margin:0;
+}
+.article-body{
+  position:absolute; left:32px; width:348px; transform:translateY(-50%);
+  font-family:var(--font-nunito); font-weight:400; font-size:18px; line-height:1.3; letter-spacing:-.2px; color:#fff; margin:0;
+}
+.article-body p{margin:0 0 1.3em;}
+.article-body p:last-child{margin-bottom:0;}
+
+@media (max-width: 1000px){
+  .kit-sidebar{display:none;}
+  .kit-content{padding:var(--sp-7) var(--sp-5) 120px;}
+  .kit-grid-icons{grid-template-columns:repeat(4,1fr);}
+  .kit-grid-6, .kit-grid-5, .kit-grid-4{grid-template-columns:repeat(2,1fr);}
+}
