@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
 
 /* ============ TOKENS ============ */
 :root{
@@ -78,7 +78,6 @@
   --glow-chart-pink:0 0 6px #FFD8F6;
   --glow-chart-violet:0 0 6px #B6ABFF;
 
-  --font:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
   --font-nunito:'Nunito Sans',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
@@ -87,7 +86,7 @@ html,body{margin:0;padding:0;}
 body{
   background:var(--bg-0);
   color:var(--text-primary);
-  font-family:var(--font);
+  font-family:var(--font-nunito);
   -webkit-font-smoothing:antialiased;
   min-height:100vh;
 }
@@ -192,11 +191,10 @@ button{font-family:inherit;}
 
 /* ============ FOUNDATIONS: TYPE ============ */
 /* Sizes/weights below are sourced from the components actually built in this kit (not an aspirational
-   scale) — Display = .article-title, H1 = .mood-title (largest 800-weight headline in use), H2 =
-   .article-pullquote, H3 = .moonsun-title, Body L = .list-row-sub/.pstep-sub, Body M = .article-desc/
-   .tcc-desc, Caption = .tag-pill/.mood-labels. Font is Nunito Sans throughout — it's what every real
-   title/body/label in the kit is set in (--font/Manrope is only used for a few interactive-chrome
-   controls: buttons, inputs, segmented control). */
+   scale) — Display = .article-title, H1 = .article-pullquote, H2 = .mood-title (largest 800-weight
+   headline in use), H3 = .moonsun-title, Body L = .list-row-sub/.pstep-sub, Body M = .article-desc/
+   .tcc-desc, Caption = .tag-pill/.mood-labels. Font is Nunito Sans everywhere in the kit — no second
+   font (Manrope was removed 2026-07-30). */
 .type-row{
   display:grid; grid-template-columns:120px 90px 1fr; align-items:center; gap:var(--sp-5);
   padding:var(--sp-5) 0; border-bottom:1px solid var(--border-soft);
@@ -293,7 +291,7 @@ button{font-family:inherit;}
 /* ============ BUTTONS ============ */
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  border:none; cursor:pointer; font-family:var(--font); font-weight:700; font-size:15px;
+  border:none; cursor:pointer; font-family:var(--font-nunito); font-weight:700; font-size:15px;
   border-radius:var(--r-pill); padding:0 26px; height:52px;
   transition:transform .12s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease, border-color .15s ease, color .15s ease, filter .15s ease;
   user-select:none;
@@ -431,7 +429,7 @@ button{font-family:inherit;}
    "disabled" signal here. */
 .field-input{
   height:64px; border-radius:var(--r-sm); background:var(--bg-0); border:1.5px solid var(--border-default);
-  color:var(--text-primary); font-family:var(--font); font-size:18px; font-weight:500; padding:0 20px;
+  color:var(--text-primary); font-family:var(--font-nunito); font-size:18px; font-weight:500; padding:0 20px;
   outline:none; transition:all .15s ease; width:100%;
 }
 .field-input::placeholder{color:var(--text-tertiary);}
@@ -490,7 +488,7 @@ button{font-family:inherit;}
 }
 .segmented button{
   position:relative; z-index:1; border:none; background:transparent; color:var(--text-secondary);
-  font-family:var(--font); font-weight:700; font-size:13.5px; padding:10px 22px; border-radius:var(--r-pill);
+  font-family:var(--font-nunito); font-weight:700; font-size:13.5px; padding:10px 22px; border-radius:var(--r-pill);
   cursor:pointer; transition:color .2s ease;
 }
 .segmented button.is-active{color:#0B0C18;}

@@ -46,6 +46,6 @@ Common thread: they want the app to explain *why* they feel a certain way, witho
 ## Local folder usage rules
 - **`Claude AI/v1/`** — do not use for design elements anymore (the design-system doc there is outdated). Wireframes under v1 are still fine. The v1 research (personas/job-stories/CJM/concept) matches Figma, but prefer Figma directly.
 - **`Claude AI/v2/Для создания ui kit/`** — use this for design elements (`Элементы и экраны/` exported PNGs/SVGs, `Вайрфреймы/`).
-- **`UI Kit/`** — the live static HTML/CSS/JS component-doc build (`index.html`, `css/style.css`, `js/main.js`, `assets/`). Source of truth for exact tokens/values already shipped there. Font: Manrope. As of 2026-07-19, `assets/icons-clean/` (default + `-alt` active-state icon pairs) is the current icon set, fully wired into the Icons and Navigation sections.
+- **`UI Kit/`** — the live static HTML/CSS/JS component-doc build (`index.html`, `css/style.css`, `js/main.js`, `assets/`). Source of truth for exact tokens/values already shipped there. Font: Nunito Sans (the whole kit — no second font). As of 2026-07-19, `assets/icons-clean/` (default + `-alt` active-state icon pairs) is the current icon set, fully wired into the Icons and Navigation sections.
 - **`Вайрфреймы/`** (top level) — canonical wireframe screenshots, ~28 screens.
 - **`Референсы/`** — competitor/inspiration screenshots (Bettersleep, Clue, Co-Star, Reflectly, Stoic, etc.) — neutral, fine to use regardless of v1/v2.

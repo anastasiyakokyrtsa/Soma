@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.textSecondary,
+    fontFamily: type.bodyL.fontFamily,
     fontSize: type.bodyL.fontSize,
-    fontWeight: type.bodyL.fontWeight,
   },
 });
