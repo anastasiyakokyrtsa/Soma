@@ -3,19 +3,20 @@ import { Canvas, Circle, Blur, Group } from '@shopify/react-native-skia';
 import { useSharedValue, withDelay, withRepeat, withSequence, withTiming, Easing, useDerivedValue } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native';
 
-// Sparse, mostly-static starfield — a handful of soft points scattered behind the
-// splash logo, most fixed, a few slowly twinkling. Deliberately kept low-count and
-// low-contrast per spec ("не прям много", "слегка мерцающие") — this isn't meant
-// to read as a busy pattern, just faint ambient depth.
+// Sparse starfield behind the splash logo — meant to read as "looking up at a clear
+// night sky from below": mostly tiny, bright pinpoints, a few slightly bigger ones
+// with a soft glow, most static, a minority twinkling with a real brightness swing.
 
 type Star = {
   x: number;
   y: number;
   r: number;
   baseOpacity: number;
+  glow: boolean;
   twinkle: boolean;
   duration: number;
   delay: number;
+  dip: number;
 };
 
 // fixed seed-ish pseudo-random so the layout doesn't reshuffle on every re-render
@@ -26,15 +27,20 @@ function makeStars(width: number, height: number, count: number): Star[] {
     return seed / 233280;
   };
   return Array.from({ length: count }, () => {
-    const twinkle = rand() < 0.4;
+    // mostly tiny pinpoints, occasional slightly bigger "near" star
+    const big = rand() < 0.2;
+    const r = big ? 0.9 + rand() * 0.7 : 0.3 + rand() * 0.5;
+    const twinkle = rand() < 0.45;
     return {
       x: rand() * width,
       y: rand() * height,
-      r: 0.8 + rand() * 1.7,
-      baseOpacity: 0.25 + rand() * 0.45,
+      r,
+      baseOpacity: 0.55 + rand() * 0.45,
+      glow: big,
       twinkle,
-      duration: 2500 + rand() * 2500,
-      delay: rand() * 2000,
+      duration: 2200 + rand() * 3000,
+      delay: rand() * 3000,
+      dip: 0.1 + rand() * 0.25,
     };
   });
 }
@@ -48,7 +54,7 @@ function Star({ star }: { star: Star }) {
       star.delay,
       withRepeat(
         withSequence(
-          withTiming(0.25, { duration: star.duration / 2, easing: Easing.inOut(Easing.quad) }),
+          withTiming(star.dip, { duration: star.duration / 2, easing: Easing.inOut(Easing.quad) }),
           withTiming(1, { duration: star.duration / 2, easing: Easing.inOut(Easing.quad) })
         ),
         -1,
@@ -63,13 +69,18 @@ function Star({ star }: { star: Star }) {
   return (
     <Group opacity={opacity}>
       <Circle cx={star.x} cy={star.y} r={star.r} color="white">
-        {star.r > 1.6 ? <Blur blur={0.6} /> : null}
+        {star.glow ? <Blur blur={1.2} /> : null}
       </Circle>
+      {star.glow && (
+        <Circle cx={star.x} cy={star.y} r={star.r * 2.2} color="white" opacity={0.25}>
+          <Blur blur={2.5} />
+        </Circle>
+      )}
     </Group>
   );
 }
 
-export function StarField({ width, height, count = 18 }: { width: number; height: number; count?: number }) {
+export function StarField({ width, height, count = 26 }: { width: number; height: number; count?: number }) {
   const stars = useMemo(() => makeStars(width, height, count), [width, height, count]);
   return (
     <Canvas style={[StyleSheet.absoluteFillObject, { width, height }]}>
