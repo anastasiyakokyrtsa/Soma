@@ -160,8 +160,12 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animationKey]);
 
+  // Built as an explicit arc starting at 12 o'clock (-90°) sweeping 360° clockwise —
+  // NOT Skia's addCircle, whose own start point/winding direction doesn't match the
+  // dot's angle formula below, which was the root cause of the dot drifting out of
+  // sync with the ring's trimmed (drawn) arc.
   const ringPath = Skia.Path.Make();
-  ringPath.addCircle(CX, CY, R);
+  ringPath.addArc(Skia.XYWHRect(CX - R, CY - R, R * 2, R * 2), -90, 360);
 
   const outerOpacity = useDerivedValue(() => interpolateStops(draw.value, DRAW_GLOW_STOPS, DRAW_GLOW_VALUES) * pulseRing0.value);
   const midOpacity = useDerivedValue(() => interpolateStops(draw.value, DRAW_GLOW_STOPS, DRAW_GLOW_VALUES) * pulseRing1.value);
