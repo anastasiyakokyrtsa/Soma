@@ -11,7 +11,13 @@ import {
   NunitoSans_800ExtraBold,
 } from '@expo-google-fonts/nunito-sans';
 import { RootNavigator } from './navigation/RootNavigator';
+import { SplashScreen } from './screens/SplashScreen';
 import { colors } from './theme';
+
+// TEMP: showing the splash screen standalone for review, per the current task —
+// swap back to <RootNavigator /> (or wire a timed handoff between the two once
+// the splash is approved) when moving on to the rest of the app.
+const REVIEWING_SPLASH = true;
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -33,7 +39,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <RootNavigator />
+      {REVIEWING_SPLASH ? <SplashScreen /> : <RootNavigator />}
       <StatusBar style="light" />
     </SafeAreaProvider>
   );
