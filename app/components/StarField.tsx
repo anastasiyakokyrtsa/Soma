@@ -1,18 +1,21 @@
 import { useEffect, useMemo } from 'react';
-import { Canvas, Circle, Group } from '@shopify/react-native-skia';
+import { Canvas, Circle, Blur, Group } from '@shopify/react-native-skia';
 import { useSharedValue, withDelay, withRepeat, withSequence, withTiming, Easing, useDerivedValue } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native';
 
 // Sparse starfield behind the splash logo — meant to read as "looking up at a clear
 // night sky from below": tiny, crisp, bright pinpoints scattered evenly across the
 // whole screen, most static, a minority twinkling with a real brightness swing.
-// No blur/glow on any star — that read as "out of focus" rather than "bright".
+// A handful of stars are bigger — kept crisp (only a hair of blur, just enough to
+// stop a small circle looking jagged, not the earlier heavy glow-halo treatment
+// that read as "out of focus").
 
 type Star = {
   x: number;
   y: number;
   r: number;
   baseOpacity: number;
+  big: boolean;
   twinkle: boolean;
   duration: number;
   delay: number;
@@ -56,13 +59,19 @@ function makeStars(width: number, height: number, count: number): Star[] {
     [cells[i], cells[j]] = [cells[j], cells[i]];
   }
 
-  return cells.slice(0, count).map(({ cx, cy }) => {
+  // ~5 big stars — cells are already in shuffled (random) order, so just tagging
+  // the first few after trimming gives a random, well-scattered subset.
+  const bigCount = Math.min(5, Math.round(count / 9));
+
+  return cells.slice(0, count).map(({ cx, cy }, i) => {
+    const big = i < bigCount;
     const twinkle = rand() < 0.45;
     return {
       x: cx + rand() * cellW,
       y: cy + rand() * cellH,
-      r: 0.3 + rand() * 0.5,
+      r: big ? 1.3 + rand() * 0.6 : 0.3 + rand() * 0.5,
       baseOpacity: 0.55 + rand() * 0.45,
+      big,
       twinkle,
       duration: 2200 + rand() * 3000,
       delay: rand() * 3000,
@@ -94,12 +103,14 @@ function Star({ star }: { star: Star }) {
 
   return (
     <Group opacity={opacity}>
-      <Circle cx={star.x} cy={star.y} r={star.r} color="white" />
+      <Circle cx={star.x} cy={star.y} r={star.r} color="white">
+        {star.big ? <Blur blur={0.5} /> : null}
+      </Circle>
     </Group>
   );
 }
 
-export function StarField({ width, height, count = 34 }: { width: number; height: number; count?: number }) {
+export function StarField({ width, height, count = 48 }: { width: number; height: number; count?: number }) {
   const stars = useMemo(() => makeStars(width, height, count), [width, height, count]);
   return (
     <Canvas style={[StyleSheet.absoluteFillObject, { width, height }]}>
