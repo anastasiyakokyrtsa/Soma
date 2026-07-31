@@ -25,7 +25,7 @@ import { View, StyleSheet } from 'react-native';
 // "Логотип с анимацией" file) — same constants/timeline/colors, just re-expressed
 // as Skia + Reanimated since RN can't run embedded SVG <style>/SMIL animation.
 // Native SVG filters (feGaussianBlur/feMorphology) aren't 1:1 in Skia either —
-// the orbiting dot's glow is approximated with two stacked blurred circles
+// the orbiting dot's glow is approximated with three stacked blurred circles
 // instead of the original's dilate+double-blend filter chain, and the 4-layer
 // text glow stack is approximated with 2 passes (blurred halo + crisp). Skia's
 // Text has no letter-spacing prop, so "Soma" is laid out char-by-char to match
@@ -181,34 +181,40 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
     <View style={[styles.wrap, { width: size, height: size }]}>
       <Canvas style={{ width: size, height: size }}>
         <Group transform={[{ scale }]}>
-          {/* Outer halo */}
+          {/* Outer halo — trimmed to the same arc as the dot's progress, not a full faint circle
+              from frame 0, so the glow visibly leads/trails the dot instead of "already being there" */}
           <Group opacity={outerOpacity}>
-            <Path path={ringPath} style="stroke" strokeWidth={22} color={C_OUTER} opacity={0.28}>
+            <Path path={ringPath} style="stroke" strokeWidth={22} color={C_OUTER} opacity={0.28} start={0} end={coreEnd}>
               <Blur blur={18} />
             </Path>
           </Group>
           {/* Mid glow */}
           <Group opacity={midOpacity}>
-            <Path path={ringPath} style="stroke" strokeWidth={9} color={C_MID} opacity={0.6}>
+            <Path path={ringPath} style="stroke" strokeWidth={9} color={C_MID} opacity={0.6} start={0} end={coreEnd}>
               <Blur blur={8} />
             </Path>
           </Group>
           {/* Inner glow */}
           <Group opacity={innerOpacity}>
-            <Path path={ringPath} style="stroke" strokeWidth={3.5} color={C_INNER} opacity={0.9}>
+            <Path path={ringPath} style="stroke" strokeWidth={3.5} color={C_INNER} opacity={0.9} start={0} end={coreEnd}>
               <Blur blur={3} />
             </Path>
           </Group>
           {/* Core crisp ring — actually draws (trims) rather than just fading */}
           <Path path={ringPath} style="stroke" strokeWidth={1.2} color="white" start={0} end={coreEnd} />
 
-          {/* Orbital dot — soft halo behind + bright core, approximating the source's dilate+blur filter */}
+          {/* Orbital dot — 3-layer glow (wide soft halo, tighter mid glow, bright core) so it reads
+              as a real glowing point rather than a faint smudge; sits exactly at the drawn arc's
+              tip since it shares the same `draw`/coreEnd progress value as the ring above. */}
           <Group opacity={dotOpacity}>
-            <Circle cx={dotCx} cy={dotCy} r={dotR} color={C_DOT} opacity={0.55}>
-              <Blur blur={14} />
+            <Circle cx={dotCx} cy={dotCy} r={dotR} color={C_OUTER} opacity={0.45}>
+              <Blur blur={16} />
+            </Circle>
+            <Circle cx={dotCx} cy={dotCy} r={dotR} color={C_DOT} opacity={0.9}>
+              <Blur blur={6} />
             </Circle>
             <Circle cx={dotCx} cy={dotCy} r={dotR} color="white">
-              <Blur blur={5} />
+              <Blur blur={1.5} />
             </Circle>
           </Group>
 
