@@ -63,7 +63,7 @@ function makeStars(width: number, height: number, count: number): Star[] {
   // the first few after trimming gives a random, well-scattered subset.
   const bigCount = Math.min(5, Math.round(count / 9));
 
-  return cells.slice(0, count).map(({ cx, cy }, i) => {
+  const gridStars = cells.slice(0, count).map(({ cx, cy }, i) => {
     const big = i < bigCount;
     const twinkle = rand() < 0.45;
     return {
@@ -78,6 +78,29 @@ function makeStars(width: number, height: number, count: number): Star[] {
       dip: 0.1 + rand() * 0.25,
     };
   });
+
+  // The grid's cols/rows don't always tile a tall phone screen evenly — the top-right
+  // corner in particular read as sparse. A couple of hand-placed stars there, on top
+  // of the grid, rather than reworking the tiling math for one corner.
+  const topRightExtras = [
+    { fx: 0.82, fy: 0.05 },
+    { fx: 0.93, fy: 0.12 },
+  ].map(({ fx, fy }) => {
+    const twinkle = rand() < 0.45;
+    return {
+      x: fx * width,
+      y: fy * height,
+      r: 0.3 + rand() * 0.5,
+      baseOpacity: 0.55 + rand() * 0.45,
+      big: false,
+      twinkle,
+      duration: 2200 + rand() * 3000,
+      delay: rand() * 3000,
+      dip: 0.1 + rand() * 0.25,
+    };
+  });
+
+  return [...gridStars, ...topRightExtras];
 }
 
 function Star({ star }: { star: Star }) {
