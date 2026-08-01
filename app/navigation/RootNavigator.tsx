@@ -1,13 +1,15 @@
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors } from '../theme';
-import { PlaceholderScreen } from '../screens/PlaceholderScreen';
+import { MainTabs } from './MainTabs';
+import { AboutApp1Screen } from '../screens/onboarding/AboutApp1Screen';
+import { AboutApp2Screen } from '../screens/onboarding/AboutApp2Screen';
+import { AboutApp3Screen } from '../screens/onboarding/AboutApp3Screen';
 
-// Placeholder tab bar — replace with the kit's real Bottom Bar (SVG dome shape,
-// FAB, active-icon glow) once that component is ported. Screens/onboarding stack
-// (2 branches: Научный/Астрологический) still need building on top of this.
-const Tab = createBottomTabNavigator();
+// Single stack for the whole app: onboarding screens, then "Main" (the tab
+// navigator). AboutApp3 calls navigation.replace('Main') so onboarding isn't
+// left in the back-stack once the user is past it.
+const Stack = createNativeStackNavigator();
 
 const navTheme = {
   ...DarkTheme,
@@ -21,41 +23,15 @@ const navTheme = {
   },
 };
 
-function TabNavigator() {
-  // bottom-tabs is supposed to pad itself for the device's safe area automatically,
-  // but that wasn't landing on Android (labels sat flush against the gesture bar) —
-  // sizing the bar off the real inset here instead of trusting the library default.
-  const insets = useSafeAreaInsets();
-  // floor it at 16 even if the device reports a 0 inset, so labels never sit
-  // flush against the physical edge regardless of gesture-nav vs 3-button nav
-  const bottomPad = Math.max(insets.bottom, 16);
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.bg0,
-          borderTopColor: colors.borderSoft,
-          height: 56 + bottomPad,
-          paddingTop: 8,
-          paddingBottom: bottomPad,
-        },
-        tabBarActiveTintColor: colors.violet300,
-        tabBarInactiveTintColor: colors.textTertiary,
-      }}
-    >
-      <Tab.Screen name="Home">{() => <PlaceholderScreen label="Главный экран" />}</Tab.Screen>
-      <Tab.Screen name="Journal">{() => <PlaceholderScreen label="Дневник" />}</Tab.Screen>
-      <Tab.Screen name="Stats">{() => <PlaceholderScreen label="Статистика" />}</Tab.Screen>
-      <Tab.Screen name="Profile">{() => <PlaceholderScreen label="Профиль" />}</Tab.Screen>
-    </Tab.Navigator>
-  );
-}
-
 export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
-      <TabNavigator />
+      <Stack.Navigator initialRouteName="AboutApp1" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="AboutApp1" component={AboutApp1Screen} />
+        <Stack.Screen name="AboutApp2" component={AboutApp2Screen} />
+        <Stack.Screen name="AboutApp3" component={AboutApp3Screen} />
+        <Stack.Screen name="Main" component={MainTabs} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

@@ -21,6 +21,9 @@ export const colors = {
   violet500: '#7B6FF0',
   violet600: '#6355D6',
   violet700: '#4C41B0',
+  // inactive progress-dot fill — from the "About app" onboarding screens (Figma),
+  // distinct from violet200, not seen in the kit's own token set before this
+  dotInactive: '#E0DBFF',
 
   pink300: '#FBD3F1',
   pink400: '#F3A6E0',
@@ -59,6 +62,9 @@ export const gradients = {
 export const glow = {
   card: { color: 'rgba(0,0,0,0.45)', offset: { x: 0, y: 8 }, blur: 30 },
   btn: { color: '#8B7CF6', blur: 15 },
+  // onboarding primary button specifically specs a softer 7.5px glow, not the
+  // kit-wide 15px --glow-btn — kept as its own literal value per Figma
+  btnSoft: { color: '#8B7CF6', blur: 7.5 },
   chartGreen: { color: '#7DE8C4', blur: 6 },
   chartPink: { color: '#FFD8F6', blur: 6 },
   chartViolet: { color: '#B6ABFF', blur: 6 },
