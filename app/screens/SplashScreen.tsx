@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors } from '../theme';
 import { SomaLogoAnimation } from '../components/SomaLogoAnimation';
 import { StarField } from '../components/StarField';
@@ -8,13 +9,14 @@ import { StarField } from '../components/StarField';
 // "Логотип с анимацией" Figma Make file. See SomaLogoAnimation.tsx for what's
 // exact vs. approximated in the port.
 //
-// Auto-advances into onboarding once the logo animation has had time to play
-// out: ring draws in (~4.4s after the 0.6s start delay) + text bloom (~2s more,
-// done ~6.9s in) + a good stretch of the breathing pulse (~1.3 cycles, PULSE_DUR
-// is 3s) so it doesn't feel rushed, before handing off. If SomaLogoAnimation's
-// timeline constants change, revisit ADVANCE_DELAY_MS too. The actual screen
-// transition (fade, not slide/scale) is configured on the stack navigator.
-const ADVANCE_DELAY_MS = 11000;
+// Auto-advances into onboarding once the logo has fully formed and "breathed"
+// 3 times. From SomaLogoAnimation's own constants: the breathing pulse starts
+// at PULSE_START = TEXT_DELAY(4.9s) + 0.8s = 5.7s, each cycle is PULSE_DUR =
+// 3.0s — so 3 full cycles land at 5.7 + 3*3.0 = 14.7s. If those constants
+// change, recompute this. The screen transition itself (fade) is handled by
+// this screen's own entering animation, not the navigator's native transition
+// — see OnboardingSlide.tsx for why.
+const ADVANCE_DELAY_MS = 14700;
 
 export function SplashScreen({ navigation }: any) {
   const { width, height } = useWindowDimensions();
@@ -27,10 +29,13 @@ export function SplashScreen({ navigation }: any) {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={styles.container}
+      entering={FadeIn.duration(600).easing(Easing.inOut(Easing.cubic))}
+    >
       <StarField width={width} height={height} count={18} />
       <SomaLogoAnimation size={390} />
-    </View>
+    </Animated.View>
   );
 }
 

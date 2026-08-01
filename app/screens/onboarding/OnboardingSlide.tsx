@@ -1,5 +1,6 @@
 import { View, Text, Image, Pressable, StyleSheet, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, glow, type, fontFamily, spacing } from '../../theme';
 import { ProgressDots } from '../../components/ProgressDots';
 
@@ -15,6 +16,11 @@ import { ProgressDots } from '../../components/ProgressDots';
 // back, when a back target is given. Story-style navigation, chosen over a
 // back arrow so the screen stays free of chrome beyond the dots (see
 // memory/project_app_development.md for the reasoning).
+//
+// Screen-transition smoothness: native-stack's per-screen `animationDuration`
+// is iOS-only (Android always uses its own default fade timing/curve, which
+// read as too abrupt) — so the actual "smooth fade" is this component's own
+// entering animation instead, identical on both platforms.
 export function OnboardingSlide({
   image,
   title,
@@ -39,7 +45,10 @@ export function OnboardingSlide({
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={styles.container}
+      entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}
+    >
       <View style={[styles.dotsRow, { paddingTop: insets.top + 40 }]}>
         <ProgressDots count={totalDots} activeIndex={activeIndex} />
       </View>
@@ -74,7 +83,7 @@ export function OnboardingSlide({
           </Pressable>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

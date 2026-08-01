@@ -28,9 +28,13 @@ const navTheme = {
 export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
+      {/* animation: 'none' — each screen fades its own content in via Reanimated
+          (see OnboardingSlide.tsx/SplashScreen.tsx), so the native transition
+          would just double up on top of that, not fully controllable on
+          Android anyway (animationDuration is iOS-only). */}
       <Stack.Navigator
         initialRouteName="Splash"
-        screenOptions={{ headerShown: false, animation: 'fade' }}
+        screenOptions={{ headerShown: false, animation: 'none' }}
       >
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="AboutApp1" component={AboutApp1Screen} />

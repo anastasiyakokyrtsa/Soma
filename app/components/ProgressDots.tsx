@@ -18,8 +18,8 @@ function Dot({ active }: { active: boolean }) {
 
   useEffect(() => {
     progress.value = withTiming(active ? 1 : 0, {
-      duration: 320,
-      easing: Easing.out(Easing.cubic),
+      duration: 480,
+      easing: Easing.inOut(Easing.cubic),
     });
   }, [active, progress]);
 
