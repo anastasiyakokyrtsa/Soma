@@ -9,6 +9,7 @@ export function AboutApp2Screen({ navigation }: any) {
       buttonLabel="Далее"
       activeIndex={1}
       onPressNext={() => navigation.navigate('AboutApp3')}
+      onPressBack={() => navigation.navigate('AboutApp1')}
       onPressLogin={() => {}}
     />
   );

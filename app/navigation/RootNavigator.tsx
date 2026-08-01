@@ -28,7 +28,10 @@ const navTheme = {
 export function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="Splash"
+        screenOptions={{ headerShown: false, animation: 'fade' }}
+      >
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="AboutApp1" component={AboutApp1Screen} />
         <Stack.Screen name="AboutApp2" component={AboutApp2Screen} />

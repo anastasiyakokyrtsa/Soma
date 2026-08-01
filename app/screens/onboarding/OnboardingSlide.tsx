@@ -1,6 +1,6 @@
 import { View, Text, Image, Pressable, StyleSheet, ImageSourcePropType } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, glow, type, fontFamily } from '../../theme';
+import { colors, glow, type, fontFamily, spacing } from '../../theme';
 import { ProgressDots } from '../../components/ProgressDots';
 
 // Shared layout for the "About app" onboarding slides (Figma: About app / About
@@ -9,6 +9,12 @@ import { ProgressDots } from '../../components/ProgressDots';
 // reference frame: dots pinned near the top (safe-area + 40, matching the
 // reference's 92px - 52px status bar), art fills the middle, text+CTA block is
 // bottom-anchored — this adapts across real device heights instead of one frame.
+//
+// Tap-to-navigate: the whole area above the text block (dots + art) is split
+// into left/right halves — tap right = next (same as the button), tap left =
+// back, when a back target is given. Story-style navigation, chosen over a
+// back arrow so the screen stays free of chrome beyond the dots (see
+// memory/project_app_development.md for the reasoning).
 export function OnboardingSlide({
   image,
   title,
@@ -17,6 +23,7 @@ export function OnboardingSlide({
   activeIndex,
   totalDots = 3,
   onPressNext,
+  onPressBack,
   onPressLogin,
 }: {
   image: ImageSourcePropType;
@@ -26,6 +33,7 @@ export function OnboardingSlide({
   activeIndex: number;
   totalDots?: number;
   onPressNext: () => void;
+  onPressBack?: () => void;
   onPressLogin: () => void;
 }) {
   const insets = useSafeAreaInsets();
@@ -38,9 +46,18 @@ export function OnboardingSlide({
 
       <View style={styles.imageZone}>
         <Image source={image} style={styles.image} resizeMode="cover" />
+
+        <View style={styles.tapZones} pointerEvents="box-none">
+          <Pressable
+            style={styles.tapZoneLeft}
+            disabled={!onPressBack}
+            onPress={onPressBack}
+          />
+          <Pressable style={styles.tapZoneRight} onPress={onPressNext} />
+        </View>
       </View>
 
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + 24 }]}>
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + 60 }]}>
         <View style={styles.textBlock}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.description}>{description}</Text>
@@ -73,13 +90,24 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing.screenPadding,
   },
   image: {
     width: '100%',
     height: '100%',
   },
+  tapZones: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: 'row',
+  },
+  tapZoneLeft: {
+    flex: 2,
+  },
+  tapZoneRight: {
+    flex: 3,
+  },
   bottom: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.screenPadding,
   },
   textBlock: {
     gap: 4,

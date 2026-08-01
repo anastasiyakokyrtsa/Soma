@@ -10,9 +10,11 @@ import { StarField } from '../components/StarField';
 //
 // Auto-advances into onboarding once the logo animation has had time to play
 // out: ring draws in (~4.4s after the 0.6s start delay) + text bloom (~2s more,
-// done ~6.9s in) + a beat to actually read "Soma" before moving on. If
-// SomaLogoAnimation's timeline constants change, revisit ADVANCE_DELAY_MS too.
-const ADVANCE_DELAY_MS = 8000;
+// done ~6.9s in) + a good stretch of the breathing pulse (~1.3 cycles, PULSE_DUR
+// is 3s) so it doesn't feel rushed, before handing off. If SomaLogoAnimation's
+// timeline constants change, revisit ADVANCE_DELAY_MS too. The actual screen
+// transition (fade, not slide/scale) is configured on the stack navigator.
+const ADVANCE_DELAY_MS = 11000;
 
 export function SplashScreen({ navigation }: any) {
   const { width, height } = useWindowDimensions();

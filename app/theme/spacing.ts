@@ -10,6 +10,10 @@ export const spacing = {
   sp8: 40,
   sp9: 48,
   sp10: 64,
+  // App-wide horizontal screen margin, decided 2026-08-01 (was 16/sp4, felt
+  // cramped against the phone edge) — same value as sp5, named for clarity so
+  // future screens reach for this instead of picking a spacing step by feel.
+  screenPadding: 20,
 } as const;
 
 // Ported 1:1 from --r-* in UI Kit/css/style.css, plus the `card` swatch added
