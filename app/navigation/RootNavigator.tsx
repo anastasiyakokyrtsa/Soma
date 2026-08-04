@@ -6,6 +6,10 @@ import { SplashScreen } from '../screens/SplashScreen';
 import { AboutApp1Screen } from '../screens/onboarding/AboutApp1Screen';
 import { AboutApp2Screen } from '../screens/onboarding/AboutApp2Screen';
 import { AboutApp3Screen } from '../screens/onboarding/AboutApp3Screen';
+import { NameScreen } from '../screens/onboarding/NameScreen';
+import { EmailScreen } from '../screens/onboarding/EmailScreen';
+import { GenderScreen } from '../screens/onboarding/GenderScreen';
+import { SupportScreen } from '../screens/onboarding/SupportScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -40,6 +44,10 @@ export function RootNavigator() {
         <Stack.Screen name="AboutApp1" component={AboutApp1Screen} />
         <Stack.Screen name="AboutApp2" component={AboutApp2Screen} />
         <Stack.Screen name="AboutApp3" component={AboutApp3Screen} />
+        <Stack.Screen name="Name" component={NameScreen} />
+        <Stack.Screen name="Email" component={EmailScreen} />
+        <Stack.Screen name="Gender" component={GenderScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>
