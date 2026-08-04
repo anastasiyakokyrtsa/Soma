@@ -72,12 +72,15 @@ export function OnboardingSlide({
           <Text style={styles.description}>{description}</Text>
         </View>
 
-        <Pressable style={styles.button} onPress={onPressNext}>
+        <Pressable
+          style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+          onPress={onPressNext}
+        >
           <Text style={styles.buttonLabel}>{buttonLabel}</Text>
         </Pressable>
 
         <View style={styles.loginRow}>
-          <Text style={styles.loginText}>У меня уже есть аккаунт </Text>
+          <Text style={styles.loginText}>У меня уже есть аккаунт </Text>
           <Pressable onPress={onPressLogin}>
             <Text style={styles.loginLink}>Войти</Text>
           </Pressable>
@@ -125,13 +128,13 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: type.h3.fontFamily,
     fontSize: type.h3.fontSize,
-    lineHeight: type.h3.fontSize * 1.2,
+    lineHeight: type.h3.fontSize * 1.0,
     color: colors.textPrimary,
   },
   description: {
     fontFamily: fontFamily.regular, // Nunito Sans Regular, per Figma spec (not bodyL/medium)
     fontSize: 20,
-    lineHeight: 20 * 1.2,
+    lineHeight: 20 * 1.1,
     color: colors.textPrimary,
   },
   button: {
@@ -142,6 +145,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // supported cross-platform (iOS + Android) by RN's Fabric renderer
     boxShadow: `0px 0px ${glow.btnSoft.blur}px ${glow.btnSoft.color}`,
+  },
+  // Ports .btn-primary:active (style.css ~L307) — was missing here too (same
+  // gap as OnboardingStepLayout's button, fixed 2026-08-04).
+  buttonPressed: {
+    backgroundColor: colors.violet300,
+    boxShadow: `0px 0px 15px ${colors.violet300}`,
+    transform: [{ scale: 0.97 }],
   },
   buttonLabel: {
     fontFamily: fontFamily.semiBold, // Nunito Sans SemiBold, per Figma spec
