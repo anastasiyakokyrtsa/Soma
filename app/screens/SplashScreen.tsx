@@ -10,13 +10,13 @@ import { StarField } from '../components/StarField';
 // exact vs. approximated in the port.
 //
 // Auto-advances into onboarding once the logo has fully formed and "breathed"
-// 3 times. From SomaLogoAnimation's own constants: the breathing pulse starts
+// 2 times. From SomaLogoAnimation's own constants: the breathing pulse starts
 // at PULSE_START = TEXT_DELAY(4.9s) + 0.8s = 5.7s, each cycle is PULSE_DUR =
-// 3.0s — so 3 full cycles land at 5.7 + 3*3.0 = 14.7s. If those constants
+// 3.0s — so 2 full cycles land at 5.7 + 2*3.0 = 11.7s. If those constants
 // change, recompute this. The screen transition itself (fade) is handled by
 // this screen's own entering animation, not the navigator's native transition
 // — see OnboardingSlide.tsx for why.
-const ADVANCE_DELAY_MS = 14700;
+const ADVANCE_DELAY_MS = 11700;
 
 export function SplashScreen({ navigation }: any) {
   const { width, height } = useWindowDimensions();
