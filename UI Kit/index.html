@@ -371,10 +371,20 @@
       <div class="kit-section-head"><h2 class="kit-section-title">Inputs &amp; Controls</h2></div>
 
       <div class="kit-block">
-        <p class="kit-block-title">Text Field</p>
+        <p class="kit-block-title">Text Field — the small caption above each box is just this doc's swatch label; the floating text inside the field is the real component</p>
         <div class="kit-grid kit-grid-2">
-          <div class="field"><span class="field-label">Default</span><input class="field-input" placeholder="Имя"></div>
-          <div class="field"><span class="field-label">Focus</span><input class="field-input force-focus" placeholder="Имя" value="Анастасия"></div>
+          <div class="field">
+            <span class="field-label">Default (empty)</span>
+            <div class="field-wrap"><input class="field-input" placeholder=" "><span class="field-float-label">Имя</span></div>
+          </div>
+          <div class="field">
+            <span class="field-label">Focus</span>
+            <div class="field-wrap"><input class="field-input force-focus" placeholder=" " value="Анастасия"><span class="field-float-label">Имя</span></div>
+          </div>
+          <div class="field">
+            <span class="field-label">Filled, blurred — label hides once there's a committed value</span>
+            <div class="field-wrap"><input class="field-input force-filled" placeholder=" " value="Анастасия"><span class="field-float-label">Имя</span></div>
+          </div>
           <div class="field"><span class="field-label">Error</span><input class="field-input force-error" value="ana@"><span class="field-hint is-error">Проверь адрес почты</span></div>
           <div class="field"><span class="field-label">Disabled</span><input class="field-input" value="Недоступно" disabled></div>
         </div>

@@ -378,11 +378,14 @@ button{font-family:inherit;}
 /* Selection Chip — onboarding multi-select ("В чем тебе больше всего нужна поддержка?"), text-only,
    stays toggled once picked. Own design (this onboarding screen had no existing Figma spec to match).
    Selected = thin border only, no fill/glow — kept deliberately quiet since several of these can be
-   selected at once on screen. */
+   selected at once on screen. Sized down from an earlier 48px/20px-padding/14px-font pass (app
+   feedback 2026-08-04): with a dozen chips of very different lengths, the bigger size only fit ~2 per
+   row and left ragged empty space — smaller chips pack more per line, reading as a denser, more
+   balanced set instead of a sparse list. */
 .select-chip{
-  display:inline-flex; align-items:center; height:48px; padding:0 20px;
+  display:inline-flex; align-items:center; height:38px; padding:0 14px;
   border-radius:var(--r-pill); background:var(--bg-0); border:1px solid var(--border-default);
-  color:var(--text-primary); font-size:14px; font-weight:600; cursor:pointer;
+  color:var(--text-primary); font-size:13px; font-weight:600; cursor:pointer;
   transition:all .15s ease; user-select:none;
 }
 .select-chip.is-selected, .select-chip.force-selected{
@@ -422,21 +425,45 @@ button{font-family:inherit;}
 /* ============ INPUTS ============ */
 .field{display:flex; flex-direction:column; gap:8px; width:100%;}
 .field-label{font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.06em;}
-/* Default border uses --border-default (shared with Selection Chip / Toggle Off / Segment control)
-   so it reads as present/interactive without going all the way to violet. Focus (typing) picks up the
-   Secondary-button violet-400 1.5px border. Disabled = border-soft 1.5px + muted text color only — no
-   opacity fade, that made the value unreadable; the dimmer text/border color already carries the
-   "disabled" signal here. */
+/* Border thinned 1.5 -> 1.05px (30% thinner, app feedback 2026-08-04) and the
+   idle color is shared with .field-float-label below — box and hint read as
+   one quiet, present-but-not-shouting resting state instead of two different
+   grays. Focus (typing) picks up the Secondary-button violet-400 border, same
+   thickness. Disabled = border-soft + muted text color only — no opacity
+   fade, that made the value unreadable; the dimmer text/border color already
+   carries the "disabled" signal here. Filled-but-blurred is intentionally NOT
+   a distinct border color anymore (that was tried and reverted) — see
+   .field-float-label for what actually signals "this field has a value." */
 .field-input{
-  height:64px; border-radius:var(--r-sm); background:var(--bg-0); border:1.5px solid var(--border-default);
+  height:64px; border-radius:var(--r-sm); background:var(--bg-0); border:1.05px solid var(--border-default);
   color:var(--text-primary); font-family:var(--font-nunito); font-size:18px; font-weight:500; padding:0 20px;
-  outline:none; transition:all .15s ease; width:100%;
+  outline:none; transition:border-color .15s ease; width:100%;
 }
-.field-input::placeholder{color:var(--text-tertiary);}
 .field-input:focus, .field-input.force-focus{border-color:var(--violet-400);}
-.field-input.force-filled{border-color:var(--border-soft);}
 .field-input.force-error, .field-input.is-error{border-color:var(--red-400); box-shadow:0 0 0 3px rgba(240,132,127,.12);}
 .field-input:disabled, .field-input.force-disabled{background:var(--bg-0); border-color:var(--border-soft); color:var(--text-disabled); cursor:not-allowed;}
+
+/* Floating label — replaces a plain placeholder. Give the input an invisible
+   `placeholder=" "` (a single space, just to make the :placeholder-shown
+   trick below work) and put the real hint text in a sibling
+   .field-float-label span instead. Three states, matching the RN component:
+     - empty, unfocused:  centered over the input like a normal placeholder
+     - focused:           floats up to a small violet-300 caption
+     - filled, unfocused: hidden entirely (opacity 0) — a committed value
+       doesn't need a label anymore, so nothing is shown but the value.
+   `.force-focus` is paired with real `:focus` throughout (can't script a
+   real focus state for a static swatch); the filled/hidden rule works off
+   the input's real value via :placeholder-shown, no force-class needed. */
+.field-wrap{position:relative; width:100%;}
+.field-float-label{
+  position:absolute; left:20px; top:22px; font-family:var(--font-nunito); font-weight:500; font-size:18px;
+  color:var(--border-default); pointer-events:none; opacity:1;
+  transition:top .18s ease-out, font-size .18s ease-out, color .18s ease-out, opacity .18s ease-out;
+}
+.field-input:focus ~ .field-float-label, .field-input.force-focus ~ .field-float-label{
+  top:8px; font-size:12px; color:var(--violet-300);
+}
+.field-input:not(:placeholder-shown):not(:focus):not(.force-focus) ~ .field-float-label{opacity:0;}
 .field-hint{font-size:12px; color:var(--text-tertiary);}
 .field-hint.is-error{color:var(--red-400);}
 
