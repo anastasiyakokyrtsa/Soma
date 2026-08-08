@@ -123,6 +123,18 @@ document.querySelectorAll('[data-radio-group]').forEach(group => {
   });
 });
 
+// Expandable Choice Card — like the radio group above, but clicking the
+// already-open card closes it again (the RN version's "tap to deselect").
+document.querySelectorAll('[data-accordion-group]').forEach(group => {
+  group.querySelectorAll('[data-accordion-item]').forEach(item => {
+    item.addEventListener('click', () => {
+      const wasExpanded = item.classList.contains('is-expanded');
+      group.querySelectorAll('[data-accordion-item]').forEach(i => i.classList.remove('is-expanded'));
+      if (!wasExpanded) item.classList.add('is-expanded');
+    });
+  });
+});
+
 // ============ SEGMENTED CONTROL ============
 function initSegmented(root) {
   const thumb = root.querySelector('.segmented-thumb');
