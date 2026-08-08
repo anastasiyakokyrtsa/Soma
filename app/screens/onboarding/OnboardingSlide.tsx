@@ -66,7 +66,7 @@ export function OnboardingSlide({
         </View>
       </View>
 
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + 60 }]}>
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + 32 }]}>
         <View style={styles.textBlock}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.description}>{description}</Text>
@@ -137,9 +137,11 @@ const styles = StyleSheet.create({
     lineHeight: 20 * 1.1,
     color: colors.textPrimary,
   },
+  // height/radius 62/20 -> 54/16, bottom offset 60 -> 32 (see `bottom` above)
+  // — rolled out app-wide 2026-08-07 after trialing on Visual style alone.
   button: {
-    height: 62,
-    borderRadius: 20,
+    height: 54,
+    borderRadius: 16,
     backgroundColor: colors.violet400,
     alignItems: 'center',
     justifyContent: 'center',
