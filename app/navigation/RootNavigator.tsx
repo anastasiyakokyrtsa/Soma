@@ -10,6 +10,10 @@ import { NameScreen } from '../screens/onboarding/NameScreen';
 import { EmailScreen } from '../screens/onboarding/EmailScreen';
 import { GenderScreen } from '../screens/onboarding/GenderScreen';
 import { SupportScreen } from '../screens/onboarding/SupportScreen';
+import { ChooseApproachScreen } from '../screens/onboarding/ChooseApproachScreen';
+import { VisualStyleScreen } from '../screens/onboarding/VisualStyleScreen';
+import { StylePreviewScreen } from '../screens/onboarding/StylePreviewScreen';
+import { DevMenuScreen } from '../screens/DevMenuScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -37,9 +41,13 @@ export function RootNavigator() {
           would just double up on top of that, not fully controllable on
           Android anyway (animationDuration is iOS-only). */}
       <Stack.Navigator
-        initialRouteName="Splash"
+        // __DEV__-only: start on a screen picker instead of Splash so
+        // reviewing one specific screen in Expo Go doesn't mean replaying
+        // the whole onboarding flow every time. Never true in a real build.
+        initialRouteName={__DEV__ ? 'DevMenu' : 'Splash'}
         screenOptions={{ headerShown: false, animation: 'none' }}
       >
+        {__DEV__ ? <Stack.Screen name="DevMenu" component={DevMenuScreen} /> : null}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="AboutApp1" component={AboutApp1Screen} />
         <Stack.Screen name="AboutApp2" component={AboutApp2Screen} />
@@ -48,6 +56,9 @@ export function RootNavigator() {
         <Stack.Screen name="Email" component={EmailScreen} />
         <Stack.Screen name="Gender" component={GenderScreen} />
         <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="ChooseApproach" component={ChooseApproachScreen} />
+        <Stack.Screen name="VisualStyle" component={VisualStyleScreen} />
+        <Stack.Screen name="StylePreview" component={StylePreviewScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>

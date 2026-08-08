@@ -40,8 +40,15 @@ function mulberry32(seed: number) {
 // randomness reads as clumpy by chance (this is what produced the "stars stuck in
 // two corners" complaint even with a decent PRNG). One star per cell, randomly
 // offset within the cell, guarantees even coverage while still looking organic.
-function makeStars(width: number, height: number, count: number): Star[] {
+function makeStars(
+  width: number,
+  height: number,
+  count: number,
+  twinkleChance: number,
+  dipRange: [number, number]
+): Star[] {
   const rand = mulberry32(1337);
+  const dip = () => dipRange[0] + rand() * (dipRange[1] - dipRange[0]);
   const cols = Math.round(Math.sqrt((count * width) / height));
   const rows = Math.ceil(count / cols);
   const cellW = width / cols;
@@ -65,7 +72,7 @@ function makeStars(width: number, height: number, count: number): Star[] {
 
   const gridStars = cells.slice(0, count).map(({ cx, cy }, i) => {
     const big = i < bigCount;
-    const twinkle = rand() < 0.45;
+    const twinkle = rand() < twinkleChance;
     return {
       x: cx + rand() * cellW,
       y: cy + rand() * cellH,
@@ -75,7 +82,7 @@ function makeStars(width: number, height: number, count: number): Star[] {
       twinkle,
       duration: 2200 + rand() * 3000,
       delay: rand() * 3000,
-      dip: 0.1 + rand() * 0.25,
+      dip: dip(),
     };
   });
 
@@ -86,7 +93,7 @@ function makeStars(width: number, height: number, count: number): Star[] {
     { fx: 0.82, fy: 0.05 },
     { fx: 0.93, fy: 0.12 },
   ].map(({ fx, fy }) => {
-    const twinkle = rand() < 0.45;
+    const twinkle = rand() < twinkleChance;
     return {
       x: fx * width,
       y: fy * height,
@@ -96,7 +103,7 @@ function makeStars(width: number, height: number, count: number): Star[] {
       twinkle,
       duration: 2200 + rand() * 3000,
       delay: rand() * 3000,
-      dip: 0.1 + rand() * 0.25,
+      dip: dip(),
     };
   });
 
@@ -133,8 +140,28 @@ function Star({ star }: { star: Star }) {
   );
 }
 
-export function StarField({ width, height, count = 48 }: { width: number; height: number; count?: number }) {
-  const stars = useMemo(() => makeStars(width, height, count), [width, height, count]);
+// twinkleChance/dipRange default to the splash screen's original tuning
+// (~45% of stars twinkle, dipping to 10-35% opacity) — overridable per call
+// site. Added 2026-08-08 for the Cosmos style-picker swatch, which wanted
+// visibly more shimmer than the splash's calmer night-sky feel ("пусть
+// звёзды больше сияют") without changing how the splash itself looks.
+export function StarField({
+  width,
+  height,
+  count = 48,
+  twinkleChance = 0.45,
+  dipRange = [0.1, 0.35],
+}: {
+  width: number;
+  height: number;
+  count?: number;
+  twinkleChance?: number;
+  dipRange?: [number, number];
+}) {
+  const stars = useMemo(
+    () => makeStars(width, height, count, twinkleChance, dipRange),
+    [width, height, count, twinkleChance, dipRange]
+  );
   return (
     <Canvas style={[StyleSheet.absoluteFillObject, { width, height }]}>
       {stars.map((s, i) => (

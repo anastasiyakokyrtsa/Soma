@@ -33,9 +33,7 @@ export function SupportScreen({ navigation }: any) {
       title="В чем тебе больше всего нужна поддержка?"
       description="Можно выбрать несколько вариантов. Советуем начать с 2-3 самых актуальных пунктов"
       buttonDisabled={selected.length === 0}
-      // TODO: next stop is "Choose an approach" (WF 10-11, Научный/Астрологический
-      // branch) once that's built — replace('Main') is a temporary terminus.
-      onPressNext={() => navigation.replace('Main')}
+      onPressNext={() => navigation.navigate('ChooseApproach')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >
