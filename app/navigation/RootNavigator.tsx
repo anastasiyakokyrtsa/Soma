@@ -13,6 +13,12 @@ import { SupportScreen } from '../screens/onboarding/SupportScreen';
 import { ChooseApproachScreen } from '../screens/onboarding/ChooseApproachScreen';
 import { VisualStyleScreen } from '../screens/onboarding/VisualStyleScreen';
 import { StylePreviewScreen } from '../screens/onboarding/StylePreviewScreen';
+import { PersonalizationScreen } from '../screens/onboarding/PersonalizationScreen';
+import { ProfileStartScreen } from '../screens/onboarding/ProfileStartScreen';
+import { ProfileDateOfBirthScreen } from '../screens/onboarding/ProfileDateOfBirthScreen';
+import { ProfileSleepScheduleScreen } from '../screens/onboarding/ProfileSleepScheduleScreen';
+import { ProfileMenstrualCycleScreen } from '../screens/onboarding/ProfileMenstrualCycleScreen';
+import { ProfileMoodScreen } from '../screens/onboarding/ProfileMoodScreen';
 import { DevMenuScreen } from '../screens/DevMenuScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
@@ -59,6 +65,12 @@ export function RootNavigator() {
         <Stack.Screen name="ChooseApproach" component={ChooseApproachScreen} />
         <Stack.Screen name="VisualStyle" component={VisualStyleScreen} />
         <Stack.Screen name="StylePreview" component={StylePreviewScreen} />
+        <Stack.Screen name="Personalization" component={PersonalizationScreen} />
+        <Stack.Screen name="ProfileStart" component={ProfileStartScreen} />
+        <Stack.Screen name="ProfileDateOfBirth" component={ProfileDateOfBirthScreen} />
+        <Stack.Screen name="ProfileSleepSchedule" component={ProfileSleepScheduleScreen} />
+        <Stack.Screen name="ProfileMenstrualCycle" component={ProfileMenstrualCycleScreen} />
+        <Stack.Screen name="ProfileMood" component={ProfileMoodScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>

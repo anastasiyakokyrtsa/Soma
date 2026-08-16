@@ -18,6 +18,12 @@ const ROUTES = [
   'ChooseApproach',
   'VisualStyle',
   'StylePreview',
+  'Personalization',
+  'ProfileStart',
+  'ProfileDateOfBirth',
+  'ProfileSleepSchedule',
+  'ProfileMenstrualCycle',
+  'ProfileMood',
   'Main',
 ];
 

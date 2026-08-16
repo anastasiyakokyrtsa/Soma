@@ -272,6 +272,13 @@
       </div>
 
       <div class="kit-block">
+        <p class="kit-block-title">Astrolabe</p>
+        <div class="kit-grid kit-grid-4">
+          <div><div class="illus-tile"><img src="assets/illustrations/astrolabe.png" alt=""></div><div class="swatch-label">Profile - Start</div></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
         <p class="kit-block-title">Onboarding</p>
         <div class="kit-grid kit-grid-4">
           <div><div class="illus-tile photo"><img src="assets/illustrations/picture-for-onboarding-screen-1.png" alt=""></div><div class="swatch-label">Onboarding 1</div></div>
@@ -446,6 +453,56 @@
           <button>Месяц</button>
           <button>Год</button>
         </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Date Wheel Picker — scroll a column (ported from app/components/DateWheelPicker.tsx, WF17 "Когда ты родился?")</p>
+        <div class="wheel-picker">
+          <div class="wheel-hairline wheel-hairline-top"></div>
+          <div class="wheel-hairline wheel-hairline-bottom"></div>
+          <div class="wheel-col" data-wheel="day"></div>
+          <div class="wheel-col wheel-col-month" data-wheel="month"></div>
+          <div class="wheel-col wheel-col-year" data-wheel="year"></div>
+        </div>
+      </div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Sleep Duration Dial — static reference, drag lives in the app (ported from app/components/SleepWheelPicker.tsx, WF18 "Какой у тебя обычно график сна?")</p>
+        <svg class="sleep-dial" width="300" height="300" viewBox="0 0 300 300" fill="none">
+          <defs>
+            <linearGradient id="sleepArcGradKit" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFC6F1"/>
+              <stop offset="50%" stop-color="#A89CF8"/>
+              <stop offset="100%" stop-color="#8B7CF6"/>
+            </linearGradient>
+            <linearGradient id="sleepTextGradKit" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="25%" stop-color="#FFC6F1"/>
+              <stop offset="70%" stop-color="#A89CF8"/>
+              <stop offset="100%" stop-color="#8B7CF6"/>
+            </linearGradient>
+            <filter id="sleepGlowKit" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="20"/>
+            </filter>
+          </defs>
+          <circle cx="150" cy="150" r="134" stroke="rgba(139,124,246,0.27)" stroke-width="32" fill="none"/>
+          <path d="M 150.00 16.00 A 134 134 0 1 1 20.57 184.68" stroke="url(#sleepArcGradKit)" stroke-width="32" stroke-linecap="round" fill="none" filter="url(#sleepGlowKit)"/>
+          <path d="M 150.00 16.00 A 134 134 0 1 1 20.57 184.68" stroke="url(#sleepArcGradKit)" stroke-width="32" stroke-linecap="round" fill="none"/>
+          <line x1="201.00" y1="61.67" x2="205.00" y2="54.74" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="238.33" y1="99.00" x2="245.26" y2="95.00" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="238.33" y1="201.00" x2="245.26" y2="205.00" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="201.00" y1="238.33" x2="205.00" y2="245.26" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="99.00" y1="238.33" x2="95.00" y2="245.26" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="61.67" y1="201.00" x2="54.74" y2="205.00" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="61.67" y1="99.00" x2="54.74" y2="95.00" stroke="#D9D9D9" stroke-width="2"/>
+          <line x1="99.00" y1="61.67" x2="95.00" y2="54.74" stroke="#D9D9D9" stroke-width="2"/>
+          <text x="150" y="50.22" font-family="Nunito Sans" font-weight="600" font-size="14" fill="#FFFFFF" text-anchor="middle">12</text>
+          <text x="260" y="155.11" font-family="Nunito Sans" font-weight="600" font-size="14" fill="#FFFFFF" text-anchor="end">3</text>
+          <text x="150" y="257.2" font-family="Nunito Sans" font-weight="600" font-size="14" fill="#FFFFFF" text-anchor="middle">6</text>
+          <text x="40" y="155.11" font-family="Nunito Sans" font-weight="600" font-size="14" fill="#FFFFFF" text-anchor="start">9</text>
+          <text x="150" y="143" font-family="Nunito Sans" font-weight="600" font-size="26" fill="url(#sleepTextGradKit)" text-anchor="middle">8 ч 30 мин</text>
+          <text x="150" y="168" font-family="Nunito Sans" font-weight="400" font-size="16" fill="#FFFFFF" text-anchor="middle">Длительность</text>
+          <text x="150" y="188" font-family="Nunito Sans" font-weight="400" font-size="16" fill="#FFFFFF" text-anchor="middle">сна</text>
+        </svg>
       </div>
 
     </section>

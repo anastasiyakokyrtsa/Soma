@@ -556,6 +556,39 @@ button{font-family:inherit;}
   transition:transform .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1);
 }
 
+/* ============ DATE WHEEL PICKER ============ */
+/* ported from app/components/DateWheelPicker.tsx (WF17) — real native scroll-snap here instead of
+   the app's Reanimated-driven fade, but same 44px row height / 5 visible rows / fade-toward-edges
+   feel (via a mask-image on the column instead of per-row opacity). js/main.js populates the 3
+   columns and keeps the true-center row at full opacity+scale on scroll. */
+.wheel-picker{position:relative; display:flex; justify-content:center; align-items:center; gap:4px; height:220px;}
+.wheel-col{
+  width:64px; height:220px; overflow-y:auto; scroll-snap-type:y mandatory;
+  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+  mask-image:linear-gradient(to bottom, transparent, #000 32%, #000 68%, transparent);
+  scrollbar-width:none; text-align:right;
+}
+.wheel-col::-webkit-scrollbar{display:none;}
+.wheel-col-month{width:140px; text-align:center;}
+.wheel-col-year{width:80px; text-align:left;}
+.wheel-row{
+  height:44px; display:flex; align-items:center; justify-content:center;
+  scroll-snap-align:center; font-family:var(--font-nunito); font-weight:600; font-size:20px;
+  color:var(--text-primary); opacity:.4; transform:scale(.82); transition:opacity .15s ease, transform .15s ease;
+}
+.wheel-row.is-center{opacity:1; transform:scale(1);}
+.wheel-hairline{position:absolute; left:8px; right:8px; height:1px; background:var(--border-soft); pointer-events:none;}
+.wheel-hairline-top{top:88px;}
+.wheel-hairline-bottom{top:132px;}
+
+/* ============ SLEEP DURATION DIAL ============ */
+/* ported from app/components/SleepWheelPicker.tsx (WF18) — exact numbers from her own Figma panel
+   (node 402:2915): 300x300 reference, ring r=134 (centered-stroke equivalent of an inside-aligned
+   32px stroke on a 150 outer radius), gradient arc stops 0/50/100% #FFC6F1→#A89CF8→#8B7CF6, track
+   8B7CF6 @ 27%, real Gaussian blur glow (not layered-opacity) stdDeviation 20, numbers/ticks each 8px
+   from the ring's own inner edge. Static swatch only — the drag interaction lives in the app. */
+.sleep-dial{display:block; margin:0 auto;}
+
 /* ============ NAVIGATION ============ */
 
 /* 48×8 total (3 dots + 2×4px gaps): short dots #E0DBFF, current/longer dot #8B7CF6, no glow */
@@ -706,7 +739,9 @@ button{font-family:inherit;}
   -webkit-mask-composite:xor; mask-composite:exclude;
   pointer-events:none;
 }
-/* next step: no fill, border only — placeholder color pending the real "Обводка неактивный" spec, see note */
+/* upcoming step: no fill, border-soft outline + dimmed text (.pstep-row.is-inactive .pstep-title/.pstep-sub
+   below) — confirmed against the real Figma frame data while building PersonalizationScreen.tsx
+   (2026-08-09), no longer a placeholder. */
 .pstep-row.is-inactive{background:none; border:1px solid var(--border-soft);}
 /* done step: same ring-border as active, no fill — just the gradient outline */
 .pstep-row.is-done{background:none; border:1px solid transparent;}
@@ -724,10 +759,14 @@ button{font-family:inherit;}
 .pstep-title{font-family:var(--font-nunito); font-size:18px; font-weight:600; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
 .pstep-sub{font-family:var(--font-nunito); font-size:16px; font-weight:500; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
 .pstep-row.is-inactive .pstep-title, .pstep-row.is-inactive .pstep-sub{color:var(--text-tertiary);}
-/* the ring icon's own SVG crop has ~25% empty padding baked in around the visible circle (it's a
-   shared sprite-sheet asset), so sizing the <img> at 38px like the number circle actually renders the
-   *visible* ring noticeably smaller — scale the box up so the ring itself reads as the same size. */
-.pstep-ring{width:48px; height:48px; margin-left:auto; flex-shrink:0;}
+/* progress-circle.svg/-alt.svg used to ship as a shared sprite-sheet crop with ~25% empty padding
+   baked in around the visible ring, so sizing the <img> at 38px like the number circle rendered the
+   *visible* ring noticeably smaller — the box was scaled up to 48px to compensate. Building the real
+   Personalization screen (app/screens/onboarding/PersonalizationScreen.tsx) surfaced that this read as
+   a mismatched size once actually placed next to the badge (2026-08-09 review: "прогресс бар...
+   становится меньше"). Fixed at the source instead: both SVGs now ship pre-cropped tight to the ring's
+   own bounds, so 38px here means the same 38px as the badge, no compensation needed. */
+.pstep-ring{width:38px; height:38px; margin-left:auto; flex-shrink:0;}
 
 /* photo card with the same glow-ring effect as the Article Reader's empty photo slot:
    inner shadow rgba(5,8,22,.8) blur10 + drop shadow rgba(139,124,246,.3) blur40 spread8 */

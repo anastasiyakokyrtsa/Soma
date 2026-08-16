@@ -25,10 +25,8 @@ export function VisualStyleScreen({ navigation }: any) {
         navigation.navigate('StylePreview', { initialId: VISUAL_STYLES[selected!].id })
       }
       // TODO: applying a non-Cosmos style doesn't actually re-theme the app
-      // yet (see theme/visualStyles.ts) — Main is also the real next step
-      // once Home exists, this isn't a temporary stub the way earlier
-      // screens' onPressNext were.
-      onPressNext={() => navigation.replace('Main')}
+      // yet (see theme/visualStyles.ts).
+      onPressNext={() => navigation.replace('Personalization')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >

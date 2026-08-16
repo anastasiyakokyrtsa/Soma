@@ -188,7 +188,7 @@ export function StylePreviewScreen({ navigation, route }: any) {
             },
             pressed && styles.buttonPressed,
           ]}
-          onPress={() => navigation.replace('Main')}
+          onPress={() => navigation.replace('Personalization')}
         >
           <Text style={[styles.buttonLabel, { fontFamily: mood.buttonFont, color: mood.onAccent }]}>
             Применить стиль

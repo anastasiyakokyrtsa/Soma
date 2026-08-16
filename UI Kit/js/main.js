@@ -154,6 +154,47 @@ function initSegmented(root) {
 }
 document.querySelectorAll('.segmented').forEach(initSegmented);
 
+// ============ DATE WHEEL PICKER ============
+// Ported from app/components/DateWheelPicker.tsx (WF17) — real native
+// scroll-snap here instead of the app's Reanimated-driven per-row
+// opacity/scale, but the same 44px row height / 5 visible rows and the
+// same "true-center row reads full strength" idea (toggled via
+// .is-center on scroll instead of an interpolated style).
+(function initDateWheelPickers() {
+  const ROW_HEIGHT = 44;
+  const VISIBLE_ROWS = 5;
+  const PAD = ROW_HEIGHT * ((VISIBLE_ROWS - 1) / 2);
+  const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1));
+  const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  const YEARS = Array.from({ length: 2015 - 1940 + 1 }, (_, i) => String(1940 + i));
+  // Same default as the app's own ProfileDateOfBirthScreen (14 июня 1995).
+  const COLUMNS = {
+    day: { list: DAYS, index: 13 },
+    month: { list: MONTHS, index: 5 },
+    year: { list: YEARS, index: 55 },
+  };
+
+  document.querySelectorAll('[data-wheel]').forEach((col) => {
+    const { list, index } = COLUMNS[col.dataset.wheel];
+    col.style.paddingTop = PAD + 'px';
+    col.style.paddingBottom = PAD + 'px';
+    list.forEach((label) => {
+      const row = document.createElement('div');
+      row.className = 'wheel-row';
+      row.textContent = label;
+      col.appendChild(row);
+    });
+    const rows = [...col.children];
+    const updateCenter = () => {
+      const centerIndex = Math.round(col.scrollTop / ROW_HEIGHT);
+      rows.forEach((row, i) => row.classList.toggle('is-center', i === centerIndex));
+    };
+    col.addEventListener('scroll', updateCenter, { passive: true });
+    col.scrollTop = index * ROW_HEIGHT;
+    updateCenter();
+  });
+})();
+
 // ============ BOTTOM NAV ============
 const bottomNav = document.getElementById('bottomNav');
 if (bottomNav) {
