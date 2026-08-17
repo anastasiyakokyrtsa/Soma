@@ -22,7 +22,11 @@ export function ProfileMoodScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
+  // 14, same as ProfileDateOfBirthScreen/ProfileMenstrualCycleScreen's own
+  // wrap - MoodScale's own top content (the mood-word title) is flush with
+  // its own top edge, so 16(content)+14 = 30 lands the same gap those
+  // screens use (was 24, giving 40 - noticeably more; 2026-08-17 review).
   wrap: {
-    marginTop: 24,
+    marginTop: 14,
   },
 });

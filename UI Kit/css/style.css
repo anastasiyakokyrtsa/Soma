@@ -589,6 +589,37 @@ button{font-family:inherit;}
    from the ring's own inner edge. Static swatch only — the drag interaction lives in the app. */
 .sleep-dial{display:block; margin:0 auto;}
 
+/* ============ CALENDAR RANGE PICKER ============ */
+/* ported from app/components/CalendarRangePicker.tsx (WF19) — static reference (one hardcoded
+   month + range), the actual month grid/range-selection logic lives in the app. 336px card, 7
+   equal-width (48px) columns, 36px day circle centered in each 48px cell. Endpoint squares use
+   r-xs (10px, soft corners) not a full circle - and the range pill's own left/width are inset by
+   (48-36)/2 = 6px so its edges land on the endpoint squares' real edges, not the wider cell edges
+   (2026-08-17: "подложка... вылазит немного за первую и последнюю цифру" - the same overflow fix
+   ported here). Pill color rgba(139,124,246,.12) matches the app's other translucent-violet
+   "selected" fills (OptionRow/SelectChip/nav-chip pressed state), not the 0.16 it started at. */
+.cal-card{width:336px;}
+.cal-header{display:flex; align-items:center; justify-content:space-between;}
+.cal-nav-btn{
+  width:32px; height:32px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+  background:none; border:none; cursor:pointer; padding:0;
+}
+.cal-nav-btn img{width:16px; height:16px;}
+.cal-month-label{font-family:var(--font-nunito); font-weight:600; font-size:16px; color:var(--text-primary);}
+.cal-weekdays{display:grid; grid-template-columns:repeat(7,1fr); margin-top:20px;}
+.cal-weekday{text-align:center; font-family:var(--font-nunito); font-weight:500; font-size:13px; color:var(--text-tertiary);}
+.cal-week{position:relative; display:grid; grid-template-columns:repeat(7,1fr);}
+.cal-pill{position:absolute; top:4px; bottom:4px; background:rgba(139,124,246,.12);}
+.cal-pill.is-round-left{border-top-left-radius:var(--r-xs); border-bottom-left-radius:var(--r-xs);}
+.cal-pill.is-round-right{border-top-right-radius:var(--r-xs); border-bottom-right-radius:var(--r-xs);}
+.cal-day{height:44px; display:flex; align-items:center; justify-content:center;}
+.cal-day-circle{
+  width:36px; height:36px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-nunito); font-weight:500; font-size:15px; color:var(--text-primary);
+}
+.cal-day.is-dim .cal-day-circle{color:var(--text-disabled);}
+.cal-day.is-endpoint .cal-day-circle{border-radius:var(--r-xs); background:var(--violet-400); color:var(--bg-0); font-weight:600;}
+
 /* ============ NAVIGATION ============ */
 
 /* 48×8 total (3 dots + 2×4px gaps): short dots #E0DBFF, current/longer dot #8B7CF6, no glow */
@@ -883,9 +914,10 @@ button{font-family:inherit;}
    regardless of its own width — flex space-between centers box EDGES, not centres, which is what
    caused the icons/labels/thumb to drift out of alignment with each other before. */
 .mood-track{position:relative; margin:0 0 var(--sp-7); height:24px; cursor:pointer;}
-.mood-track::before{content:""; position:absolute; left:0; right:0; top:50%; height:2px; background:rgba(255,255,255,.18); transform:translateY(-50%);}
+/* rounded ends on both the track and its fill (2026-08-17 app review) - kept in sync with the app's MoodScale.tsx */
+.mood-track::before{content:""; position:absolute; left:0; right:0; top:50%; height:2px; border-radius:1px; background:rgba(255,255,255,.18); transform:translateY(-50%);}
 .mood-track-fill{
-  position:absolute; left:0; top:50%; height:2px; background:#8B7CF6; transform:translateY(-50%); transition:width .25s ease;
+  position:absolute; left:0; top:50%; height:2px; border-radius:1px; background:#8B7CF6; transform:translateY(-50%); transition:width .25s ease;
   box-shadow:0 0 8px #8B7CF6;
 }
 .mood-thumb{

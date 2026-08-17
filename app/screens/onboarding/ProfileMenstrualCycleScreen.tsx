@@ -42,7 +42,13 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
+  // 14, matching ProfileDateOfBirthScreen's pickerWrap - both the calendar's
+  // month header and the date wheel's row box show real visible content
+  // flush with their own top edge (unlike the sleep dial, which has its own
+  // ~25px blank SVG margin baked in), so the same 16(content)+14 = 30px
+  // total lands the same visual gap here too (was 20, giving 36 - a bit more
+  // than the other screens; 2026-08-17: "так же как на предыдущих экранах?").
   wrap: {
-    marginTop: 20,
+    marginTop: 14,
   },
 });

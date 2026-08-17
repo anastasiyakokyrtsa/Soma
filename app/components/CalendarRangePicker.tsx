@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, type LayoutChangeEvent } from 'react-native';
-import { colors, fontFamily } from '../theme';
+import { colors, fontFamily, radius } from '../theme';
 import { ChevronIcon } from './icons/ChevronIcon';
 
 // WF19 "Укажи даты последнего менструального цикла" — no finished Figma
@@ -13,6 +13,11 @@ import { ChevronIcon } from './icons/ChevronIcon';
 export type CalendarDate = { year: number; month: number; day: number }; // month is 0-indexed
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+// dayCircle's own box - the pill's edges are inset to this width (not the
+// full, wider cell width) so it lines up with the actual start/end square
+// instead of overhanging past it (2026-08-17: "подложка... вылазит немного
+// за первую и последнюю цифру").
+const DAY_SIZE = 36;
 const MONTH_NAMES = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
@@ -131,8 +136,12 @@ export function CalendarRangePicker({
             .map((c, ci) => ({ ci, active: inRange(c) }))
             .filter((x) => x.active)
             .map((x) => x.ci);
-          const pillLeft = rangeCols.length ? rangeCols[0] * cellWidth : 0;
-          const pillWidth = rangeCols.length ? (rangeCols[rangeCols.length - 1] - rangeCols[0] + 1) * cellWidth : 0;
+          // Inset by the gap between the cell's full width and the day
+          // circle's own 36px box, so the pill's edges land on the actual
+          // circle edges at the true start/end - not the wider cell edges.
+          const inset = (cellWidth - DAY_SIZE) / 2;
+          const pillLeft = rangeCols.length ? rangeCols[0] * cellWidth + inset : 0;
+          const pillWidth = rangeCols.length ? (rangeCols[rangeCols.length - 1] - rangeCols[0] + 1) * cellWidth - inset * 2 : 0;
           const roundLeft = rangeCols.length ? row[rangeCols[0]] && isStart(row[rangeCols[0]]) : false;
           const roundRight = rangeCols.length ? row[rangeCols[rangeCols.length - 1]] && isEnd(row[rangeCols[rangeCols.length - 1]]) : false;
 
@@ -146,10 +155,10 @@ export function CalendarRangePicker({
                     {
                       left: pillLeft,
                       width: pillWidth,
-                      borderTopLeftRadius: roundLeft ? 22 : 0,
-                      borderBottomLeftRadius: roundLeft ? 22 : 0,
-                      borderTopRightRadius: roundRight ? 22 : 0,
-                      borderBottomRightRadius: roundRight ? 22 : 0,
+                      borderTopLeftRadius: roundLeft ? radius.xs : 0,
+                      borderBottomLeftRadius: roundLeft ? radius.xs : 0,
+                      borderTopRightRadius: roundRight ? radius.xs : 0,
+                      borderBottomRightRadius: roundRight ? radius.xs : 0,
                     },
                   ]}
                 />
@@ -222,7 +231,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     bottom: 4,
-    backgroundColor: 'rgba(139,124,246,0.16)',
+    // Matches the app's established "selected fill" translucent-violet
+    // convention (OptionRow/SelectChip/ExpandableChoiceCard/DevMenu's
+    // pressed row all use 0.12) - was 0.16, a one-off value used nowhere
+    // else (2026-08-17 review).
+    backgroundColor: 'rgba(139,124,246,0.12)',
   },
   dayCell: {
     height: 44,
@@ -230,14 +243,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: DAY_SIZE,
+    height: DAY_SIZE,
+    borderRadius: DAY_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Soft-cornered square, not a full circle, for the start/end highlight
+  // (2026-08-17: "чтобы у этих квадратов были мягкие углы") - radius.xs (10),
+  // the kit's standard "soft corner" token.
   dayCircleActive: {
     backgroundColor: colors.violet400,
+    borderRadius: radius.xs,
   },
   dayText: {
     fontFamily: fontFamily.medium,

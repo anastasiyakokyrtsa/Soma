@@ -505,6 +505,73 @@
         </svg>
       </div>
 
+      <div class="kit-block">
+        <p class="kit-block-title">Calendar Range Picker — static reference, one month with a range selected (ported from app/components/CalendarRangePicker.tsx, WF19 "Укажи даты последнего менструального цикла")</p>
+        <div class="cal-card">
+          <div class="cal-header">
+            <button class="cal-nav-btn" aria-label="Previous month"><img src="assets/icons-clean/go-back.svg" alt=""></button>
+            <span class="cal-month-label">Август 2026</span>
+            <button class="cal-nav-btn" aria-label="Next month"><img src="assets/icons-clean/forward.svg" alt=""></button>
+          </div>
+          <div class="cal-weekdays">
+            <span class="cal-weekday">Mo</span><span class="cal-weekday">Tu</span><span class="cal-weekday">We</span>
+            <span class="cal-weekday">Th</span><span class="cal-weekday">Fr</span><span class="cal-weekday">Sa</span><span class="cal-weekday">Su</span>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-week">
+              <div class="cal-day is-dim"><span class="cal-day-circle">28</span></div>
+              <div class="cal-day is-dim"><span class="cal-day-circle">29</span></div>
+              <div class="cal-day is-dim"><span class="cal-day-circle">30</span></div>
+              <div class="cal-day is-dim"><span class="cal-day-circle">31</span></div>
+              <div class="cal-day"><span class="cal-day-circle">1</span></div>
+              <div class="cal-day"><span class="cal-day-circle">2</span></div>
+              <div class="cal-day"><span class="cal-day-circle">3</span></div>
+            </div>
+            <div class="cal-week">
+              <div class="cal-day"><span class="cal-day-circle">4</span></div>
+              <div class="cal-day"><span class="cal-day-circle">5</span></div>
+              <div class="cal-day"><span class="cal-day-circle">6</span></div>
+              <div class="cal-day"><span class="cal-day-circle">7</span></div>
+              <div class="cal-day"><span class="cal-day-circle">8</span></div>
+              <div class="cal-day"><span class="cal-day-circle">9</span></div>
+              <div class="cal-day"><span class="cal-day-circle">10</span></div>
+            </div>
+            <div class="cal-week">
+              <!-- range = 12..16, columns We(2)..Su(6) - pill left/width match the
+                   app's own inset formula: (cellWidth 48 - dayCircle 36) / 2 = 6px,
+                   so its edges land exactly on the endpoint squares' own edges,
+                   not the wider cell edges (2026-08-17 overflow fix). -->
+              <div class="cal-pill is-round-left is-round-right" style="left:102px; width:228px"></div>
+              <div class="cal-day"><span class="cal-day-circle">11</span></div>
+              <div class="cal-day is-endpoint"><span class="cal-day-circle">12</span></div>
+              <div class="cal-day"><span class="cal-day-circle">13</span></div>
+              <div class="cal-day"><span class="cal-day-circle">14</span></div>
+              <div class="cal-day"><span class="cal-day-circle">15</span></div>
+              <div class="cal-day is-endpoint"><span class="cal-day-circle">16</span></div>
+              <div class="cal-day"><span class="cal-day-circle">17</span></div>
+            </div>
+            <div class="cal-week">
+              <div class="cal-day"><span class="cal-day-circle">18</span></div>
+              <div class="cal-day"><span class="cal-day-circle">19</span></div>
+              <div class="cal-day"><span class="cal-day-circle">20</span></div>
+              <div class="cal-day"><span class="cal-day-circle">21</span></div>
+              <div class="cal-day"><span class="cal-day-circle">22</span></div>
+              <div class="cal-day"><span class="cal-day-circle">23</span></div>
+              <div class="cal-day"><span class="cal-day-circle">24</span></div>
+            </div>
+            <div class="cal-week">
+              <div class="cal-day"><span class="cal-day-circle">25</span></div>
+              <div class="cal-day"><span class="cal-day-circle">26</span></div>
+              <div class="cal-day"><span class="cal-day-circle">27</span></div>
+              <div class="cal-day"><span class="cal-day-circle">28</span></div>
+              <div class="cal-day"><span class="cal-day-circle">29</span></div>
+              <div class="cal-day"><span class="cal-day-circle">30</span></div>
+              <div class="cal-day"><span class="cal-day-circle">31</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ============ NAVIGATION ============ -->

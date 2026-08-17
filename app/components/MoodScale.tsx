@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View, Text, Image, StyleSheet, PanResponder, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
-import { colors, glow, fontFamily, gradients } from '../theme';
+import { colors, glow, fontFamily, gradients, spacing } from '../theme';
 
 // WF20 "Как ты чувствуешь себя сегодня?" — ported from the UI Kit's already
 // finished Mood Scale component (`UI Kit/index.html`/`css/style.css`
@@ -20,19 +20,47 @@ const MOODS = [
   { label: 'Отлично', img: require('../assets/mood/picture-mood-scala-very-good.png') },
 ];
 
+// Fixed width for the line/fill/thumb only (2026-08-17: "оставь саму линию
+// как сейчас" - the line itself is fine as-is, not part of this round's
+// complaint). Capped to the real container width so it can't overflow a
+// narrower phone (same pattern as SleepWheelPicker's `dialSize`).
+const SCALE_WIDTH = 380;
+
+// Separate coordinate system for the icons+labels row only - the line's
+// fixed 380 was leaving "Ужасно"/"Отлично" clipped off the left/right edge
+// on a narrower device (2026-08-17: "опять сделал так что слова... не
+// видно"). These need the real 16px-from-wall behavior instead: shrink the
+// icons/labels' own 0%/100% points inward by (half that label's real
+// rendered width - 4), so once centered on its point the label's own edge
+// lands exactly 16px from the wall - measured via two invisible off-screen
+// Text twins, since a fixed-width centered box (see labelText below) can't
+// report its own glyph width.
+const WALL_TO_LABEL = 16;
+const WALL_TO_CARD = spacing.screenPadding;
+
 export function MoodScale({ index, onChange }: { index: number; onChange: (index: number) => void }) {
   const [trackWidth, setTrackWidth] = useState(0);
-  const widthRef = useRef(0);
+  const [firstLabelWidth, setFirstLabelWidth] = useState(0);
+  const [lastLabelWidth, setLastLabelWidth] = useState(0);
 
   const onTrackLayout = (e: LayoutChangeEvent) => {
-    widthRef.current = e.nativeEvent.layout.width;
     setTrackWidth(e.nativeEvent.layout.width);
   };
 
+  const ready = trackWidth > 0;
+  const scaleWidth = Math.min(SCALE_WIDTH, trackWidth);
+  const leftOffset = Math.max(0, (trackWidth - scaleWidth) / 2);
+  const posForPct = (p: number) => leftOffset + p * scaleWidth;
+
+  const labelInsetLeft = Math.max(0, firstLabelWidth / 2 - (WALL_TO_CARD - WALL_TO_LABEL));
+  const labelInsetRight = Math.max(0, lastLabelWidth / 2 - (WALL_TO_CARD - WALL_TO_LABEL));
+  const labelUsableWidth = Math.max(0, trackWidth - labelInsetLeft - labelInsetRight);
+  const labelsReady = trackWidth > 0 && firstLabelWidth > 0 && lastLabelWidth > 0;
+  const labelPosForPct = (p: number) => labelInsetLeft + p * labelUsableWidth;
+
   const indexFromX = (x: number) => {
-    const w = widthRef.current;
-    if (w <= 0) return index;
-    const ratio = Math.min(1, Math.max(0, x / w));
+    if (scaleWidth <= 0) return index;
+    const ratio = Math.min(1, Math.max(0, (x - leftOffset) / scaleWidth));
     return Math.round(ratio * (MOODS.length - 1));
   };
 
@@ -45,7 +73,7 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
         onPanResponderMove: (evt: GestureResponderEvent) => onChange(indexFromX(evt.nativeEvent.locationX)),
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [leftOffset, scaleWidth]
   );
 
   const pct = index / (MOODS.length - 1);
@@ -70,28 +98,40 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
       </View>
 
       <View style={styles.track} onLayout={onTrackLayout}>
-        <View style={styles.trackLine} />
-        {trackWidth > 0 ? (
+        {ready ? (
           <>
-            <View style={[styles.trackFill, { width: pct * trackWidth }]} />
-            <View style={[styles.thumb, { left: pct * trackWidth }]} />
+            <View style={[styles.trackLine, { left: leftOffset, width: scaleWidth }]} />
+            <View style={[styles.trackFill, { left: leftOffset, width: pct * scaleWidth }]} />
+            <View style={[styles.thumb, { left: posForPct(pct) }]} />
           </>
         ) : null}
         <View style={StyleSheet.absoluteFill} {...panResponder.panHandlers} />
       </View>
 
       <View style={styles.icons}>
-        {MOODS.map((m, i) => (
-          <Image key={i} source={m.img} style={[styles.iconMini, { left: `${(i / (MOODS.length - 1)) * 100}%` }]} resizeMode="contain" />
-        ))}
+        {labelsReady
+          ? MOODS.map((m, i) => (
+              <Image key={i} source={m.img} style={[styles.iconMini, { left: labelPosForPct(i / (MOODS.length - 1)) }]} resizeMode="contain" />
+            ))
+          : null}
       </View>
 
       <View style={styles.labels}>
-        {MOODS.map((m, i) => (
-          <Text key={i} style={[styles.labelText, { left: `${(i / (MOODS.length - 1)) * 100}%` }, i === index && styles.labelActive]}>
-            {m.label}
-          </Text>
-        ))}
+        {labelsReady
+          ? MOODS.map((m, i) => (
+              <Text key={i} style={[styles.labelText, { left: labelPosForPct(i / (MOODS.length - 1)) }, i === index && styles.labelActive]}>
+                {m.label}
+              </Text>
+            ))
+          : null}
+        {/* Invisible width-measuring twins - real rendered glyph width, not
+            a guess, feeds labelInsetLeft/labelInsetRight above. */}
+        <Text style={styles.hiddenMeasure} onLayout={(e) => setFirstLabelWidth(e.nativeEvent.layout.width)}>
+          {MOODS[0].label}
+        </Text>
+        <Text style={styles.hiddenMeasure} onLayout={(e) => setLastLabelWidth(e.nativeEvent.layout.width)}>
+          {MOODS[MOODS.length - 1].label}
+        </Text>
       </View>
     </View>
   );
@@ -119,18 +159,18 @@ const styles = StyleSheet.create({
   },
   trackLine: {
     position: 'absolute',
-    left: 0,
-    right: 0,
     top: '50%',
     height: 2,
+    marginTop: -1,
+    borderRadius: 1,
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
   trackFill: {
     position: 'absolute',
-    left: 0,
     top: '50%',
     height: 2,
     marginTop: -1,
+    borderRadius: 1,
     backgroundColor: colors.violet400,
     boxShadow: `0px 0px 8px ${colors.violet400}`,
   },
@@ -168,13 +208,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
-    // Approximate the web version's translateX(-50%) with a fixed-width
-    // box centered on its own `left` percentage - close enough for these
-    // short one-word labels.
+    // Approximates the web version's translateX(-50%): a fixed-width box
+    // centered on its own `left` px position (labelPosForPct above) - fine
+    // for these short one-word labels.
     width: 90,
     marginLeft: -45,
   },
   labelActive: {
     color: colors.violet400,
+  },
+  hiddenMeasure: {
+    position: 'absolute',
+    opacity: 0,
+    fontFamily: fontFamily.semiBold,
+    fontSize: 12,
   },
 });

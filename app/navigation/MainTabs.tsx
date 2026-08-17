@@ -1,34 +1,41 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../theme';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
+import { HomeScreen } from '../screens/HomeScreen';
+import { CareScreen } from '../screens/CareScreen';
+import { BottomBar } from '../components/BottomBar';
 
-// Placeholder tab bar — replace with the kit's real Bottom Bar (SVG dome shape,
-// FAB, active-icon glow) once that component is ported.
+// Real Bottom Bar now ported (BottomBar.tsx - SVG dome shape, FAB,
+// active-icon glow), replacing the old placeholder tabBarStyle.
+//
+// Route set renamed from the earlier placeholder guess (Home/Journal/Stats/
+// Profile) to Home/Care/Journal/Analytics - the literal tab set+order shown
+// in the Home screen's own Figma bottom-bar instance (node 488:1054,
+// "Analytics" being the kit's internal English name for what the product
+// copy calls "Статистика", per the kit's English-internal-naming
+// convention). Figma's bar has no "Profile" tab at all - not carried
+// forward here; where profile access lives is still an open question for a
+// later screen, not decided by this change.
 const Tab = createBottomTabNavigator();
 
 export function MainTabs() {
-  const insets = useSafeAreaInsets();
-  const bottomPad = Math.max(insets.bottom, 16);
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.bg0,
-          borderTopColor: colors.borderSoft,
-          height: 56 + bottomPad,
-          paddingTop: 8,
-          paddingBottom: bottomPad,
-        },
-        tabBarActiveTintColor: colors.violet300,
-        tabBarInactiveTintColor: colors.textTertiary,
+        // Floats the custom dome-shaped BottomBar over the screen content
+        // (transparent gaps either side of the dome are meant to show
+        // content behind them) instead of React Navigation's default of
+        // reserving a solid rectangular strip and shrinking screens to fit
+        // above it - each screen accounts for the bar's own height via its
+        // own bottom padding instead (see e.g. HomeScreen.tsx).
+        tabBarStyle: { position: 'absolute', backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0 },
       }}
+      tabBar={(props) => <BottomBar {...props} />}
     >
-      <Tab.Screen name="Home">{() => <PlaceholderScreen label="Главный экран" />}</Tab.Screen>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Care" component={CareScreen} />
       <Tab.Screen name="Journal">{() => <PlaceholderScreen label="Дневник" />}</Tab.Screen>
-      <Tab.Screen name="Stats">{() => <PlaceholderScreen label="Статистика" />}</Tab.Screen>
-      <Tab.Screen name="Profile">{() => <PlaceholderScreen label="Профиль" />}</Tab.Screen>
+      <Tab.Screen name="Analytics">{() => <PlaceholderScreen label="Статистика" />}</Tab.Screen>
     </Tab.Navigator>
   );
 }
