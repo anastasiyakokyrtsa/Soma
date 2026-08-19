@@ -38,7 +38,7 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
 
-      <View style={[styles.content, { top: 50 * scale, height: 75 * scale }]}>
+      <View style={[styles.content, { top: 50 * scale, height: 75 * scale, paddingHorizontal: 12 * scale }]}>
         {state.routes.map((route, index) => {
           const meta = TAB_ICONS[route.name];
           if (!meta) return null;
@@ -48,11 +48,11 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
             if (!isActive && !event.defaultPrevented) navigation.navigate(route.name);
           };
           return (
-            <Pressable key={route.key} style={styles.item} onPress={onPress}>
+            <Pressable key={route.key} style={[styles.item, { paddingVertical: 8 * scale, paddingHorizontal: 12 * scale }]} onPress={onPress}>
               <View style={isActive && styles.iconActiveGlow}>
-                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} />
+                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
               </View>
-              <Text style={styles.itemLabel}>{isActive ? meta.label : ''}</Text>
+              <Text style={[styles.itemLabel, { fontSize: 10 * scale, height: 12 * scale }]}>{isActive ? meta.label : ''}</Text>
             </Pressable>
           );
         })}
@@ -60,9 +60,14 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
 
       {/* FAB opens a quick-action sheet - not yet designed/spec'd beyond the
           kit's own static "+" reference, so onPress is a no-op placeholder. */}
-      <Pressable style={[styles.fab, { top: 50 * scale, left: width / 2 }]}>
-        <View style={styles.iconPlusBar} />
-        <View style={styles.iconPlusBarVertical} />
+      <Pressable
+        style={[
+          styles.fab,
+          { width: 68 * scale, height: 68 * scale, borderRadius: 34 * scale, marginLeft: -34 * scale, marginTop: -34 * scale, top: 50 * scale, left: width / 2 },
+        ]}
+      >
+        <View style={[styles.iconPlusBar, { width: 30 * scale, height: 3 * scale, borderRadius: 2 * scale }]} />
+        <View style={[styles.iconPlusBarVertical, { width: 3 * scale, height: 30 * scale, borderRadius: 2 * scale }]} />
       </Pressable>
     </View>
   );
@@ -77,8 +82,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    // dome glow - matches .bottombar-svg's drop-shadow(0 0 6px violet400 70%) x2
-    boxShadow: `0px 0px 6px rgba(139,124,246,0.7)`,
+    // dome glow - kit stacks this exact same drop-shadow twice (extra
+    // intensity, not two different blurs) - mirrored here for the same effect.
+    boxShadow: `0px 0px 6px rgba(139,124,246,0.7), 0px 0px 6px rgba(139,124,246,0.7)`,
   },
   content: {
     position: 'absolute',
@@ -87,46 +93,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingHorizontal: 12,
   },
   item: {
     flex: 1,
     alignItems: 'center',
     gap: 2,
-    paddingVertical: 8,
   },
   iconActiveGlow: {
     boxShadow: `0px 0px ${glow.iconGradient.blur}px ${glow.iconGradient.color}`,
   },
   itemLabel: {
     fontFamily: fontFamily.bold,
-    fontSize: 10,
-    height: 12,
     color: colors.violet300,
   },
   fab: {
     position: 'absolute',
-    width: 68,
-    height: 68,
-    marginLeft: -34,
-    marginTop: -34,
-    borderRadius: 34,
     backgroundColor: colors.violet400,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconPlusBar: {
     position: 'absolute',
-    width: 22,
-    height: 3,
-    borderRadius: 2,
     backgroundColor: colors.textPrimary,
   },
   iconPlusBarVertical: {
     position: 'absolute',
-    width: 3,
-    height: 22,
-    borderRadius: 2,
     backgroundColor: colors.textPrimary,
   },
 });

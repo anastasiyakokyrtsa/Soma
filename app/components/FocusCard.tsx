@@ -22,7 +22,10 @@ const styles = StyleSheet.create({
     width: 336,
     height: 167,
     borderWidth: 1,
-    borderColor: colors.borderVioletFlat,
+    // Figma's own literal spec for this card is a fully opaque #a89cf8
+    // border (colors.violet300), not the translucent borderVioletFlat stand-in
+    // used elsewhere for the kit's gradient-border recipe (2026-08-17 audit).
+    borderColor: colors.violet300,
     borderRadius: radius.md,
     padding: 16,
     gap: 8,

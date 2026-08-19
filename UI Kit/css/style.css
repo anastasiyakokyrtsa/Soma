@@ -284,7 +284,7 @@ button{font-family:inherit;}
 .moonsun-rows{width:100%; display:flex; flex-direction:column; gap:8px; margin-bottom:var(--sp-4);}
 .moonsun-row{display:flex; gap:28px; font-family:var(--font-nunito); font-size:16px;}
 /* fixed-width label container so every value column lines up instead of scattering per label length */
-.moonsun-row span:first-child{width:110px; flex-shrink:0; font-weight:500; line-height:1.5; color:var(--text-primary);}
+.moonsun-row span:first-child{min-width:110px; flex-shrink:0; white-space:nowrap; font-weight:500; line-height:1.5; color:var(--text-primary);}
 .moonsun-row span:last-child{font-weight:300; line-height:1.5; color:var(--text-primary);}
 .moonsun-note{font-family:var(--font-nunito); font-size:16px; font-weight:400; color:var(--text-primary); line-height:1.3; margin:0;}
 

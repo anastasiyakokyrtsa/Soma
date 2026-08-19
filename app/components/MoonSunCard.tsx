@@ -27,7 +27,9 @@ export function MoonSunCard({
       <View style={styles.rows}>
         {rows.map((r) => (
           <View key={r.label} style={styles.row}>
-            <Text style={styles.rowLabel}>{r.label}</Text>
+            <Text style={styles.rowLabel} numberOfLines={1}>
+              {r.label}
+            </Text>
             <Text style={styles.rowValue}>{r.value}</Text>
           </View>
         ))}
@@ -85,8 +87,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 28,
   },
+  // minWidth (not a fixed width): "Освещенность" is real, long enough that
+  // a hard 110px wrapped it mid-word ("Освещенност/ь") on-device - letting
+  // it grow past 110 for just that one label (numberOfLines={1} above keeps
+  // it from ever wrapping again) beats forcing every label wider just to
+  // fit the one outlier (2026-08-17 review).
   rowLabel: {
-    width: 110,
+    minWidth: 110,
     flexShrink: 0,
     fontFamily: fontFamily.medium,
     fontSize: 16,

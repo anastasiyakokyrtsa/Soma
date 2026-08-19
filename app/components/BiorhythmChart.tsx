@@ -1,25 +1,62 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Svg, { Line, Path, Circle, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 
 // Ports UI Kit's "Biorhythm Chart" (.biorhythm/.biorhythm-axis/.biorhythm-chart/
-// .biorhythm-rings, style.css ~L811-833) verbatim - curve paths, ring
-// dasharray/dashoffset and the 3 placeholder values (97,3% / -95,1% / -93,6%)
-// are the kit's own already-tuned demo data, not re-derived from the Figma
-// screenshot, per her explicit "bere iz kita" instruction (2026-08-17).
-const AXIS = [
-  { label: '10', left: 10 },
-  { label: '11', left: 55 },
-  { label: '12', left: 100 },
-  { label: '13', left: 145 },
-  { label: '14', left: 190, isToday: true },
-  { label: '15', left: 235 },
-  { label: '16', left: 280 },
-  { label: '17', left: 325 },
-  { label: '18', left: 370 },
-];
+// .biorhythm-rings, style.css ~L811-833) - curve paths are the kit's own
+// already-tuned demo data, not re-derived from the Figma screenshot, per her
+// explicit "bere iz kita" instruction (2026-08-17). Ring size/glow/cap style
+// and the value scale below are her own explicit 2026-08-19 deviations from
+// the kit's literal numbers - not kit fidelity issues, real creative calls.
+//
+// `width` is a real responsive prop (same pattern as SleepWheelPicker's
+// `size`/the astrolabe's sizing), default 380 only as a cap. Curve/gridline
+// coordinates are untouched (still authored in their original 360x200
+// space) - scaling is done for free by setting each inner <Svg>'s rendered
+// width/height to `space * scale` while keeping its `viewBox` at the
+// original space, not by rewriting any point math. Axis labels are plain RN
+// Text (not SVG), so those genuinely need their position/size scaled by hand.
+//
+// Axis days are tappable (selectedDay/onSelectDay). The 3 curves' raw y
+// values at each marked day were read directly off each curve's own path
+// data (every marked day 10-18 lands exactly on a real bezier anchor point
+// at x=(day-10)*45 - no sampling/curve-fitting needed).
+const DAYS = [10, 11, 12, 13, 14, 15, 16, 17, 18] as const;
+const FIRST_DAY = DAYS[0];
+const LAST_DAY = DAYS[DAYS.length - 1];
+const DAY_TO_X = (day: number) => (day - 10) * 45;
 
-const GRIDLINES = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+type CurveYs = { physical: number; emotional: number; intellect: number };
+// Raw SVG y (0-200, top-to-bottom) at each marked day, read off the curve
+// paths below - green=physical, pink=emotional, violet=intellect.
+const DAY_Y: Record<number, CurveYs> = {
+  10: { physical: 150.2, emotional: 77.9, intellect: 162.8 },
+  11: { physical: 106.0, emotional: 114.6, intellect: 183.7 },
+  12: { physical: 60.5, emotional: 149.4, intellect: 196.5 },
+  13: { physical: 23.4, emotional: 177.5, intellect: 199.9 },
+  14: { physical: 2.7, emotional: 195.1, intellect: 193.6 },
+  15: { physical: 2.7, emotional: 199.8, intellect: 178.2 },
+  16: { physical: 23.4, emotional: 191.1, intellect: 155.3 },
+  17: { physical: 60.5, emotional: 170.0, intellect: 126.9 },
+  18: { physical: 106.0, emotional: 139.5, intellect: 96.0 },
+};
+
+// Her scale, simplified same-day (2026-08-19): no negative numbers at all -
+// bottom (y=200) = 0, middle (y=100) = 50, top (y=0) = 100. A plain single
+// linear map, not the asymmetric two-segment one this used for about an
+// hour ("уберу минусы... получается от 0 до 100 просто").
+function yToPct(y: number): number {
+  return 100 - y / 2;
+}
+
+export function getDayValues(day: number): CurveYs {
+  const y = DAY_Y[day] ?? DAY_Y[14];
+  return { physical: yToPct(y.physical), emotional: yToPct(y.emotional), intellect: yToPct(y.intellect) };
+}
+
+function formatPct(v: number) {
+  return `${v.toFixed(1).replace('.', ',')}%`;
+}
 
 const CURVES = [
   {
@@ -39,36 +76,91 @@ const CURVES = [
   },
 ];
 
-const RING_CIRCUMFERENCE = 213.63;
-const RINGS = [
-  { id: 'physical', colors: ['#7DE8C4', '#5DC2A3', '#4BA78D'], glow: '#5DC2A3', dashoffset: 5.77, pct: '97,3%', label: 'Физика' },
-  { id: 'emotional', colors: ['#FFCBF2', '#FFC6F1', '#FBBDEC'], glow: '#FFC6F1', dashoffset: 10.47, pct: '-95,1%', label: 'Эмоции' },
-  { id: 'intellect', colors: ['#B6ABFF', colors.violet400, '#7060E8'], glow: colors.violet400, dashoffset: 13.66, pct: '-93,6%', label: 'Интеллект' },
-];
+// dashoffset = circumference * (100 - pct) / 100 - ring reads empty at
+// pct=0, full at pct=100, now that pct itself is a plain 0-100 value (no
+// more folding a signed -100..100 range through Math.abs).
+const RING_R = 34;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R;
+const RING_DASHARRAY: [number, number] = [RING_CIRCUMFERENCE, RING_CIRCUMFERENCE];
+const dashoffsetForPct = (pct: number) => (RING_CIRCUMFERENCE * (100 - pct)) / 100;
 
-export function BiorhythmChart() {
+const RING_META = [
+  { id: 'physical' as const, colors: ['#7DE8C4', '#5DC2A3', '#4BA78D'], glow: '#5DC2A3', label: 'Физика' },
+  { id: 'emotional' as const, colors: ['#FFCBF2', '#FFC6F1', '#FBBDEC'], glow: '#FFC6F1', label: 'Эмоции' },
+  { id: 'intellect' as const, colors: ['#B6ABFF', colors.violet400, '#7060E8'], glow: colors.violet400, label: 'Интеллект' },
+];
+// 100, not the kit's literal 84 - her explicit ask to size these up past
+// the kit's own reference (2026-08-19, "прогресс бары... сделать побольше").
+const RING_BOX = 100;
+
+export function BiorhythmChart({
+  width = 380,
+  selectedDay,
+  onSelectDay,
+}: {
+  width?: number;
+  selectedDay: number;
+  onSelectDay: (day: number) => void;
+}) {
+  const scale = Math.min(width, 380) / 380;
+  const chartW = 360 * scale;
+  const chartH = 200 * scale;
+  const chartInset = 10 * scale; // kit's own 10px inset (380-360)/2, applied explicitly instead of via alignSelf so it can't drift out of sync with the axis labels' own math
+  const ringBoxSize = RING_BOX * scale;
+  const values = getDayValues(selectedDay);
+  const selectedX = DAY_TO_X(selectedDay);
+
   return (
-    <View style={styles.wrap}>
-      <View style={styles.axis}>
-        {AXIS.map((a) => (
-          <Text key={a.label} style={[styles.axisLabel, a.isToday && styles.axisLabelToday, { left: a.left }]}>
-            {a.label}
-          </Text>
-        ))}
+    <View style={[styles.wrap, { width: width }]}>
+      <View style={[styles.axis, { width }]}>
+        {DAYS.map((day) => {
+          const isSelected = day === selectedDay;
+          const fontSize = (isSelected ? 20 : 16) * scale;
+          const lineHeight = fontSize * 1.1;
+          const boxWidth = (isSelected ? 36 : 28) * scale;
+          // The two ends are edge-anchored to the axis row's own edges (=16px
+          // from the screen wall, via HomeScreen's own side margin) instead
+          // of centered on their gridline - centering AND a fixed 16px wall
+          // clearance can't both hold at once once the label grows on
+          // selection, and the 16px clearance was her explicit, more recent
+          // ask (2026-08-19) for these two specifically. Days 11-17 stay
+          // centered on their real gridline.
+          const posStyle =
+            day === FIRST_DAY
+              ? { left: 0 }
+              : day === LAST_DAY
+                ? { right: 0 }
+                : { left: (10 + DAY_TO_X(day)) * scale, marginLeft: -boxWidth / 2 };
+          return (
+            <Pressable
+              key={day}
+              onPress={() => onSelectDay(day)}
+              hitSlop={8}
+              style={[{ position: 'absolute', top: '50%', marginTop: -lineHeight / 2, width: boxWidth }, posStyle]}
+            >
+              <Text style={[styles.axisLabel, isSelected && styles.axisLabelSelected, { fontSize, lineHeight }]}>{day}</Text>
+            </Pressable>
+          );
+        })}
       </View>
 
-      <Svg width={360} height={200} style={styles.chart}>
+      {/* viewBox padded 4 units above/below the real 0-200 content range -
+          the green curve's peak touches y=0 exactly, and a 2px stroke +
+          glow blur bleeding past that edge got clipped by the SVG's own
+          canvas (overflow:visible on the <Svg> style doesn't prevent this on
+          every platform the way it does on web) - real fix is giving the
+          content actual room inside the viewBox, not just declaring
+          overflow visible (2026-08-17: "горки... немного срезаются"). */}
+      <Svg width={chartW} height={chartH} viewBox="0 -4 360 208" style={[styles.chart, { marginLeft: chartInset }]}>
         <Defs>
           {CURVES.map((c) => (
             <Filter key={c.id} id={`curveGlow-${c.id}`} x="-50%" y="-50%" width="200%" height="200%">
-              <FeGaussianBlur stdDeviation={3} />
+              {/* stdDeviation bumped 3 -> 6 (2026-08-19: "прибавим свечения у линий") */}
+              <FeGaussianBlur stdDeviation={6} />
             </Filter>
           ))}
         </Defs>
-        {GRIDLINES.map((x) => (
-          <Line key={x} x1={x} y1={0} x2={x} y2={200} stroke="#B7B7B7" strokeOpacity={0.35} strokeWidth={x === 180 ? 0.9 : 0.3} />
-        ))}
-        <Line x1={0} y1={100} x2={360} y2={100} stroke="#B7B7B7" strokeOpacity={0.35} strokeWidth={0.9} />
+        <Gridlines selectedX={selectedX} />
         {/* real glow (Gaussian blur on a duplicate underneath, same technique
             as SleepWheelPicker's arc) - CSS drop-shadow isn't a valid RN
             style prop, unlike the web reference's filter:drop-shadow(). */}
@@ -80,92 +172,107 @@ export function BiorhythmChart() {
         ))}
       </Svg>
 
-      <View style={styles.rings}>
-        {RINGS.map((r) => (
-          <View key={r.label} style={styles.ringItem}>
-            <View style={styles.ringBox}>
-              <Svg width={84} height={84} viewBox="0 0 84 84" style={styles.ringSvg}>
-                <Defs>
-                  <Filter id={`ringGlow-${r.id}`} x="-50%" y="-50%" width="200%" height="200%">
-                    <FeGaussianBlur stdDeviation={2.5} />
-                  </Filter>
-                </Defs>
-                <Circle
-                  cx={42}
-                  cy={42}
-                  r={34}
-                  fill="none"
-                  stroke={r.glow}
-                  strokeWidth={8}
-                  strokeDasharray={RING_CIRCUMFERENCE}
-                  strokeDashoffset={r.dashoffset}
-                  filter={`url(#ringGlow-${r.id})`}
-                />
-                <Circle
-                  cx={42}
-                  cy={42}
-                  r={34}
-                  fill="none"
-                  stroke={r.colors[1]}
-                  strokeWidth={8}
-                  strokeDasharray={RING_CIRCUMFERENCE}
-                  strokeDashoffset={r.dashoffset}
-                />
-              </Svg>
-              <Text style={styles.ringPct}>{r.pct}</Text>
+      <View style={[styles.rings, { width: chartW, marginLeft: chartInset, marginTop: 40 * scale }]}>
+        {RING_META.map((r) => {
+          const pct = values[r.id];
+          const dashoffset = dashoffsetForPct(pct);
+          return (
+            <View key={r.id} style={styles.ringItem}>
+              <View style={[styles.ringBox, { width: ringBoxSize, height: ringBoxSize }]}>
+                <Svg width={ringBoxSize} height={ringBoxSize} viewBox="0 0 84 84" style={styles.ringSvg}>
+                  <Defs>
+                    <Filter id={`ringGlow-${r.id}`} x="-50%" y="-50%" width="200%" height="200%">
+                      {/* stdDeviation bumped 2.5 -> 4 (2026-08-19: same glow ask, applied to the rings too) */}
+                      <FeGaussianBlur stdDeviation={4} />
+                    </Filter>
+                  </Defs>
+                  {/* faint full-circle track behind the arc, so the ring
+                      doesn't read as floating with nothing under it
+                      (2026-08-19: "чтобы если они не совсем в воздухе
+                      висели"). Started as violet400@27%, same as
+                      SleepWheelPicker's own track - then made about half as
+                      opaque again on request ("прозрачность повысим... на
+                      половину"), landing at 14%, roughly half of 27%. */}
+                  <Circle cx={42} cy={42} r={RING_R} fill="none" stroke="rgba(139,124,246,0.14)" strokeWidth={8} />
+                  {/* strokeLinecap="round" on both - was "butt" (a deliberate
+                      earlier kit decision to keep a near-full ring's tiny gap
+                      legible), explicitly overridden here per her ask for
+                      soft rounded arc ends (2026-08-19: "конечики... красивые
+                      закругленные а не такие острые"). */}
+                  <Circle
+                    cx={42}
+                    cy={42}
+                    r={RING_R}
+                    fill="none"
+                    stroke={r.glow}
+                    strokeWidth={8}
+                    strokeLinecap="round"
+                    strokeDasharray={RING_DASHARRAY}
+                    strokeDashoffset={dashoffset}
+                    filter={`url(#ringGlow-${r.id})`}
+                  />
+                  <Circle
+                    cx={42}
+                    cy={42}
+                    r={RING_R}
+                    fill="none"
+                    stroke={r.colors[1]}
+                    strokeWidth={8}
+                    strokeLinecap="round"
+                    strokeDasharray={RING_DASHARRAY}
+                    strokeDashoffset={dashoffset}
+                  />
+                </Svg>
+                <Text style={[styles.ringPct, { fontSize: 16 * scale }]}>{formatPct(pct)}</Text>
+              </View>
+              <Text style={[styles.ringLabel, { fontSize: 16 * scale, marginTop: 8 * scale }]}>{r.label}</Text>
             </View>
-            <Text style={styles.ringLabel}>{r.label}</Text>
-          </View>
-        ))}
+          );
+        })}
       </View>
     </View>
   );
 }
 
+const GRIDLINE_XS = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+
+function Gridlines({ selectedX }: { selectedX: number }) {
+  return (
+    <>
+      {GRIDLINE_XS.map((x) => (
+        <Line key={x} x1={x} y1={0} x2={x} y2={200} stroke="#B7B7B7" strokeOpacity={0.35} strokeWidth={x === selectedX ? 0.9 : 0.3} />
+      ))}
+      <Line x1={0} y1={100} x2={360} y2={100} stroke="#B7B7B7" strokeOpacity={0.35} strokeWidth={0.9} />
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
-  wrap: {
-    width: 380,
-  },
+  wrap: {},
   axis: {
-    width: 380,
     height: 30,
     marginBottom: 2,
   },
   axisLabel: {
-    position: 'absolute',
-    top: '50%',
-    marginTop: -12,
-    marginLeft: -14,
-    width: 28,
     textAlign: 'center',
     fontFamily: fontFamily.semiBold,
-    fontSize: 16,
     color: colors.textPrimary,
   },
-  axisLabelToday: {
+  axisLabelSelected: {
     fontFamily: fontFamily.bold,
-    fontSize: 20,
     color: colors.violet400,
-    marginLeft: -18,
-    width: 36,
   },
   chart: {
-    alignSelf: 'center',
     overflow: 'visible',
   },
   rings: {
-    width: 332,
-    alignSelf: 'center',
     flexDirection: 'row',
-    gap: 40,
-    marginTop: 40,
+    justifyContent: 'space-between',
   },
   ringItem: {
     alignItems: 'center',
   },
   ringBox: {
-    width: 84,
-    height: 84,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -175,13 +282,10 @@ const styles = StyleSheet.create({
   },
   ringPct: {
     fontFamily: fontFamily.medium,
-    fontSize: 16,
     color: colors.textPrimary,
   },
   ringLabel: {
-    marginTop: 8,
     fontFamily: fontFamily.regular,
-    fontSize: 16,
     color: colors.textPrimary,
   },
 });

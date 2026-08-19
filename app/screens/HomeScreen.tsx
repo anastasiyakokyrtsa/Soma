@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily, gradients } from '../theme';
@@ -8,6 +8,7 @@ import { MoonSunCard } from '../components/MoonSunCard';
 import { FocusCard } from '../components/FocusCard';
 import { QuoteCard } from '../components/QuoteCard';
 import { ProfileIcon } from '../components/icons/ProfileIcon';
+import { StarsBackground } from '../components/StarsBackground';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -31,6 +32,48 @@ const GAP = {
 
 const USER_NAME = 'Анастасия';
 
+// 2026-08-19: "тексты ты не сделал разные на каждую дату... на каждую дату
+// сделай подходящее описание" - a rule-based generator (pick whichever
+// cycle is most extreme) collapsed several different days onto the same
+// wording, since only 3 cycles x 2 directions = 6 real templates exist for
+// 9 days. Replaced with one hand-written line per day, each read off that
+// day's own actual physical/emotional/intellect pattern (see
+// BiorhythmChart.tsx's getDayValues for the numbers each of these is
+// describing):
+// Values below are on the app's current 0-100 scale (no negatives - see
+// BiorhythmChart.tsx's yToPct, simplified same-day from an earlier signed
+// -100..100 one). The qualitative reads ("X is the low/high point of the
+// day") didn't need rewriting when the scale changed, since they're about
+// which cycle stands out *relative to the other two on that day*, not about
+// hitting a specific absolute number:
+// 10: physical 25 emotional 61 intellect 19 - emotional's the outlier (up), body/mind flat-to-low
+// 11: physical 47 emotional 43 intellect 8 - intellect notably down, rest steady
+// 12: physical 70 emotional 25 intellect 2 - focus almost gone, body strong
+// 13: physical 88 emotional 11 intellect 0 - body way up, mind/focus both down
+// 14: physical 99 emotional 3 intellect 3 - body very high, mind AND mood both low (not just mood)
+// 15: physical 99 emotional 0 intellect 11 - mood at its lowest point of the week, body still strong
+// 16: physical 88 emotional 5 intellect 22 - mood still deeply down, body holding
+// 17: physical 70 emotional 15 intellect 37 - mood recovering upward, mind holding steady
+// 18: physical 47 emotional 30 intellect 52 - intellect's the highlight now, everything else settling
+// All 9 used to open with "Сегодня..." - varied the openings so they don't
+// all read as the same template with swapped nouns (2026-08-19: "мне не
+// нравится что все они одинаково начинаются... как то разнообразь"). Also
+// reworked the same day to read less machine-written - the em dash showing
+// up in most of them was the specific tell she flagged ("тире часто
+// встречается"), swapped for plain commas/periods/colons and less uniform
+// sentence rhythm between the 9.
+const DAY_PARAGRAPHS: Record<number, string> = {
+  10: 'Настроение сегодня заметно приподнятое, отличный повод сделать что-то приятное для себя. Тело и разум пока просят тишины, так что сложные задачи лучше отложить.',
+  11: 'Мысли сегодня разбегаются, трудно удержать фокус. Зато тело и настроение в полном порядке, так что переключись на простые понятные дела, а важные решения оставь на потом.',
+  12: 'Концентрации сегодня почти не найти, зато сил в теле хоть отбавляй. Отличный день для движения, но не для серьёзных решений.',
+  13: 'Тело сегодня полно энергии, а вот голове и настроению нужна пауза. Не старайся успеть всё сразу: лучше займись чем-то физическим, а не умственным.',
+  14: 'И мысли, и настроение сегодня заметно просели, хотя тело чувствует себя прекрасно. Не грузи себя решениями и сложными разговорами: лучше направь силы в тело и дай себе спокойно восстановиться.',
+  15: 'Похоже, это самый тяжёлый по настроению день недели, хотя тело держится отлично. Будь мягче к себе в общении и отложи важные разговоры на потом.',
+  16: 'Эмоции всё ещё ощутимо просели, зато тело полно сил. Физическая активность поможет мягче пережить этот спад.',
+  17: 'Настроение потихоньку выравнивается, а разум и тело держатся стабильно. Хороший день для привычных дел без лишнего напряжения.',
+  18: 'Голова сегодня особенно ясная, а тело и настроение в спокойном балансе. Удачный момент для аналитической работы и планов.',
+};
+
 // "Доброе утро, {имя}" needs real dynamic line-wrapping (the name's length
 // varies) with a gradient fill - unlike the fixed 2-line headings elsewhere,
 // which use a hardcoded 2-line SvgText split. RN has no gradient-fill Text,
@@ -38,6 +81,10 @@ const USER_NAME = 'Анастасия';
 // (onTextLayout gives each line's real text + position), then renders each
 // line through SvgText with the gradient - same "measure for real, don't
 // guess" principle as MoodScale's label-width twins.
+// 28 - two rounds of "уменьшим шрифт" (2026-08-19): Figma's literal 36, then
+// 34, now 28.
+const GREETING_FONT_SIZE = 28;
+
 function GreetingHeading({ text }: { text: string }) {
   const [lines, setLines] = useState<{ text: string; y: number }[] | null>(null);
 
@@ -62,7 +109,7 @@ function GreetingHeading({ text }: { text: string }) {
             </SvgLinearGradient>
           </Defs>
           {lines.map((l, i) => (
-            <SvgText key={i} x={0} y={l.y} fontSize={36} fontFamily={fontFamily.bold} fill="url(#greetingGrad)">
+            <SvgText key={i} x={0} y={l.y} fontSize={GREETING_FONT_SIZE} fontFamily={fontFamily.bold} fill="url(#greetingGrad)">
               {l.text}
             </SvgText>
           ))}
@@ -74,17 +121,43 @@ function GreetingHeading({ text }: { text: string }) {
 
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  // Capped at 380 (the kit's own reference width) but shrinks on anything
+  // narrower - was a hardcoded 380 that clipped the axis ("18" cut off) on
+  // any phone under 412 logical px wide (2026-08-17 review).
+  const chartWidth = Math.min(screenWidth - SIDE_MARGIN * 2, 380);
+  // Real content height, measured off the ScrollView itself - the star
+  // background needs to span the *whole* scrollable column (it's meant to
+  // scroll together with the content, not sit fixed behind the viewport,
+  // matching Figma's own "Star Field" frame being part of the tall
+  // scrollable Home v2 frame) - can't know this size ahead of a render since
+  // it depends on real text wrapping/device width.
+  //
+  // Only ever grows, never shrinks: `paragraph`'s length (and so the
+  // ScrollView's real content height) changes with the selected day, and
+  // re-setting this on every change re-stretched the star SVG
+  // (preserveAspectRatio="none") to the new height each time - visible as
+  // the whole starfield "moving" when tapping a different date. Clamping to
+  // the max height ever seen keeps it visually static after it first
+  // settles, while still fully covering the tallest real content.
+  const [contentHeight, setContentHeight] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(14);
+  const paragraph = DAY_PARAGRAPHS[selectedDay] ?? DAY_PARAGRAPHS[14];
 
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 140 }]}
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: insets.bottom + 140 }}
         showsVerticalScrollIndicator={false}
+        onContentSizeChange={(_w, h) => setContentHeight((prev) => Math.max(prev, h))}
       >
-        <View style={styles.greetingRow}>
-          <GreetingHeading text={`Доброе утро, ${USER_NAME}`} />
-          <ProfileIcon size={40} />
-        </View>
+        <StarsBackground width={screenWidth} height={contentHeight} />
+
+        <View style={styles.content}>
+          <View style={styles.greetingRow}>
+            <GreetingHeading text={`Доброе утро, ${USER_NAME}`} />
+            <ProfileIcon size={28} />
+          </View>
 
         <View style={[styles.biorhythmHeader, { marginTop: GAP.greetingToBiorhythmTitle }]}>
           <Text style={styles.biorhythmTitle}>Биоритмы</Text>
@@ -92,12 +165,10 @@ export function HomeScreen() {
         </View>
 
         <View style={{ marginTop: GAP.titleToChart }}>
-          <BiorhythmChart />
+          <BiorhythmChart width={chartWidth} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
         </View>
 
-        <Text style={[styles.paragraph, { marginTop: GAP.chartToParagraph }]}>
-          Сегодня эмоциональный ресурс ниже обычного. Тело и разум помогут сохранить устойчивость — планируй день спокойно и не забывай про отдых.
-        </Text>
+        <Text style={[styles.paragraph, { marginTop: GAP.chartToParagraph }]}>{paragraph}</Text>
 
         <ScrollView
           horizontal
@@ -114,9 +185,9 @@ export function HomeScreen() {
               { label: 'Освещенность', value: '24%' },
               { label: 'Восход', value: '4:32 утра' },
               { label: 'Закат', value: '12:15 дня' },
-              { label: 'До новолуния', value: '6 дней' },
+              { label: 'До новолуния', value: '6 дней' },
             ]}
-            note="Конец лунного цикла. В ближайшие дни рекомендуется снизить нагрузку и сфокусироваться на отдыхе и восстановлении ресурса."
+            note="Конец лунного цикла. В ближайшие дни рекомендуется снизить нагрузку и сфокусироваться на отдыхе и восстановлении ресурса."
           />
           <MoonSunCard
             title="Солнечная активность"
@@ -129,7 +200,7 @@ export function HomeScreen() {
               { label: 'Закат', value: '18:41 дня' },
               { label: 'Световой день', value: '11 ч 26 мин' },
             ]}
-            note="Солнечная активность умеренная — день подойдёт для спокойной и сосредоточенной работы."
+            note="Солнечная активность умеренная — день подойдёт для спокойной и сосредоточенной работы."
           />
         </ScrollView>
 
@@ -142,23 +213,24 @@ export function HomeScreen() {
         >
           <FocusCard
             icon="lotus"
-            title="Мягкий старт и обновление"
-            text="Не время для рекордов, но идеальное время для «входа» в ритм. Подойдет пилатес, растяжка или долгая прогулка. Это поднимет серотонин и сгладит эмоциональный провал."
+            title="Мягкий старт и обновление"
+            text="Не время для рекордов, но идеальное время для «входа» в ритм. Подойдет пилатес, растяжка или долгая прогулка. Это поднимет серотонин и сгладит эмоциональный провал."
           />
           <FocusCard
             icon="idea"
             title="Планирование"
-            text="Идеальный момент для аналитической работы в одиночестве. Пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений."
+            text="Идеальный момент для аналитической работы в одиночестве. Пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений."
           />
           <FocusCard
             icon="broom"
             title="Пространство"
-            text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого даст чувство контроля и облегчения, что очень важно при низком эмоциональном биоритме."
+            text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого даст чувство контроля и облегчения, что очень важно при низком эмоциональном биоритме."
           />
         </ScrollView>
 
         <View style={{ marginTop: GAP.cardsToQuote }}>
-          <QuoteCard quote={'Важно не то, как ты идёшь, а то, что ты\nне останавливаешься'} author="Конфуций" />
+          <QuoteCard quote={'Важно не то, как ты идёшь, а то, что ты\nне останавливаешься'} author="Конфуций" />
+        </View>
         </View>
       </ScrollView>
     </View>
@@ -185,8 +257,8 @@ const styles = StyleSheet.create({
     width: 270,
     opacity: 0,
     fontFamily: fontFamily.bold,
-    fontSize: 36,
-    lineHeight: 36 * 1.1,
+    fontSize: GREETING_FONT_SIZE,
+    lineHeight: GREETING_FONT_SIZE * 1.1,
   },
   biorhythmHeader: {
     flexDirection: 'row',
@@ -195,13 +267,15 @@ const styles = StyleSheet.create({
   },
   biorhythmTitle: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 28,
-    lineHeight: 28 * 1.5,
+    // 24 - "Биоритмы... уменьшить на 4" (2026-08-19), Figma's literal was 28.
+    fontSize: 24,
+    lineHeight: 24 * 1.5,
     color: colors.textPrimary,
   },
   moreLink: {
     fontFamily: fontFamily.medium,
     fontSize: 16,
+    lineHeight: 16 * 1.5,
     color: colors.violet300,
     textDecorationLine: 'underline',
   },
