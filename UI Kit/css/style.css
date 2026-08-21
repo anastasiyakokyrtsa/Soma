@@ -257,12 +257,16 @@ button{font-family:inherit;}
 .illus-tile.photo img{width:100%; height:100%; object-fit:cover;}
 
 /* ============ MOON & SUN ACTIVITY CARDS ============ */
-/* two separate cards, fixed to the real component size: 336×487 */
-.moonsun-cards{display:flex; gap:var(--sp-5); flex-wrap:wrap;}
+/* two separate cards, width fixed at 336, height hugs content (Figma's own
+   "hug" setting on this frame, not a literal 487 - corrected 2026-08-20,
+   was wrongly treated as a fixed size since the very first port). Gap
+   between cards 12px (--sp-3, was --sp-5/20px), padding 16px all sides
+   (--sp-4, was --sp-6/24px) - both real spec corrections, not style tweaks. */
+.moonsun-cards{display:flex; gap:var(--sp-3); flex-wrap:wrap;}
 .moonsun-card{
-  position:relative; width:336px; height:487px; box-sizing:border-box;
+  position:relative; width:336px; box-sizing:border-box;
   display:flex; flex-direction:column; align-items:center;
-  padding:var(--sp-6); border-radius:var(--r-lg); background:var(--card-fill);
+  padding:var(--sp-4); border-radius:var(--r-lg); background:var(--card-fill);
   cursor:pointer; transition:transform .15s ease;
 }
 /* no border at rest — pressed gets the same gradient ring as the Analytics Stat Card,

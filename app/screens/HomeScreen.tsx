@@ -24,14 +24,14 @@ const GAP = {
   greetingToBiorhythmTitle: 32,
   titleToChart: 20,
   chartToParagraph: 20,
-  // block-to-block gaps unified to match greetingToBiorhythmTitle (2026-08-20:
-  // "пусть у нас расстояние между блоками будет такое же как от заголовка
-  // Доброе утро Анастасия до Биоритмы") - were 60/67/110, the literal Figma
-  // y-deltas, until she judged the resulting empty space too big on-device.
-  paragraphToMoonsun: 32,
-  moonsunToFocusTitle: 32,
+  // block-to-block gaps: tried unifying to 32 (matching greetingToBiorhythmTitle)
+  // 2026-08-20, then reverted the same day ("ты наверное прав, давай между
+  // блоками вернем 60 пикселей") - back to a uniform 60 for every block
+  // transition (not the original non-uniform literal Figma deltas 60/67/110).
+  paragraphToMoonsun: 60,
+  moonsunToFocusTitle: 60,
   focusTitleToCards: 20,
-  cardsToQuote: 32,
+  cardsToQuote: 60,
 };
 
 const USER_NAME = 'Анастасия';
@@ -289,9 +289,13 @@ const styles = StyleSheet.create({
     lineHeight: 16 * 1.2,
     color: colors.textPrimary,
   },
+  // no paddingRight here: this ScrollView already lives inside `content`
+  // (paddingHorizontal:SIDE_MARGIN), so its own viewport right edge is
+  // already exactly SIDE_MARGIN from the screen edge - adding paddingRight
+  // here too double-counted the margin, landing the last card 32px from
+  // the edge instead of 16 when scrolled all the way (caught 2026-08-20).
   moonsunScroll: {
-    gap: 20,
-    paddingRight: SIDE_MARGIN,
+    gap: 12,
   },
   focusTitle: {
     fontFamily: fontFamily.semiBold,
@@ -299,8 +303,8 @@ const styles = StyleSheet.create({
     lineHeight: 22 * 1.5,
     color: colors.textPrimary,
   },
+  // same double-margin issue as moonsunScroll above - fixed the same way.
   focusScroll: {
     gap: 12,
-    paddingRight: SIDE_MARGIN,
   },
 });

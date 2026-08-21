@@ -3,7 +3,6 @@ import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { colors, fontFamily, radius } from '../theme';
 
 const CARD_W = 336;
-const CARD_H = 487;
 
 // Ports UI Kit's "Moon and Sun Activity" card (.moonsun-card/-title/-img/
 // -date/-phase/-rows/-row/-note, style.css ~L262-289) verbatim.
@@ -30,8 +29,13 @@ export function MoonSunCard({
           read as a solid box with zero depth and blocked the stars behind
           it entirely, caught on-device 2026-08-20). r=70.7% (objectBoundingBox
           normalized corner distance, sqrt(0.5^2+0.5^2)) reproduces CSS
-          "farthest-corner"; the 45% CSS stop becomes 0.45*70.7%=31.8% here. */}
-      <Svg width={CARD_W} height={CARD_H} style={StyleSheet.absoluteFillObject}>
+          "farthest-corner"; the 45% CSS stop becomes 0.45*70.7%=31.8% here.
+          No fixed width/height here - the card's own height now hugs its
+          content (Figma's "hug" setting, not a literal 487px), so this
+          layer is sized purely by absoluteFillObject + percentage-based
+          gradient/rect coordinates, matching whatever the real height
+          resolves to after layout. */}
+      <Svg style={StyleSheet.absoluteFillObject}>
         <Defs>
           <RadialGradient id="moonsunFill" cx="50%" cy="50%" r="70.7%">
             <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
@@ -39,7 +43,7 @@ export function MoonSunCard({
             <Stop offset="1" stopColor={colors.violet300} stopOpacity={0.2} />
           </RadialGradient>
         </Defs>
-        <Rect x={0} y={0} width={CARD_W} height={CARD_H} fill="url(#moonsunFill)" />
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#moonsunFill)" />
       </Svg>
       <View style={styles.whiteWash} pointerEvents="none" />
       <View style={styles.inner}>
@@ -64,21 +68,20 @@ export function MoonSunCard({
 }
 
 const styles = StyleSheet.create({
-  // unpadded - the radial-gradient background layer needs to span the whole
-  // 336x487 face, including the area under the padding. `padding` moved to
-  // `inner` instead of `card` itself (see 2026-08-20 comment above) so the
+  // unpadded, no fixed height - the radial-gradient background layer needs
+  // to span the whole card face including under the padding, and the real
+  // Figma frame hugs its content rather than a literal 487px (2026-08-20
+  // correction). `padding` lives on `inner` instead of `card` itself so the
   // absolutely-positioned Svg's own top:0/left:0/right:0/bottom:0 anchors
   // to the true card corners, not to a padding-inset content box.
   card: {
     width: CARD_W,
-    height: CARD_H,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },
   inner: {
-    flex: 1,
     alignItems: 'center',
-    padding: 24,
+    padding: 16,
   },
   // second --card-fill layer (the CSS linear-gradient(rgba(255,255,255,.02)...)
   // flat wash sitting on top of the radial gradient) - too subtle for its own
