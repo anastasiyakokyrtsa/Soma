@@ -5,9 +5,21 @@ import { GradientIcon, type GradientIconName } from './icons/GradientIcon';
 // "Фокус дня" recommendation card - no existing kit component for this one
 // (new to the Home screen, Figma node 579:1085) - purple-stroke card style
 // matches the same borderVioletFlat family already used for ArticleLinkRow.
-export function FocusCard({ icon, title, text }: { icon: GradientIconName; title: string; text: string }) {
+export function FocusCard({
+  width = 336,
+  icon,
+  title,
+  text,
+}: {
+  // 336 only holds exactly on the Figma reference width (412) - same
+  // per-device derivation as MoonSunCard, same reason (2026-08-20).
+  width?: number;
+  icon: GradientIconName;
+  title: string;
+  text: string;
+}) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { width }]}>
       <View style={styles.header}>
         <GradientIcon name={icon} size={32} />
         <Text style={styles.title}>{title}</Text>
@@ -19,7 +31,6 @@ export function FocusCard({ icon, title, text }: { icon: GradientIconName; title
 
 const styles = StyleSheet.create({
   card: {
-    width: 336,
     height: 167,
     borderWidth: 1,
     // Figma's own literal spec for this card is a fully opaque #a89cf8

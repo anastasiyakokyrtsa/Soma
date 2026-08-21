@@ -7,6 +7,7 @@ const CARD_W = 336;
 // Ports UI Kit's "Moon and Sun Activity" card (.moonsun-card/-title/-img/
 // -date/-phase/-rows/-row/-note, style.css ~L262-289) verbatim.
 export function MoonSunCard({
+  width = CARD_W,
   title,
   image,
   date,
@@ -14,6 +15,11 @@ export function MoonSunCard({
   rows,
   note,
 }: {
+  // 336 only holds exactly on the Figma reference width (412) - HomeScreen
+  // derives a real per-device value so the 60px trailing gap she measured
+  // in Figma survives on narrower phones instead of the card nearly
+  // touching the screen edge (2026-08-20).
+  width?: number;
   title: string;
   image: ImageSourcePropType;
   date: string;
@@ -22,7 +28,7 @@ export function MoonSunCard({
   note: string;
 }) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { width }]}>
       {/* real port of --card-fill (a translucent radial gradient over
           whatever sits behind the card, not an opaque fill - the flat
           colors.cardFillFallback stand-in this used before made the card
@@ -75,7 +81,6 @@ const styles = StyleSheet.create({
   // absolutely-positioned Svg's own top:0/left:0/right:0/bottom:0 anchors
   // to the true card corners, not to a padding-inset content box.
   card: {
-    width: CARD_W,
     borderRadius: radius.lg,
     overflow: 'hidden',
   },

@@ -130,6 +130,15 @@ export function HomeScreen() {
   // narrower - was a hardcoded 380 that clipped the axis ("18" cut off) on
   // any phone under 412 logical px wide (2026-08-17 review).
   const chartWidth = Math.min(screenWidth - SIDE_MARGIN * 2, 380);
+  // MoonSunCard/FocusCard: 336 is only correct on the Figma reference
+  // width (412) - 16 (left margin) + 336 = 352, leaving exactly the 60px
+  // trailing gap she measured in Figma before the next card peeks in. A
+  // literal 336 on a narrower real device (hers isn't 412 logical px wide)
+  // eats into that 60px, or overflows past it entirely - so derive the
+  // width from the actual screen instead of hardcoding it (2026-08-20:
+  // "если ширина экрана 412, а ширина карточки 336... край карточки
+  // не видно, чтобы его увидеть надо скроллить").
+  const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
   // Real content height, measured off the ScrollView itself - the star
   // background needs to span the *whole* scrollable column (it's meant to
   // scroll together with the content, not sit fixed behind the viewport,
@@ -181,6 +190,7 @@ export function HomeScreen() {
           contentContainerStyle={styles.moonsunScroll}
         >
           <MoonSunCard
+            width={cardWidth}
             title="Лунная активность"
             image={MOON_IMAGE}
             date="14 марта, 18:07"
@@ -194,6 +204,7 @@ export function HomeScreen() {
             note="Конец лунного цикла. В ближайшие дни рекомендуется снизить нагрузку и сфокусироваться на отдыхе и восстановлении ресурса."
           />
           <MoonSunCard
+            width={cardWidth}
             title="Солнечная активность"
             image={SUN_IMAGE}
             date="14 марта, 18:07"
@@ -216,16 +227,19 @@ export function HomeScreen() {
           contentContainerStyle={styles.focusScroll}
         >
           <FocusCard
+            width={cardWidth}
             icon="lotus"
             title="Мягкий старт и обновление"
             text="Не время для рекордов, но идеальное время для «входа» в ритм. Подойдет пилатес, растяжка или долгая прогулка. Это поднимет серотонин и сгладит эмоциональный провал."
           />
           <FocusCard
+            width={cardWidth}
             icon="idea"
             title="Планирование"
             text="Идеальный момент для аналитической работы в одиночестве. Пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений."
           />
           <FocusCard
+            width={cardWidth}
             icon="broom"
             title="Пространство"
             text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого даст чувство контроля и облегчения, что очень важно при низком эмоциональном биоритме."
