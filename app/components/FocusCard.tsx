@@ -22,7 +22,20 @@ export function FocusCard({
     <View style={[styles.card, { width }]}>
       <View style={styles.header}>
         <GradientIcon name={icon} size={32} />
-        <Text style={styles.title}>{title}</Text>
+        {/* numberOfLines+adjustsFontSizeToFit (not a smaller shared literal
+            size): only "Мягкий старт и обновление" is long enough to
+            actually need shrinking at the real (narrower-than-Figma) card
+            widths this now renders at - "Планирование"/"Пространство" fit
+            at the full 20px already, and forcing all 3 titles down to a
+            smaller shared size just to cover the one long outlier would be
+            a real quality loss for the two that don't need it (2026-08-20:
+            "нужно чтобы заголовок... умещался", "чтобы качество не
+            терялось"). flexShrink:1 gives Text a real width to shrink
+            against inside the row, otherwise adjustsFontSizeToFit has
+            nothing to measure itself against. */}
+        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
+          {title}
+        </Text>
       </View>
       <Text style={styles.text}>{text}</Text>
     </View>
@@ -30,8 +43,12 @@ export function FocusCard({
 }
 
 const styles = StyleSheet.create({
+  // height hugs content now (was a fixed 167) - the only way to guarantee
+  // the real last line of `text` sits exactly `padding` (16) from the
+  // card's bottom edge regardless of how many lines it wraps to, same
+  // reasoning as MoonSunCard's height fix (2026-08-20: "от нижней строки
+  // до нижнего края карточки... 16 пикселей").
   card: {
-    height: 167,
     borderWidth: 1,
     // Figma's own literal spec for this card is a fully opaque #a89cf8
     // border (colors.violet300), not the translucent borderVioletFlat stand-in
@@ -47,6 +64,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   title: {
+    flexShrink: 1,
     fontFamily: fontFamily.semiBold,
     fontSize: 20,
     lineHeight: 20 * 1.5,

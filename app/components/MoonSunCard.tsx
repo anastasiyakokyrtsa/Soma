@@ -27,6 +27,17 @@ export function MoonSunCard({
   rows: { label: string; value: string }[];
   note: string;
 }) {
+  // Every internal size below (font/line-height/gaps/image/padding) was
+  // literal, tuned for a 336-wide card - once `width` started shrinking to
+  // fit real (narrower-than-Figma's 412 reference) screens, the same fixed
+  // numbers made the card look "вытянутые" (elongated): text wrapping into
+  // more lines than the design intended, since font size stayed full-size
+  // on a narrower box. Scaling everything by the same ratio the card itself
+  // shrank by keeps the original proportions/wrap pattern instead (same
+  // technique as BiorhythmChart/BottomBar's own `scale` factor) - only
+  // shrinks below 1 (never grows past the original 336 design), and is
+  // gentle in practice since real widths land close to 336 anyway.
+  const scale = Math.min(width, CARD_W) / CARD_W;
   return (
     <View style={[styles.card, { width }]}>
       {/* real port of --card-fill (a translucent radial gradient over
@@ -52,22 +63,35 @@ export function MoonSunCard({
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#moonsunFill)" />
       </Svg>
       <View style={styles.whiteWash} pointerEvents="none" />
-      <View style={styles.inner}>
-        <Text style={styles.title}>{title}</Text>
-        <Image source={image} style={styles.img} resizeMode="cover" />
-        <Text style={styles.date}>{date}</Text>
-        <Text style={styles.phase}>{phase}</Text>
-        <View style={styles.rows}>
+      <View style={[styles.inner, { padding: 16 * scale }]}>
+        <Text style={[styles.title, { fontSize: 22 * scale, lineHeight: 22 * 1.2 * scale, marginBottom: 16 * scale }]}>
+          {title}
+        </Text>
+        <Image
+          source={image}
+          style={[styles.img, { width: 110 * scale, height: 110 * scale, marginBottom: 16 * scale }]}
+          resizeMode="cover"
+        />
+        <Text style={[styles.date, { fontSize: 14 * scale, lineHeight: 14 * 1.5 * scale, marginBottom: 4 * scale }]}>
+          {date}
+        </Text>
+        <Text style={[styles.phase, { fontSize: 16 * scale, lineHeight: 16 * 1.5 * scale, marginBottom: 16 * scale }]}>
+          {phase}
+        </Text>
+        <View style={[styles.rows, { gap: 8 * scale, marginBottom: 16 * scale }]}>
           {rows.map((r) => (
-            <View key={r.label} style={styles.row}>
-              <Text style={styles.rowLabel} numberOfLines={1}>
+            <View key={r.label} style={[styles.row, { gap: 28 * scale }]}>
+              <Text
+                style={[styles.rowLabel, { minWidth: 110 * scale, fontSize: 16 * scale, lineHeight: 16 * 1.5 * scale }]}
+                numberOfLines={1}
+              >
                 {r.label}
               </Text>
-              <Text style={styles.rowValue}>{r.value}</Text>
+              <Text style={[styles.rowValue, { fontSize: 16 * scale, lineHeight: 16 * 1.5 * scale }]}>{r.value}</Text>
             </View>
           ))}
         </View>
-        <Text style={styles.note}>{note}</Text>
+        <Text style={[styles.note, { fontSize: 16 * scale, lineHeight: 16 * 1.3 * scale }]}>{note}</Text>
       </View>
     </View>
   );
@@ -86,7 +110,6 @@ const styles = StyleSheet.create({
   },
   inner: {
     alignItems: 'center',
-    padding: 16,
   },
   // second --card-fill layer (the CSS linear-gradient(rgba(255,255,255,.02)...)
   // flat wash sitting on top of the radial gradient) - too subtle for its own
@@ -95,44 +118,32 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
+  // fontSize/lineHeight/margin/gap/minWidth below are all set inline
+  // (scaled by `scale`, see the component body) - only the properties that
+  // don't scale (color, fontFamily, alignment) stay in the StyleSheet.
   title: {
     alignSelf: 'flex-start',
     fontFamily: fontFamily.bold,
-    fontSize: 22,
-    lineHeight: 22 * 1.2,
     color: colors.textPrimary,
-    marginBottom: 16,
   },
   img: {
-    width: 110,
-    height: 110,
     borderRadius: radius.sm,
-    marginBottom: 16,
   },
   date: {
     fontFamily: fontFamily.light,
-    fontSize: 14,
-    lineHeight: 14 * 1.5,
     color: colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 4,
   },
   phase: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 16,
-    lineHeight: 16 * 1.5,
     color: colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 16,
   },
   rows: {
     width: '100%',
-    gap: 8,
-    marginBottom: 16,
   },
   row: {
     flexDirection: 'row',
-    gap: 28,
   },
   // minWidth (not a fixed width): "Освещенность" is real, long enough that
   // a hard 110px wrapped it mid-word ("Освещенност/ь") on-device - letting
@@ -140,23 +151,16 @@ const styles = StyleSheet.create({
   // it from ever wrapping again) beats forcing every label wider just to
   // fit the one outlier (2026-08-17 review).
   rowLabel: {
-    minWidth: 110,
     flexShrink: 0,
     fontFamily: fontFamily.medium,
-    fontSize: 16,
-    lineHeight: 16 * 1.5,
     color: colors.textPrimary,
   },
   rowValue: {
     fontFamily: fontFamily.light,
-    fontSize: 16,
-    lineHeight: 16 * 1.5,
     color: colors.textPrimary,
   },
   note: {
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 16 * 1.3,
     color: colors.textPrimary,
   },
 });
