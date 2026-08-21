@@ -24,10 +24,14 @@ const GAP = {
   greetingToBiorhythmTitle: 32,
   titleToChart: 20,
   chartToParagraph: 20,
-  paragraphToMoonsun: 60,
-  moonsunToFocusTitle: 67,
+  // block-to-block gaps unified to match greetingToBiorhythmTitle (2026-08-20:
+  // "пусть у нас расстояние между блоками будет такое же как от заголовка
+  // Доброе утро Анастасия до Биоритмы") - were 60/67/110, the literal Figma
+  // y-deltas, until she judged the resulting empty space too big on-device.
+  paragraphToMoonsun: 32,
+  moonsunToFocusTitle: 32,
   focusTitleToCards: 20,
-  cardsToQuote: 110,
+  cardsToQuote: 32,
 };
 
 const USER_NAME = 'Анастасия';

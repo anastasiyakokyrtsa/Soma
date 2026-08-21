@@ -82,7 +82,18 @@ const CURVES = [
 const RING_R = 34;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R;
 const RING_DASHARRAY: [number, number] = [RING_CIRCUMFERENCE, RING_CIRCUMFERENCE];
-const dashoffsetForPct = (pct: number) => (RING_CIRCUMFERENCE * (100 - pct)) / 100;
+// A round strokeLinecap bulges ~strokeWidth (8) into the gap from each of
+// its two ends - at a high pct like 98.7% the true gap (~2.9 units) is
+// smaller than that bulge, so the ring rendered as fully closed even though
+// the number underneath said 98.7%, not 100 (caught 2026-08-20 on real
+// day-14/15 data). Clamping the gap to a floor comfortably bigger than the
+// cap's own encroachment keeps a real sliver visible at any pct < 100,
+// without giving up the rounded caps she asked for.
+const MIN_VISIBLE_GAP = 16;
+const dashoffsetForPct = (pct: number) => {
+  if (pct >= 100) return 0;
+  return Math.max((RING_CIRCUMFERENCE * (100 - pct)) / 100, MIN_VISIBLE_GAP);
+};
 
 const RING_META = [
   { id: 'physical' as const, colors: ['#7DE8C4', '#5DC2A3', '#4BA78D'], glow: '#5DC2A3', label: 'Физика' },
