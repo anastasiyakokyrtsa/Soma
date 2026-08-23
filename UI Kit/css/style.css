@@ -366,7 +366,9 @@ button{font-family:inherit;}
    ::before, no background tint) — min-height not height: at 16px vertical padding the icon+text row is
    under 60 on its own, so min-height:60 actually renders at exactly 60. */
 .nav-chip{
-  position:relative; display:inline-flex; align-items:center; gap:6px; min-height:60px; padding:16px 24px; box-sizing:border-box;
+  /* 20px side padding, not 24 — app parity request 2026-08-20, so "Дыхание"/
+     "Звуки природы" fit on one row on a real device without wrapping. */
+  position:relative; display:inline-flex; align-items:center; gap:6px; min-height:60px; padding:16px 20px; box-sizing:border-box;
   border-radius:30px; background:var(--card-fill); border:none; outline:none;
   color:var(--text-primary); font-size:14px; font-weight:600; cursor:pointer;
   transition:transform .15s ease; user-select:none;
@@ -729,8 +731,12 @@ button{font-family:inherit;}
 .mt-icon-frame{width:60px; height:60px; margin:0 0 44px; display:flex; align-items:center; justify-content:center;}
 .mt-icon-frame img{width:60px; height:60px; object-fit:contain; display:block;}
 .mt-text{width:70px; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;}
-.mt-title{font-family:var(--font-nunito); font-weight:400; font-size:16px; line-height:1.1; margin:0; color:var(--text-primary);}
-.mt-time{font-family:var(--font-nunito); font-weight:400; font-size:14px; line-height:1.1; margin:0; color:rgba(255,255,255,.75);}
+/* Title dropped 16px->13px and bumped 400->600 (matches `.mt-time`'s own size,
+   one weight step above it for hierarchy) — app parity, 2026-08-20: 13px so
+   "Медитация" holds one line on a real device width, 600 per her explicit
+   follow-up ask to bump the weight further once size was settled. */
+.mt-title{font-family:var(--font-nunito); font-weight:600; font-size:13px; line-height:1.1; margin:0; color:var(--text-primary);}
+.mt-time{font-family:var(--font-nunito); font-weight:400; font-size:13px; line-height:1.1; margin:0; color:rgba(255,255,255,.75);}
 
 /* Article link row — 380×112, transparent fill, gradient ring always on (not just pressed,
    since there's no fill to read the card's edge otherwise). Ring via mask-composite, not the
@@ -806,20 +812,22 @@ button{font-family:inherit;}
 /* photo card with the same glow-ring effect as the Article Reader's empty photo slot:
    inner shadow rgba(5,8,22,.8) blur10 + drop shadow rgba(139,124,246,.3) blur40 spread8 */
 .quote-card{
-  position:relative; width:380px; height:272px; border-radius:30px; overflow:hidden;
-  display:flex; align-items:center; justify-content:center;
+  position:relative; width:380px; border-radius:30px; overflow:hidden;
   box-shadow:inset 0 0 10px rgba(5,8,22,.8), 0 0 40px 8px rgba(139,124,246,.3);
 }
 .quote-card-bg{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
-.quote-card-content{position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 32px;}
+/* Hugs content + 60px top/bottom padding, not a fixed 272px vertically-centered
+   box — app parity request 2026-08-20 ("сверху и снизу... по 60 пикселей"). */
+.quote-card-content{position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding:60px 32px;}
 .quote-card-text{font-family:var(--font-nunito); font-weight:500; font-style:italic; font-size:22px; line-height:1.1; color:#fff; margin:0 0 16px;}
 .quote-card-author{font-family:var(--font-nunito); font-weight:400; font-style:italic; font-size:18px; color:rgba(255,255,255,.75); margin:0 0 10px;}
 .quote-card-actions{display:flex; align-items:center; gap:12px;}
 .quote-card-icon{width:32px; height:32px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-/* bookmark.svg (solid fill) and forward-arrow.svg (thin outline stroke) read as different visual
-   weights at the same box size — the outline needs to run larger to hold its own next to the solid shape. */
-.quote-card-icon img{width:24px; height:24px; object-fit:contain;}
-.quote-card-icon img[src*="forward-arrow"]{width:29px; height:29px;}
+/* Both icons rendered at the same 29px height — app parity request 2026-08-20
+   ("иконка Сохранить визуально было такой же по высоте как иконка Отправить"),
+   superseding an earlier size split here (bookmark 24px vs forward-arrow 29px)
+   meant to compensate solid-fill vs outline-stroke visual weight. */
+.quote-card-icon img{width:29px; height:29px; object-fit:contain;}
 
 /* Tea Category Card — wider than tall (380×302), standard var(--card-fill). No press-state ring on
    the card itself anymore: now that it has its own button, the button is the interactive affordance
