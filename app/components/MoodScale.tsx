@@ -26,6 +26,14 @@ const MOODS = [
 // narrower phone (same pattern as SleepWheelPicker's `dialSize`).
 const SCALE_WIDTH = 380;
 
+// A literal `pct * scaleWidth` fill width goes to 0 at index 0 ("Ужасно"),
+// leaving the whole line's left tip plain gray - she wants the left tail
+// always violet, never gray, regardless of the current selection (2026-08-20:
+// "хвостик линии слева закрась в сиреневый, не оставляй серым"). A small
+// floor keeps a violet rounded nub showing at rest, growing into the full
+// fill bar as the selection moves right.
+const MIN_FILL_WIDTH = 8;
+
 // Separate coordinate system for the icons+labels row only - the line's
 // fixed 380 was leaving "Ужасно"/"Отлично" clipped off the left/right edge
 // on a narrower device (2026-08-17: "опять сделал так что слова... не
@@ -100,7 +108,7 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
         {ready ? (
           <>
             <View style={[styles.trackLine, { left: leftOffset, width: scaleWidth }]} />
-            <View style={[styles.trackFill, { left: leftOffset, width: pct * scaleWidth }]} />
+            <View style={[styles.trackFill, { left: leftOffset, width: Math.max(pct * scaleWidth, MIN_FILL_WIDTH) }]} />
           </>
         ) : null}
         {/* Thumb positioned on the icons/labels' own coordinate system

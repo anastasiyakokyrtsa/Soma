@@ -266,7 +266,12 @@ function setMood(index) {
   // the fill/thumb reach the true edges of the line at the first/last mood (0% / 100%),
   // evenly spread in between — matching where the icons/labels are centred.
   const pct = (index / (moodData.length - 1)) * 100;
-  moodFill.style.width = pct + '%';
+  // 8px floor so the left tail always shows violet, never plain gray, even
+  // at index 0 where the literal fill would otherwise be 0 width (2026-08-20,
+  // ported from the app's MoodScale.tsx MIN_FILL_WIDTH) — needs a real px
+  // width (not %) to floor against, so measure the track directly.
+  const trackWidth = moodTrackEl.getBoundingClientRect().width;
+  moodFill.style.width = Math.max((pct / 100) * trackWidth, 8) + 'px';
   moodThumb.style.left = pct + '%';
 }
 
