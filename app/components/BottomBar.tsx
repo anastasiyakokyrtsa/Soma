@@ -26,6 +26,11 @@ const TAB_ICONS: Record<string, { icon: NavIconName; iconAlt: NavIconName; label
 // actual rendered height the same way this component does.
 export const BAR_VIEWBOX_W = 412;
 export const BAR_VIEWBOX_H = 125;
+// Also exported for HomeScreen's own scroll-clearance math (see there) -
+// the bar's real on-screen box is narrower and higher than a naive
+// screenWidth/insets.bottom calculation would assume.
+export const BAR_SIDE_MARGIN = 12;
+export const BAR_BOTTOM_GAP = 12;
 const DOME_PATH =
   'M 6,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 406,50 Q 412,50 412,56 L 412,99 Q 412,125 386,125 L 26,125 Q 0,125 0,99 L 0,56 Q 0,50 6,50 Z';
 
@@ -66,7 +71,15 @@ const GLOW_LAYERS = Array.from({ length: GLOW_LAYER_COUNT }, (_, i) => {
 export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
-  const width = Math.min(screenWidth, 412);
+  // Narrower than the screen, and lifted off the true bottom edge - the bar
+  // used to sit flush against the screen's left/right/bottom edges (0
+  // margin), leaving the glow nowhere to bleed into on any of those three
+  // sides (2026-08-20: "бар так вплотную стоит... что свечение не
+  // помещается... сузить по сторонам и поднять чуть вверх"). Both margins
+  // are exported so HomeScreen's own scroll-clearance math (barHeight+60,
+  // see there) can account for the bar sitting BAR_BOTTOM_GAP higher than
+  // the literal screen bottom.
+  const width = Math.min(screenWidth, BAR_VIEWBOX_W) - BAR_SIDE_MARGIN * 2;
   const scale = width / BAR_VIEWBOX_W;
   const height = BAR_VIEWBOX_H * scale;
 
@@ -92,7 +105,12 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
     // no explicit `position:'relative'` needed the way CSS requires) - now
     // the screen genuinely fills the full height behind it, matching the
     // "floats over content" behavior this always should have had.
-    <View style={[styles.wrap, { width, left: (screenWidth - width) / 2, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
+    <View
+      style={[
+        styles.wrap,
+        { width, left: (screenWidth - width) / 2, bottom: BAR_BOTTOM_GAP, height: height + insets.bottom, paddingBottom: insets.bottom },
+      ]}
+    >
       {/* Kit's glow is filter:drop-shadow(), tracing the dome's alpha
           silhouette. No SVG <Filter> here (FeDropShadow, then
           FeGaussianBlur, both rasterized their filter *region* as an

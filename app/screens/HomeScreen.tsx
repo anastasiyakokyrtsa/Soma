@@ -9,7 +9,7 @@ import { FocusCard } from '../components/FocusCard';
 import { QuoteCard } from '../components/QuoteCard';
 import { ProfileIcon } from '../components/icons/ProfileIcon';
 import { StarsBackground } from '../components/StarsBackground';
-import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
+import { BAR_VIEWBOX_W, BAR_VIEWBOX_H, BAR_SIDE_MARGIN, BAR_BOTTOM_GAP } from '../components/BottomBar';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -140,12 +140,16 @@ export function HomeScreen() {
   // "если ширина экрана 412, а ширина карточки 336... край карточки
   // не видно, чтобы его увидеть надо скроллить").
   const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
-  // Real rendered bar height (BottomBar scales the same way) - a flat
-  // guessed clearance number can't guarantee an exact gap to the last
-  // scrollable element on every screen width. 60px below the quote card,
-  // specifically (2026-08-20: "расстояние от карточки с цитатой до бара
-  // пусть будет 60") - not just "roughly clears the bar."
-  const barHeight = BAR_VIEWBOX_H * (Math.min(screenWidth, BAR_VIEWBOX_W) / BAR_VIEWBOX_W);
+  // Real rendered bar height (BottomBar scales the same way, including its
+  // own side-margin shrink) - a flat guessed clearance number can't
+  // guarantee an exact gap to the last scrollable element on every screen
+  // width. 60px below the quote card, specifically (2026-08-20: "расстояние
+  // от карточки с цитатой до бара пусть будет 60") - not just "roughly
+  // clears the bar." Also accounts for BAR_BOTTOM_GAP now that the bar
+  // sits lifted off the true screen bottom, not flush against it
+  // (2026-08-20: "поднять чуть вверх чтобы снизу тоже было видно").
+  const barWidth = Math.min(screenWidth, BAR_VIEWBOX_W) - BAR_SIDE_MARGIN * 2;
+  const barHeight = BAR_VIEWBOX_H * (barWidth / BAR_VIEWBOX_W) + BAR_BOTTOM_GAP;
   // Real content height, measured off the ScrollView itself - the star
   // background needs to span the *whole* scrollable column (it's meant to
   // scroll together with the content, not sit fixed behind the viewport,
