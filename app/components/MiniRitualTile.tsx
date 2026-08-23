@@ -67,17 +67,17 @@ export function MiniRitualTile({
       <View style={[styles.iconFrame, { marginBottom: iconMarginBottom }]}>
         <GradientIcon name={icon} size={60} />
       </View>
-      {/* width bound to the tile's own real width (minus a little breathing
-          room), not the old fixed 70 - "Медитация" (9 letters) didn't fit
-          on one line inside 70px, wrapping to "Медитац"/"ия" (2026-08-20:
-          "можешь уместить слово в одну строку не уменьшая шрифт?"). title
-          gets a fixed 2-line-tall box (numberOfLines={2}, height locked to
-          exactly 2 lines) so short 1-line titles ("Дыхание"/"Медитация")
-          still reserve the same vertical space "Звуки природы"'s real
-          2-line title needs - without this, `time` sat at a different Y
-          per card depending on whether its own title wrapped (her other
-          ask: "надписи с минутами все были на одном уровне"). */}
-      <View style={[styles.text, { width: width - 16 }]}>
+      {/* width: 16px side padding, matching the app's standard side margin
+          (2026-08-20: "паддинг был по сторонам 16" - was `width - 16`, an
+          8px-a-side squeeze that only fit "Медитация" by crowding the
+          edges). title's own fontSize dropped 16->15 to comfortably fit
+          inside the now-narrower box on one line without that squeeze
+          ("давай наверное чуть уменьшим шрифт"). Fixed 2-line-tall height
+          (numberOfLines={2}) still reserved on every tile, now at the new
+          15px size, so `time` stays aligned across cards regardless of
+          whether a given title wraps ("надписи с минутами все были на
+          одном уровне"). */}
+      <View style={[styles.text, { width: width - 32 }]}>
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
@@ -88,12 +88,19 @@ export function MiniRitualTile({
 }
 
 const styles = StyleSheet.create({
+  // justifyContent:'center' (not the old fixed paddingVertical:36) - her
+  // ask, 2026-08-20: the gap from the top edge to the icon should equal the
+  // gap from the "time" line to the bottom edge. A fixed top/bottom padding
+  // only guarantees that when the content stack's own height happens to
+  // exactly fill the remaining space - centering makes the two gaps
+  // mathematically equal regardless of content height, robust to future
+  // font-size/spacing tweaks instead of needing to re-tune two numbers by hand.
   tile: {
     height: TILE_H,
     borderRadius: radius.card,
     overflow: 'hidden',
     alignItems: 'center',
-    paddingVertical: 36,
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'transparent',
   },
@@ -118,11 +125,12 @@ const styles = StyleSheet.create({
   title: {
     // fixed to exactly 2 lines' worth of height - see the component body
     // comment for why (keeps `time` aligned across cards regardless of
-    // whether this specific title wraps).
-    height: 16 * 1.1 * 2,
+    // whether this specific title wraps). 15, not the kit's literal 16 -
+    // her explicit ask, 2026-08-20, to fit inside a real 16px side padding.
+    height: 15 * 1.1 * 2,
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 16 * 1.1,
+    fontSize: 15,
+    lineHeight: 15 * 1.1,
     color: colors.textPrimary,
     textAlign: 'center',
   },
