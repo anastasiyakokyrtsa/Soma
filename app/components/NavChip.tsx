@@ -55,7 +55,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     minHeight: 60,
-    paddingHorizontal: 24,
+    // 20, not the kit's literal 24 - her explicit ask, 2026-08-20, so
+    // "Дыхание"/"Звуки природы" fit on the same row (they were a few px
+    // too wide combined at 24 - see the row-fit discussion that led here).
+    paddingHorizontal: 20,
     borderRadius: radius.card,
     overflow: 'hidden',
     borderWidth: 1,
