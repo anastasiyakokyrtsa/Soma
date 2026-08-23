@@ -21,10 +21,16 @@ export function MiniRitualTile({
   icon: GradientIconName;
   title: string;
   time: string;
-  // Per-icon override for tiles whose glyph reads visually off-center in
-  // its 60x60 frame at the default 44 gap - no longer used to compensate
-  // for wrap-length differences (title's own fixed 2-line height, below,
-  // handles that now), just real per-icon visual balance if one ever needs it.
+  // Compensates for a 2-line title ("Звуки\nприроды") vs the other cards'
+  // 1-line ones, so the "icon+title" block is the same total height on
+  // every card and `time` lands at the same Y regardless. A fixed height
+  // on `title` itself was tried instead (2026-08-20 round) so this
+  // compensation wouldn't be needed - reverted the same day, it left a
+  // visible dead gap between a 1-line title and `time` below it ("Дыхание
+  // зачем поднял так... без такой дыры"). Back to this per-card override,
+  // the less pretty but visually correct fix - title's own height stays
+  // natural (no dead space inside it), the compensation lives in the gap
+  // *above* the title instead.
   iconMarginBottom?: number;
   // 116 only holds when 3 tiles + 16px side margins + 12px gaps fit the
   // Figma reference width - on a narrower real device the row overflowed
@@ -67,16 +73,16 @@ export function MiniRitualTile({
       <View style={[styles.iconFrame, { marginBottom: iconMarginBottom }]}>
         <GradientIcon name={icon} size={60} />
       </View>
-      {/* width: 16px side padding, matching the app's standard side margin
-          (2026-08-20: "паддинг был по сторонам 16" - was `width - 16`, an
-          8px-a-side squeeze that only fit "Медитация" by crowding the
-          edges). title's own fontSize dropped 16->15 to comfortably fit
-          inside the now-narrower box on one line without that squeeze
-          ("давай наверное чуть уменьшим шрифт"). Fixed 2-line-tall height
-          (numberOfLines={2}) still reserved on every tile, now at the new
-          15px size, so `time` stays aligned across cards regardless of
-          whether a given title wraps ("надписи с минутами все были на
-          одном уровне"). */}
+      {/* 16px side padding, matching the app's standard side margin
+          (2026-08-20: "паддинг был по сторонам 16"). title's fontSize
+          dropped again, 15->13 - 15 still wrapped "Медитация" on her real
+          device ("так у тебя слово Медитация так и не помещается... если
+          нужно уменьшить размер шрифта, подгони, во всех") - one shared
+          size for every title, not a per-instance auto-fit (would let
+          sibling titles render at visibly different sizes - see
+          feedback-rn-app-ui-defaults for why that's the wrong default here).
+          title height is natural now (no fixed 2-line box) - see the
+          iconMarginBottom comment above for why. */}
       <View style={[styles.text, { width: width - 32 }]}>
         <Text style={styles.title} numberOfLines={2}>
           {title}
@@ -88,19 +94,19 @@ export function MiniRitualTile({
 }
 
 const styles = StyleSheet.create({
-  // justifyContent:'center' (not the old fixed paddingVertical:36) - her
-  // ask, 2026-08-20: the gap from the top edge to the icon should equal the
-  // gap from the "time" line to the bottom edge. A fixed top/bottom padding
-  // only guarantees that when the content stack's own height happens to
-  // exactly fill the remaining space - centering makes the two gaps
-  // mathematically equal regardless of content height, robust to future
-  // font-size/spacing tweaks instead of needing to re-tune two numbers by hand.
+  // paddingVertical:36 (back from a brief justifyContent:'center'
+  // experiment the same day) - her explicit ask: "чтобы снизу и сверху был
+  // паддинг по 36". Centering had made the two gaps equal but at whatever
+  // value the leftover space produced, not literally 36 - now that the
+  // "icon+title" block is a constant height across all 3 cards again (via
+  // iconMarginBottom's per-card compensation, not title's own height), a
+  // fixed 36/36 padding lands correctly with no leftover asymmetry either.
   tile: {
     height: TILE_H,
     borderRadius: radius.card,
     overflow: 'hidden',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 36,
     borderWidth: 1,
     borderColor: 'transparent',
   },
@@ -123,14 +129,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   title: {
-    // fixed to exactly 2 lines' worth of height - see the component body
-    // comment for why (keeps `time` aligned across cards regardless of
-    // whether this specific title wraps). 15, not the kit's literal 16 -
-    // her explicit ask, 2026-08-20, to fit inside a real 16px side padding.
-    height: 15 * 1.1 * 2,
     fontFamily: fontFamily.regular,
-    fontSize: 15,
-    lineHeight: 15 * 1.1,
+    fontSize: 13,
+    lineHeight: 13 * 1.1,
     color: colors.textPrimary,
     textAlign: 'center',
   },
