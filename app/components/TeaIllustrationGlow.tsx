@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { Canvas, Image as SkiaImage, useImage, Blur, Group } from '@shopify/react-native-skia';
 
 const IMAGE_W = 193;
@@ -19,27 +19,41 @@ const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 // can - genuine gaussian blur of the artwork's own rendered pixels (real
 // alpha included), same primitive PersonalizationIllustration.tsx already
 // uses for its checkmark glow (Group > Blur > shape, then the crisp shape
-// again on top). No color tint needed: the source art is already drawn in
-// the app's own violet/starry palette, so blurring it directly reads as a
-// natural cosmic glow rather than a geometric shape glued behind it. Two
-// increasingly-blurred, increasingly-faint passes (not one strong one) per
-// her "не сильно ярко" - a soft ambient aura, not a bright ring.
+// again on top).
+//
+// Take 3 shipped with the glow AND the crisp artwork both drawn inside the
+// Skia Canvas, gated behind `useImage` resolving - "вообще нет никакого
+// свечения" came back, and since it's a single sandbox with no on-device
+// check possible here, that report can't distinguish "the blur genuinely
+// isn't visible" from "useImage never resolved so the whole Canvas rendered
+// nothing" (this app already hit one confirmed Skia/Expo-Go environment gap
+// this session - see project_skia_reanimated_bridge.md - so a second one
+// isn't out of the question). De-risked both at once: the crisp artwork is
+// back to a plain RN `Image` rendered unconditionally (identical to every
+// version before this Skia rework - can't fail to appear), and ONLY the
+// blur passes live in the Skia Canvas, now much stronger (blur 12->26,
+// opacity 0.4->0.65) - the source art is sparse constellation-style dots/
+// thin lines, not a solid-filled shape like the checkmark this pattern was
+// copied from, so it has far less pixel coverage for a blur to work with
+// and needs real intensity to read as a glow rather than washing out to
+// near-nothing.
 export function TeaIllustrationGlow() {
   const img = useImage(TEA_ILLUSTRATION);
-  if (!img) return null;
   return (
-    <View style={{ width: CANVAS_W, height: CANVAS_H }} pointerEvents="none">
-      <Canvas style={{ width: CANVAS_W, height: CANVAS_H }}>
-        <Group opacity={0.28}>
-          <Blur blur={20} />
-          <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
-        </Group>
-        <Group opacity={0.4}>
-          <Blur blur={9} />
-          <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
-        </Group>
-        <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
-      </Canvas>
+    <View style={{ width: CANVAS_W, height: CANVAS_H, alignItems: 'center', justifyContent: 'center' }}>
+      {img ? (
+        <Canvas style={[StyleSheet.absoluteFillObject]} pointerEvents="none">
+          <Group opacity={0.55}>
+            <Blur blur={26} />
+            <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
+          </Group>
+          <Group opacity={0.65}>
+            <Blur blur={12} />
+            <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
+          </Group>
+        </Canvas>
+      ) : null}
+      <Image source={TEA_ILLUSTRATION} style={{ width: IMAGE_W, height: IMAGE_H }} resizeMode="contain" />
     </View>
   );
 }
