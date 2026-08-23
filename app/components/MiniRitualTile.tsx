@@ -128,13 +128,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  // one weight step up from regular (medium), not a bigger size - her
-  // explicit ask, 2026-08-20: title read smaller than `time` (13 vs 14),
-  // she wants them the same *size* now and differentiated by *weight*
-  // instead ("текст с минутами такого же кегля... названия... на 1
-  // уровень пожирнее").
+  // weight bumped twice the same day: regular->medium (size/weight
+  // rebalance vs `time`), then medium->semiBold ("можешь в заголовках еще
+  // на ступень жирность увеличить?") - size stays 13, same as `time`.
   title: {
-    fontFamily: fontFamily.medium,
+    fontFamily: fontFamily.semiBold,
     fontSize: 13,
     lineHeight: 13 * 1.1,
     color: colors.textPrimary,

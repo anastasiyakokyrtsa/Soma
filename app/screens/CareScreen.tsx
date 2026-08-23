@@ -123,7 +123,12 @@ export function CareScreen() {
         </View>
 
         <View style={[styles.chipsRow, { marginTop: GAP.whatHelpsToChips }]}>
-          <NavChip icon="breathingCircle" label="Дыхание" />
+          {/* windyWeather, not breathingCircle - her reference screenshot
+              shows a cloud+wind glyph for "Дыхание" here, not the
+              concentric-circles icon Mini Ritual Tile uses for the same
+              word - different context, different kit icon (2026-08-20:
+              "иконки такие же к словам, бери из кита"). */}
+          <NavChip icon="windyWeather" label="Дыхание" />
           <NavChip icon="largeTree" label="Звуки природы" />
           <NavChip icon="meditationFigure" label="Медитации" />
           <NavChip icon="pegasus" label="Сказки" />
