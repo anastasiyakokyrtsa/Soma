@@ -21,18 +21,19 @@ export function FocusCard({
   return (
     <View style={[styles.card, { width }]}>
       <View style={styles.header}>
-        <GradientIcon name={icon} size={32} />
-        {/* numberOfLines+adjustsFontSizeToFit (not a smaller shared literal
-            size): only "Мягкий старт и обновление" is long enough to
-            actually need shrinking at the real (narrower-than-Figma) card
-            widths this now renders at - "Планирование"/"Пространство" fit
-            at the full 20px already, and forcing all 3 titles down to a
-            smaller shared size just to cover the one long outlier would be
-            a real quality loss for the two that don't need it (2026-08-20:
-            "нужно чтобы заголовок... умещался", "чтобы качество не
-            терялось"). flexShrink:1 gives Text a real width to shrink
-            against inside the row, otherwise adjustsFontSizeToFit has
-            nothing to measure itself against. */}
+        {/* 36, not 32 - bumped alongside the title's move to MoonSunCard's
+            larger 22px title size (was paired with the old 20px title),
+            keeping roughly the same icon-to-title weight ratio (2026-08-20:
+            "думаю тут нужно будет и размер иконки адаптировать"). */}
+        <GradientIcon name={icon} size={36} />
+        {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
+            though "Мягкий старт и обновление" (the one title that actually
+            needed it) got shortened to just "Мягкий старт" the same round -
+            still per-instance rather than a shared smaller literal size, so
+            a future long title shrinks on its own without dragging the
+            other cards' titles down with it (see [[project-app-
+            development]] 2026-08-20 for the original reasoning).
+            flexShrink:1 gives Text a real width to measure against. */}
         <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
           {title}
         </Text>
@@ -63,17 +64,24 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 4,
   },
+  // matches MoonSunCard's own title (2026-08-20: "настройки шрифта такие
+  // же как у заголовка в карточке Лунная активность") - bold, 22, 1.2, not
+  // this card's own previous semiBold/20/1.5.
   title: {
     flexShrink: 1,
-    fontFamily: fontFamily.semiBold,
-    fontSize: 20,
-    lineHeight: 20 * 1.5,
+    fontFamily: fontFamily.bold,
+    fontSize: 22,
+    lineHeight: 22 * 1.2,
     color: colors.textPrimary,
   },
+  // matches MoonSunCard's own note text (2026-08-20: "body text... сделаем
+  // как и в описании в карточках Лунной и солнечной активности") - same
+  // fontFamily/fontSize already, only the line-height ratio (1.3, not 1.2)
+  // was different.
   text: {
     fontFamily: fontFamily.regular,
     fontSize: 16,
-    lineHeight: 16 * 1.2,
+    lineHeight: 16 * 1.3,
     color: colors.textPrimary,
   },
 });
