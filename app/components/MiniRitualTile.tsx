@@ -128,8 +128,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  // one weight step up from regular (medium), not a bigger size - her
+  // explicit ask, 2026-08-20: title read smaller than `time` (13 vs 14),
+  // she wants them the same *size* now and differentiated by *weight*
+  // instead ("текст с минутами такого же кегля... названия... на 1
+  // уровень пожирнее").
   title: {
-    fontFamily: fontFamily.regular,
+    fontFamily: fontFamily.medium,
     fontSize: 13,
     lineHeight: 13 * 1.1,
     color: colors.textPrimary,
@@ -137,8 +142,8 @@ const styles = StyleSheet.create({
   },
   time: {
     fontFamily: fontFamily.regular,
-    fontSize: 14,
-    lineHeight: 14 * 1.1,
+    fontSize: 13,
+    lineHeight: 13 * 1.1,
     color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
   },
