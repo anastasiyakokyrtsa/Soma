@@ -22,6 +22,8 @@ const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 // deliberate difference from the onboarding flow's own margin, not an
 // oversight (2026-08-17 review).
 const SIDE_MARGIN = 16;
+// Gap between the 3 Mini Ritual Tiles - her explicit spec, 2026-08-20.
+const TILE_GAP = 12;
 
 // Section-to-section gaps read directly off the Figma frame's own y deltas,
 // with one adjustment: the raw gap between "Что поможет сейчас" and the chip
@@ -50,6 +52,13 @@ export function CareScreen() {
   // re-stretch/"move" if this screen's own content height ever changes
   // (see HomeScreen.tsx's own comment on this exact bug for the full story).
   const [contentHeight, setContentHeight] = useState(0);
+  // 3 tiles + 2×12px gaps + 2×16px side margins, derived from the real
+  // screen width instead of MiniRitualTile's own literal 116 - that only
+  // held on the Figma reference width, overflowed on a narrower real
+  // device ("Медитация" wrapped, the 3rd tile ran off-screen, 2026-08-20:
+  // "они у тебя не помещаются на экране... надо чтобы между ними было по
+  // 12 пикселей, и как обычно паддинг слева и справа по 16").
+  const tileWidth = (screenWidth - SIDE_MARGIN * 2 - TILE_GAP * 2) / 3;
 
   return (
     <View style={styles.container}>
@@ -99,9 +108,9 @@ export function CareScreen() {
               ExtraBold. */}
           <Text style={[styles.sectionTitle, styles.whatHelpsTitle]}>Что поможет сейчас</Text>
           <View style={styles.tilesRow}>
-            <MiniRitualTile icon="breathingCircle" title="Дыхание" time="3 мин" />
-            <MiniRitualTile icon="seaWaves" title="Звуки природы" time="10 мин" iconMarginBottom={26} />
-            <MiniRitualTile icon="lotus" title="Медитация" time="10 мин" />
+            <MiniRitualTile width={tileWidth} icon="breathingCircle" title="Дыхание" time="3 мин" />
+            <MiniRitualTile width={tileWidth} icon="seaWaves" title="Звуки природы" time="10 мин" iconMarginBottom={26} />
+            <MiniRitualTile width={tileWidth} icon="lotus" title="Медитация" time="10 мин" />
           </View>
         </View>
 
@@ -181,7 +190,7 @@ const styles = StyleSheet.create({
   tilesRow: {
     marginTop: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: TILE_GAP,
   },
   chipsRow: {
     flexDirection: 'row',

@@ -7,15 +7,21 @@ export type { GradientIconName };
 // Renders one of the kit's "Gradient" icon family (icons-clean/*.svg) - same
 // 3-stop pink->lavender->violet fill as gradients.headingText, just with each
 // icon's own real per-file diagonal direction (see gradientIconPaths.ts).
-// preserveAspectRatio="none" matches Figma's own technique for these (a
-// mask-image sized to an exact square frame, e.g. 28x28, stretching a
-// non-square source shape to fit) - not the RN/SVG default "contain" behavior.
+// preserveAspectRatio default ("xMidYMid meet", aspect-preserving, centered) -
+// was "none" (force-stretch to an exact square box), which distorted every
+// icon here since none of these source viewBoxes are actually square
+// (seaWaves especially, 44.8x31.8 - a real ~1.4:1 rectangle forced into a
+// square read as visibly squashed). Caught 2026-08-20 on MiniRitualTile's
+// icons specifically ("иконки какие-то сплюснутые получились"), but this
+// prop is shared by every GradientIcon caller (FocusCard/NavChip/
+// ArticleLinkRow too) - the distortion was never scoped to just this one
+// component, just most visible here.
 export function GradientIcon({ name, size }: { name: GradientIconName; size: number }) {
   const def = gradientIconPaths[name];
   const gradIds = def.paths.map((_, i) => `${name}Grad${i}`);
 
   return (
-    <Svg width={size} height={size} viewBox={def.viewBox} preserveAspectRatio="none">
+    <Svg width={size} height={size} viewBox={def.viewBox}>
       <Defs>
         {def.paths.map((p, i) => {
           const g = p.gradient ?? def.gradient;
