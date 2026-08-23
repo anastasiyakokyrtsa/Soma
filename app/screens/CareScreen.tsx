@@ -36,7 +36,11 @@ const GAP = {
   conditionToRing: 60,
   ringToWhatHelps: 60,
   whatHelpsToChips: 60,
-  chipsToTea: 132,
+  // 60, not the raw Figma-frame delta (132) - her explicit ask, 2026-08-20:
+  // "до блока Чай как ритуал должно быть 60. И вообще между всеми
+  // дальнейшими блоками" - a uniform 60 between every block transition on
+  // this screen now, not a per-pair literal number.
+  chipsToTea: 60,
   teaTitleToImage: 20,
   imageToCaption: 20,
   captionToButton: 32,
@@ -102,11 +106,7 @@ export function CareScreen() {
         </View>
 
         <View style={[styles.whatHelps, { marginTop: GAP.ringToWhatHelps }]}>
-          {/* Scoped to just this title, not the shared sectionTitle (which
-              "Чай как ритуал"/"О теле и ритмах" still use unchanged) - her
-              explicit ask, 2026-08-20: 24px SemiBold, not the shared 26px
-              ExtraBold. */}
-          <Text style={[styles.sectionTitle, styles.whatHelpsTitle]}>Что поможет сейчас</Text>
+          <Text style={styles.sectionTitle}>Что поможет сейчас</Text>
           <View style={styles.tilesRow}>
             <MiniRitualTile width={tileWidth} icon="breathingCircle" title="Дыхание" time="3 мин" />
             {/* explicit break, not left to auto-wrap. iconMarginBottom
@@ -180,18 +180,16 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   whatHelps: {},
+  // All 3 section titles ("Что поможет сейчас"/"Чай как ритуал"/"О теле и
+  // ритмах") now share this one style - was 26px ExtraBold, with "Что
+  // поможет сейчас" already overridden to 24px SemiBold; her explicit ask,
+  // 2026-08-20: "заголовки сделай консистентно, такие же как Что поможет
+  // сейчас" - made that the shared baseline instead of a one-off override.
   sectionTitle: {
-    fontFamily: fontFamily.extraBold,
-    fontSize: 26,
-    lineHeight: 26 * 1.1,
-    color: colors.textPrimary,
-  },
-  // "Что поможет сейчас" only - 24px SemiBold, not the shared 26px
-  // ExtraBold (2026-08-20).
-  whatHelpsTitle: {
     fontFamily: fontFamily.semiBold,
     fontSize: 24,
     lineHeight: 24 * 1.1,
+    color: colors.textPrimary,
   },
   sectionDesc: {
     marginTop: 8,
