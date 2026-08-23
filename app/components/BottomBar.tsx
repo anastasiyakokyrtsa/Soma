@@ -26,13 +26,20 @@ const TAB_ICONS: Record<string, { icon: NavIconName; iconAlt: NavIconName; label
 // actual rendered height the same way this component does.
 export const BAR_VIEWBOX_W = 412;
 export const BAR_VIEWBOX_H = 125;
-// Also exported for HomeScreen's own scroll-clearance math (see there) -
-// the bar's real on-screen box is narrower and higher than a naive
-// screenWidth/insets.bottom calculation would assume.
-export const BAR_SIDE_MARGIN = 12;
-export const BAR_BOTTOM_GAP = 12;
+// Corners squared off (were r6 top / r26 bottom, via `Q` quadratic-curve
+// commands into each corner) - her explicit ask, 2026-08-20: "углы по 4
+// сторонам сделай просто без закруглений". Bar also goes back to filling
+// the full screen width and sitting flush against the true bottom edge
+// (both a brief side/bottom-margin experiment, reverted same day: "наверное
+// странно... заполнял все пространство справа и слева... опусти вниз").
 const DOME_PATH =
-  'M 6,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 406,50 Q 412,50 412,56 L 412,99 Q 412,125 386,125 L 26,125 Q 0,125 0,99 L 0,56 Q 0,50 6,50 Z';
+  'M 0,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 412,50 L 412,125 L 0,125 Z';
+// Just the hill/dome bump (open path, no perimeter) - the glow now only
+// traces this, not the whole bar outline, per her ask to drop the
+// left/right/bottom glow entirely and keep it only around the dome
+// ("убери просто свечение справа и слева и снизу").
+const DOME_HILL_PATH =
+  'M 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50';
 
 // Filter-free glow (see the long history in the component below for why no
 // SVG <Filter>/blur is used) - a smooth falloff needs many close, small
@@ -71,15 +78,7 @@ const GLOW_LAYERS = Array.from({ length: GLOW_LAYER_COUNT }, (_, i) => {
 export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
-  // Narrower than the screen, and lifted off the true bottom edge - the bar
-  // used to sit flush against the screen's left/right/bottom edges (0
-  // margin), leaving the glow nowhere to bleed into on any of those three
-  // sides (2026-08-20: "бар так вплотную стоит... что свечение не
-  // помещается... сузить по сторонам и поднять чуть вверх"). Both margins
-  // are exported so HomeScreen's own scroll-clearance math (barHeight+60,
-  // see there) can account for the bar sitting BAR_BOTTOM_GAP higher than
-  // the literal screen bottom.
-  const width = Math.min(screenWidth, BAR_VIEWBOX_W) - BAR_SIDE_MARGIN * 2;
+  const width = Math.min(screenWidth, BAR_VIEWBOX_W);
   const scale = width / BAR_VIEWBOX_W;
   const height = BAR_VIEWBOX_H * scale;
 
@@ -105,18 +104,14 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
     // no explicit `position:'relative'` needed the way CSS requires) - now
     // the screen genuinely fills the full height behind it, matching the
     // "floats over content" behavior this always should have had.
-    <View
-      style={[
-        styles.wrap,
-        { width, left: (screenWidth - width) / 2, bottom: BAR_BOTTOM_GAP, height: height + insets.bottom, paddingBottom: insets.bottom },
-      ]}
-    >
+    <View style={[styles.wrap, { width, left: (screenWidth - width) / 2, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
       {/* Kit's glow is filter:drop-shadow(), tracing the dome's alpha
           silhouette. No SVG <Filter> here (FeDropShadow, then
           FeGaussianBlur, both rasterized their filter *region* as an
           opaque black rectangle on this platform - a real, confirmed
           limitation, not a tuning problem) - this is a filter-free glow
-          instead: GLOW_LAYERS above, stroked copies of the same path,
+          instead: GLOW_LAYERS above, stroked copies of DOME_HILL_PATH
+          (just the bump, not the whole bar outline - see that constant),
           widening/fading. strokeLinecap/strokeLinejoin="round" on every
           layer - without it, the sharp miter corner where the flat body
           meets the dome's curve read as a straight bar jutting out of the
@@ -131,7 +126,7 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         {GLOW_LAYERS.map((layer, i) => (
           <Path
             key={i}
-            d={DOME_PATH}
+            d={DOME_HILL_PATH}
             fill="none"
             stroke={colors.violet400}
             strokeWidth={layer.width}
