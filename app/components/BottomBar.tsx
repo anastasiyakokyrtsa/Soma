@@ -34,12 +34,15 @@ export const BAR_VIEWBOX_H = 125;
 // странно... заполнял все пространство справа и слева... опусти вниз").
 const DOME_PATH =
   'M 0,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 412,50 L 412,125 L 0,125 Z';
-// Just the hill/dome bump (open path, no perimeter) - the glow now only
-// traces this, not the whole bar outline, per her ask to drop the
-// left/right/bottom glow entirely and keep it only around the dome
-// ("убери просто свечение справа и слева и снизу").
-const DOME_HILL_PATH =
-  'M 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50';
+// Just the top silhouette (flat-hill-flat, open path, left edge to right
+// edge) - no glow on the vertical side walls or the bottom edge, per her
+// first ask ("убери просто свечение справа и слева и снизу"), but not
+// narrowed to only the hill either - she caught that overcorrection right
+// away ("почему свечение осталось только над кнопкой плюсом? продли по
+// всему горизонту") - it needs to run the full width, just bulging up
+// around the FAB in the middle rather than only existing there.
+const DOME_TOP_PATH =
+  'M 0,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 412,50';
 
 // Filter-free glow (see the long history in the component below for why no
 // SVG <Filter>/blur is used) - a smooth falloff needs many close, small
@@ -110,9 +113,9 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
           FeGaussianBlur, both rasterized their filter *region* as an
           opaque black rectangle on this platform - a real, confirmed
           limitation, not a tuning problem) - this is a filter-free glow
-          instead: GLOW_LAYERS above, stroked copies of DOME_HILL_PATH
-          (just the bump, not the whole bar outline - see that constant),
-          widening/fading. strokeLinecap/strokeLinejoin="round" on every
+          instead: GLOW_LAYERS above, stroked copies of DOME_TOP_PATH (the
+          top silhouette only, not the whole bar outline - see that
+          constant), widening/fading. strokeLinecap/strokeLinejoin="round" on every
           layer - without it, the sharp miter corner where the flat body
           meets the dome's curve read as a straight bar jutting out of the
           hill at wide stroke widths (2026-08-20: "свечение как будто линия
@@ -126,7 +129,7 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         {GLOW_LAYERS.map((layer, i) => (
           <Path
             key={i}
-            d={DOME_HILL_PATH}
+            d={DOME_TOP_PATH}
             fill="none"
             stroke={colors.violet400}
             strokeWidth={layer.width}
