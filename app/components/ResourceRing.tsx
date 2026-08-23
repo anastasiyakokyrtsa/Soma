@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Stop, Filter, FeGaussianBlur } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
+
+// Shared between the crisp ring and its glow duplicate below, so the two
+// gradients can't drift out of sync with each other.
+const RING_GRADIENT_STOPS = [
+  { offset: 0, color: colors.violet400 },
+  { offset: 0.47, color: '#FFC6F1' },
+  { offset: 0.5, color: '#FFE3F6' },
+  { offset: 0.53, color: '#FFC6F1' },
+  { offset: 1, color: colors.violet400 },
+];
 
 // Ports UI Kit's "Resource Meter" (.resource-ring/.rr-*, style.css ~L843) -
 // a single always-the-same violet/pink ring (no progress-arc logic, purely
@@ -56,27 +66,46 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
 
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>
-      {/* kit's `.rr-halo` is a plain circular div (border-radius:50%) with
-          a 4-layer box-shadow (2 outward + 2 inset) - CSS box-shadow
-          follows an element's own border-radius, so a *circular* View with
-          borderRadius set here renders this correctly, unlike the SVG/View
-          without any radius this used before (a boxShadow on an unrounded
-          box/Svg always shadows its literal rectangular bounds, which is
-          what made it look like a square glow behind the ring - caught
-          2026-08-20, "свечение похоже вокруг квадрата сделал, а не по
-          кругу"). Full 4-layer recipe ported now too (previously only the
-          2 outward layers were here, the 2 inset ones were missing
-          entirely). Not rotated - kit's own animation is scoped to
-          `.rr-ring` only, the halo stays a static ambient glow. */}
+      {/* kit's `.rr-halo` - plain circular div (border-radius:50%), 4-layer
+          box-shadow (2 outward + 2 inset), a circular View's boxShadow
+          follows its own borderRadius correctly (unlike the earlier
+          unrounded SVG/View version, which read as a square glow - fixed
+          2026-08-20). Stays a flat, uncolored ambient bloom - the kit's own
+          halo doesn't track the ring's gradient hue or its rotation, that's
+          a separate ask (below). */}
       <View style={[styles.halo, { width: size, height: size, borderRadius: size / 2 }]} />
+      {/* New: a wider, blurred duplicate of the ring's own gradient stroke,
+          rotating with the exact same `angle` as the crisp ring below it -
+          her follow-up ask, 2026-08-20: "свечение же под цвет кольца?
+          хотелось бы... и чтобы во время вращения, вращение свечения тоже
+          было видно". The flat `halo` above can't show this on its own
+          (a symmetric blur around a circle looks identical at any rotation
+          angle - there's nothing angular in it to rotate) - this layer
+          gives the glow real angular color variation (the same violet/pink/
+          glint gradient) so its own rotation is genuinely visible, in sync
+          with the ring. Same FeGaussianBlur-on-a-stroke technique already
+          proven safe in this app for a ring at this scale (BiorhythmChart's
+          own rings), not the large-filter-region case that caused trouble
+          on BottomBar. */}
+      <Svg width={size} height={size} style={[styles.glowSvg, { transform: [{ rotate: `${angle}deg` }] }]}>
+        <Defs>
+          <LinearGradient id="rrGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            {RING_GRADIENT_STOPS.map((s, i) => (
+              <Stop key={i} offset={s.offset} stopColor={s.color} />
+            ))}
+          </LinearGradient>
+          <Filter id="rrGlowBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <FeGaussianBlur stdDeviation={8} />
+          </Filter>
+        </Defs>
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke="url(#rrGlowGrad)" strokeWidth={18} strokeOpacity={0.55} filter="url(#rrGlowBlur)" fill="none" />
+      </Svg>
       <Svg width={size} height={size} style={[styles.ringSvg, { transform: [{ rotate: `${angle}deg` }] }]}>
         <Defs>
           <LinearGradient id="rrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset={0} stopColor={colors.violet400} />
-            <Stop offset={0.47} stopColor="#FFC6F1" />
-            <Stop offset={0.5} stopColor="#FFE3F6" />
-            <Stop offset={0.53} stopColor="#FFC6F1" />
-            <Stop offset={1} stopColor={colors.violet400} />
+            {RING_GRADIENT_STOPS.map((s, i) => (
+              <Stop key={i} offset={s.offset} stopColor={s.color} />
+            ))}
           </LinearGradient>
         </Defs>
         <Circle cx={size / 2} cy={size / 2} r={r} stroke="url(#rrGrad)" strokeWidth={stroke} fill="none" />
@@ -109,6 +138,11 @@ const styles = StyleSheet.create({
     left: 0,
     boxShadow:
       '0px 0px 50px 12px rgba(139,124,246,0.16), 0px 0px 90px 26px rgba(255,198,241,0.07), inset 0px 0px 60px 22px rgba(139,124,246,0.18), inset 0px 0px 32px 8px rgba(255,198,241,0.12)',
+  },
+  glowSvg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   ringSvg: {
     position: 'absolute',
