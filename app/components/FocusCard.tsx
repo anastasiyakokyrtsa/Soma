@@ -18,14 +18,25 @@ export function FocusCard({
   title: string;
   text: string;
 }) {
+  // Same scale MoonSunCard computes off its own `width` prop - both cards
+  // get the exact same `cardWidth` from HomeScreen, so this reproduces the
+  // exact same factor. Needed because the title/text below are meant to
+  // visually match MoonSunCard's, but MoonSunCard's own sizes are already
+  // scaled by its width - a literal (unscaled) 22/16 here rendered *larger*
+  // than MoonSunCard's actual (scaled-down, on her narrower-than-336 real
+  // device) title/note, so the two never actually matched despite using
+  // the same base numbers (caught from her screenshot 2026-08-20, "на
+  // скрине видно, что ты не выполнил мое задание" - real miss, not a
+  // wrong reading of the ask).
+  const scale = Math.min(width, 336) / 336;
   return (
-    <View style={[styles.card, { width }]}>
+    <View style={[styles.card, { width, padding: 16 * scale, gap: 8 * scale }]}>
       <View style={styles.header}>
         {/* 36, not 32 - bumped alongside the title's move to MoonSunCard's
             larger 22px title size (was paired with the old 20px title),
             keeping roughly the same icon-to-title weight ratio (2026-08-20:
             "думаю тут нужно будет и размер иконки адаптировать"). */}
-        <GradientIcon name={icon} size={36} />
+        <GradientIcon name={icon} size={36 * scale} />
         {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
             though "Мягкий старт и обновление" (the one title that actually
             needed it) got shortened to just "Мягкий старт" the same round -
@@ -34,11 +45,15 @@ export function FocusCard({
             other cards' titles down with it (see [[project-app-
             development]] 2026-08-20 for the original reasoning).
             flexShrink:1 gives Text a real width to measure against. */}
-        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
+        <Text
+          style={[styles.title, { fontSize: 22 * scale, lineHeight: 22 * 1.2 * scale }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
           {title}
         </Text>
       </View>
-      <Text style={styles.text}>{text}</Text>
+      <Text style={[styles.text, { fontSize: 16 * scale, lineHeight: 16 * 1.3 * scale }]}>{text}</Text>
     </View>
   );
 }
@@ -56,32 +71,25 @@ const styles = StyleSheet.create({
     // used elsewhere for the kit's gradient-border recipe (2026-08-17 audit).
     borderColor: colors.violet300,
     borderRadius: radius.md,
-    padding: 16,
-    gap: 8,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 4,
   },
-  // matches MoonSunCard's own title (2026-08-20: "настройки шрифта такие
-  // же как у заголовка в карточке Лунная активность") - bold, 22, 1.2, not
-  // this card's own previous semiBold/20/1.5.
+  // fontSize/lineHeight set inline (scaled), only non-scaled properties
+  // stay here - matches MoonSunCard's own title (2026-08-20: "настройки
+  // шрифта такие же как у заголовка в карточке Лунная активность") - bold,
+  // not this card's own previous semiBold.
   title: {
     flexShrink: 1,
     fontFamily: fontFamily.bold,
-    fontSize: 22,
-    lineHeight: 22 * 1.2,
     color: colors.textPrimary,
   },
   // matches MoonSunCard's own note text (2026-08-20: "body text... сделаем
-  // как и в описании в карточках Лунной и солнечной активности") - same
-  // fontFamily/fontSize already, only the line-height ratio (1.3, not 1.2)
-  // was different.
+  // как и в описании в карточках Лунной и солнечной активности").
   text: {
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 16 * 1.3,
     color: colors.textPrimary,
   },
 });
