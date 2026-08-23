@@ -109,7 +109,12 @@ export function CareScreen() {
           <Text style={[styles.sectionTitle, styles.whatHelpsTitle]}>Что поможет сейчас</Text>
           <View style={styles.tilesRow}>
             <MiniRitualTile width={tileWidth} icon="breathingCircle" title="Дыхание" time="3 мин" />
-            <MiniRitualTile width={tileWidth} icon="seaWaves" title="Звуки природы" time="10 мин" iconMarginBottom={26} />
+            {/* explicit break, not left to auto-wrap - MiniRitualTile's
+                title now reserves a fixed 2-line height on every card (see
+                that file), which already keeps "time" aligned across cards
+                regardless of wrap, so the old iconMarginBottom={26}
+                compensation isn't needed anymore either (2026-08-20). */}
+            <MiniRitualTile width={tileWidth} icon="seaWaves" title={'Звуки\nприроды'} time="10 мин" />
             <MiniRitualTile width={tileWidth} icon="lotus" title="Медитация" time="10 мин" />
           </View>
         </View>
