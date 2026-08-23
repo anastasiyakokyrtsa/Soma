@@ -1,5 +1,5 @@
 import Svg, { Path, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
-import { colors, glow } from '../../theme';
+import { colors } from '../../theme';
 import { navIconPaths, type NavIconName } from './navIconPaths';
 
 export type { NavIconName };
@@ -30,10 +30,16 @@ export function NavIcon({ name, active, size = 27 }: { name: NavIconName; active
       {active ? (
         <>
           <Defs>
+            {/* stdDeviation bumped ~2.5->4.5, plus drawing the blurred
+                copy twice (kit's own doubled-filter intensity trick, also
+                used for the dome's glow) - the single-layer version at the
+                literal kit blur value read as too weak on her device
+                (2026-08-20: "иконкам прибавь свечения"). */}
             <Filter id="navGlowBlur" x="-50%" y="-50%" width="200%" height="200%">
-              <FeGaussianBlur stdDeviation={glow.iconGradient.blur / 2} />
+              <FeGaussianBlur stdDeviation={4.5} />
             </Filter>
           </Defs>
+          <Path d={def.d} fill={colors.violet400} filter="url(#navGlowBlur)" />
           <Path d={def.d} fill={colors.violet400} filter="url(#navGlowBlur)" />
         </>
       ) : null}
