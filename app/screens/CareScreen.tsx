@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { View, Text, Image, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, RadialGradient, Stop, Rect } from 'react-native-svg';
+import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily, gradients, glow } from '../theme';
 import { ResourceRing } from '../components/ResourceRing';
 import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
-
-const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
+import { TeaIllustrationGlow, TEA_GLOW_PAD } from '../components/TeaIllustrationGlow';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -137,39 +136,19 @@ export function CareScreen() {
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Reworked again per her direct feedback on the boxShadow-only
-              version: "что это за дырка внутри? нужно чтобы свечение было
-              сплошное, под изображением. И сделай не прям точный овал, а
-              вот по контуру изображения." The "hole" was a real mechanical
-              gap, not a rendering bug: CSS/RN box-shadow only paints
-              OUTWARD from a box's edges - it never fills the box's own
-              interior, which is whatever that box's own backgroundColor
-              is. QuoteCard's glow gets away with an empty interior because
-              an opaque card sits on top of it; here the illustration's thin
-              plant lines leave gaps, so the glow box's own untinted middle
-              showed straight through as a literal hole. Switched from
-              boxShadow to the same RadialGradient-fill technique already
-              used for every card background in this app (MoonSunCard/
-              MiniRitualTile/NavChip) - genuinely solid/continuous from the
-              center outward, no interior gap possible. Sized to exactly
-              match teaImageWrap's own 193x360 box (the image's own bounding
-              box, not an arbitrary smaller shape) - r="70.7%" is this
-              session's established farthest-corner recipe, which makes the
-              falloff naturally elongate to the box's own aspect ratio, i.e.
-              hug the image's real proportions instead of forcing a generic
-              round/oval shape unrelated to it. */}
-          <View style={[styles.teaImageWrap, { marginTop: GAP.teaTitleToImage }]}>
-            <Svg width={193} height={360} style={StyleSheet.absoluteFillObject} pointerEvents="none">
-              <Defs>
-                <RadialGradient id="teaGlow" cx="50%" cy="50%" r="70.7%">
-                  <Stop offset="0" stopColor={colors.violet400} stopOpacity={0.45} />
-                  <Stop offset="0.55" stopColor={colors.violet400} stopOpacity={0.26} />
-                  <Stop offset="1" stopColor={colors.violet400} stopOpacity={0} />
-                </RadialGradient>
-              </Defs>
-              <Rect x={0} y={0} width={193} height={360} fill="url(#teaGlow)" />
-            </Svg>
-            <Image source={TEA_ILLUSTRATION} style={styles.teaImage} resizeMode="contain" />
+          {/* Box/oval glow attempts (both this session) couldn't satisfy her
+              real ask: "мне надо чтобы по контуру само травки... не
+              идеальной формы" - neither SVG nor boxShadow can trace a
+              raster PNG's actual silhouette. TeaIllustrationGlow renders
+              the artwork itself through Skia with real alpha-aware blur, so
+              the glow genuinely follows the plant's own branches - see that
+              file for the full technique/rationale. TEA_GLOW_PAD compensates
+              the extra canvas bleed room on both the top gap (from the
+              title) and bottom gap (to the caption) so the visible artwork
+              still sits exactly GAP.teaTitleToImage/imageToCaption away,
+              same as before this rework. */}
+          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage - TEA_GLOW_PAD, marginBottom: -TEA_GLOW_PAD }}>
+            <TeaIllustrationGlow />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
           <Pressable style={[styles.teaButton, { marginTop: GAP.captionToButton }]}>
@@ -242,17 +221,6 @@ const styles = StyleSheet.create({
     gap: 11,
   },
   section: {},
-  teaImageWrap: {
-    alignSelf: 'center',
-    width: 193,
-    height: 360,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  teaImage: {
-    width: 193,
-    height: 360,
-  },
   teaCaption: {
     fontFamily: fontFamily.medium,
     fontSize: 16,
