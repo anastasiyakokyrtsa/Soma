@@ -4,14 +4,17 @@ import { colors, fontFamily } from '../theme';
 
 const BG = require('../assets/article/quote-nightscape.png');
 
-// Ports UI Kit's "Quote Card" (.quote-card, style.css ~L773) - same
-// nightscape background/quote/icons as the kit's own demo, just at the
-// Home screen's own shorter instance height (159, not the kit doc's 272) -
-// literal Figma spec (node 599:1212), not the kit's own taller reference.
+// Ports UI Kit's "Quote Card" (.quote-card, style.css ~L773) verbatim - same
+// 380x272, same nightscape background/quote/icons as the kit's own demo.
+// Was rendering at a shorter 159 (a Figma-node override from an earlier
+// session), which read as a completely different card next to the kit
+// reference - reverted 2026-08-20 per her explicit "возьми прям оттуда"
+// (take it exactly from there): the kit is the source of truth for this
+// component now, full stop, not a competing Figma instance value.
 export function QuoteCard({
   quote,
   author,
-  height = 159,
+  height = 272,
   width = 380,
 }: {
   quote: string;
