@@ -29,6 +29,27 @@ export const BAR_VIEWBOX_H = 125;
 const DOME_PATH =
   'M 6,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 406,50 Q 412,50 412,56 L 412,99 Q 412,125 386,125 L 26,125 Q 0,125 0,99 L 0,56 Q 0,50 6,50 Z';
 
+// Filter-free glow (see the long history in the component below for why no
+// SVG <Filter>/blur is used) - a smooth falloff needs many close, small
+// steps rather than a few big jumps, and sharp miter corners at the dome's
+// flat-to-curve joins need rounding or a wide stroke reads as a straight
+// bar poking out of the curve (2026-08-20: "видны слои резкие переходы...
+// свечение как будто линия горизонтальная накрывает"). Generated, not
+// hand-typed, so the falloff curve is one formula to retune instead of N
+// separate literals.
+const GLOW_LAYER_COUNT = 14;
+const GLOW_MAX_WIDTH = 24;
+const GLOW_MIN_WIDTH = 2;
+const GLOW_MAX_OPACITY = 0.3;
+const GLOW_MIN_OPACITY = 0.02;
+const GLOW_LAYERS = Array.from({ length: GLOW_LAYER_COUNT }, (_, i) => {
+  const t = i / (GLOW_LAYER_COUNT - 1); // 0 = widest/faintest (drawn first), 1 = narrowest/brightest (drawn last)
+  return {
+    width: GLOW_MAX_WIDTH - (GLOW_MAX_WIDTH - GLOW_MIN_WIDTH) * t,
+    opacity: GLOW_MIN_OPACITY + (GLOW_MAX_OPACITY - GLOW_MIN_OPACITY) * Math.pow(t, 1.5),
+  };
+});
+
 export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -59,48 +80,30 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
     // the screen genuinely fills the full height behind it, matching the
     // "floats over content" behavior this always should have had.
     <View style={[styles.wrap, { width, left: (screenWidth - width) / 2, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
-      {/* Kit's glow is filter:drop-shadow() on the SVG, tracing the dome's
-          own alpha silhouette. Three attempts to get a real glow rendering
-          here, each ruled out for a concrete reason, worth reading in full
-          before touching this again:
-          1. FeDropShadow filter on the Path - the filter *region* itself
-             rasterized as an opaque black rectangle instead of a
-             transparent backing, visible across the whole 412x125 canvas
-             (2026-08-20: "зачем над баром ещё кусок черной полосы").
-          2. FeGaussianBlur on a stroked duplicate (same idea, different
-             primitive) - identical symptom, still there ("эту область
-             черную над баром я все равно вижу"), so it's the `<Filter>`
-             region mechanism itself, not the specific primitive.
-          3. Filter-free multi-layer stroked glow (this technique, kept) +
-             `overflow:'visible'` on the Svg style (to stop the wide outer
-             layers clipping at the dome's edges) - the black rectangle
-             was STILL there after this round. `overflow:'visible'` on an
-             RN-SVG <Svg> is a known trigger for hardware-layer compositing
-             without alpha on Android - almost certainly the same
-             opaque-backing symptom recurring for a third, unrelated
-             reason. Removed it - accepting that the widest glow layers
-             now clip slightly at the dome's left/right/bottom edges
-             (where it sits flush with the viewBox boundary) rather than
-             risk the black rectangle a third time; kept every layer's own
-             `strokeWidth` modest enough that the clipped sliver is minor.
-          Glow itself: went from 4 coarse steps to 7 finer ones, closer
-          together in both width and opacity, to read as a smooth falloff
-          instead of visible discrete rings (2026-08-20: "свечение ужасно
-          смотрится... какими-то слоями... как в ките") - a real blur
-          isn't safely available here (see above), so more/closer steps is
-          the best available approximation. */}
-      {/* strokeWidths widened ~35% (22/18/14/11/8/6/3, was 16/13/10/8/6/4/2)
-          - her explicit ask, 2026-08-20: "свечение линии чуть усиленнее,
-          именно spread" (spread specifically, not just brightness) -
-          opacities left as-is. */}
+      {/* Kit's glow is filter:drop-shadow(), tracing the dome's alpha
+          silhouette. No SVG <Filter> here (FeDropShadow, then
+          FeGaussianBlur, both rasterized their filter *region* as an
+          opaque black rectangle on this platform - a real, confirmed
+          limitation, not a tuning problem) - this is a filter-free glow
+          instead: GLOW_LAYERS above, stroked copies of the same path,
+          widening/fading. strokeLinecap/strokeLinejoin="round" on every
+          layer - without it, the sharp miter corner where the flat body
+          meets the dome's curve read as a straight bar jutting out of the
+          hill at wide stroke widths (2026-08-20: "свечение как будто линия
+          горизонтальная накрывает"). */}
       <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={22} strokeOpacity={0.035} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={18} strokeOpacity={0.05} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={14} strokeOpacity={0.07} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={11} strokeOpacity={0.1} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={8} strokeOpacity={0.14} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={6} strokeOpacity={0.2} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={3} strokeOpacity={0.28} />
+        {GLOW_LAYERS.map((layer, i) => (
+          <Path
+            key={i}
+            d={DOME_PATH}
+            fill="none"
+            stroke={colors.violet400}
+            strokeWidth={layer.width}
+            strokeOpacity={layer.opacity}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
         <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
 
@@ -163,12 +166,12 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   // NOT overflow:'visible' - the kit's own .bottombar-svg has it (so its
-  // glow isn't clipped at the dome's edges), but on this Svg it turned out
-  // to trigger the same opaque-black-rectangle symptom as the broken SVG
-  // filters (see the long comment above) - a known RN/Android footgun
-  // where overflow:'visible' forces hardware-layer compositing without
-  // alpha. Left off; the glow's own strokeWidths are kept modest enough
-  // that the resulting edge-clipping is minor.
+  // glow isn't clipped at the dome's edges), but on this Svg it briefly
+  // looked like a trigger for the same opaque-rectangle symptom the SVG
+  // filters caused (that turned out to actually be BottomBar's own missing
+  // position:'absolute', see the render body above) - left off anyway
+  // since it's a known RN/Android footgun in general; the glow's own
+  // strokeWidths stay modest enough that the resulting edge-clipping is minor.
   svg: {
     position: 'absolute',
     left: 0,
