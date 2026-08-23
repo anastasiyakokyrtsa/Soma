@@ -93,7 +93,11 @@ export function CareScreen() {
         </View>
 
         <View style={[styles.whatHelps, { marginTop: GAP.ringToWhatHelps }]}>
-          <Text style={styles.sectionTitle}>Что поможет сейчас</Text>
+          {/* Scoped to just this title, not the shared sectionTitle (which
+              "Чай как ритуал"/"О теле и ритмах" still use unchanged) - her
+              explicit ask, 2026-08-20: 24px SemiBold, not the shared 26px
+              ExtraBold. */}
+          <Text style={[styles.sectionTitle, styles.whatHelpsTitle]}>Что поможет сейчас</Text>
           <View style={styles.tilesRow}>
             <MiniRitualTile icon="breathingCircle" title="Дыхание" time="3 мин" />
             <MiniRitualTile icon="seaWaves" title="Звуки природы" time="10 мин" iconMarginBottom={26} />
@@ -159,6 +163,13 @@ const styles = StyleSheet.create({
     fontSize: 26,
     lineHeight: 26 * 1.1,
     color: colors.textPrimary,
+  },
+  // "Что поможет сейчас" only - 24px SemiBold, not the shared 26px
+  // ExtraBold (2026-08-20).
+  whatHelpsTitle: {
+    fontFamily: fontFamily.semiBold,
+    fontSize: 24,
+    lineHeight: 24 * 1.1,
   },
   sectionDesc: {
     marginTop: 8,
