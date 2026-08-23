@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -48,12 +49,28 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
             if (!isActive && !event.defaultPrevented) navigation.navigate(route.name);
           };
           return (
-            <Pressable key={route.key} style={[styles.item, { paddingVertical: 8 * scale, paddingHorizontal: 12 * scale }]} onPress={onPress}>
-              <View style={isActive && styles.iconActiveGlow}>
-                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
-              </View>
-              <Text style={[styles.itemLabel, { fontSize: 10 * scale, height: 12 * scale }]}>{isActive ? meta.label : ''}</Text>
-            </Pressable>
+            // A blank 68px (FAB width) spacer sits between the 2nd and 3rd
+            // real item in the kit's own markup (index.html's
+            // .bottombar-content has 5 children under justify-content:
+            // space-around - Home/Care/[68px spacer]/Journal/Analytics, not
+            // 4) - reserves room for the FAB so the 4 real icons push out
+            // toward the edges instead of spreading evenly across the full
+            // width straight through where the FAB sits. Missing this
+            // spacer was a real structural miss, not just a size/color one
+            // (caught 2026-08-20, "оба элемента должны быть в точности как
+            // в ui kit").
+            <Fragment key={route.key}>
+              {index === 2 ? <View style={{ width: 68 * scale }} /> : null}
+              <Pressable
+                style={[styles.item, { paddingVertical: 8 * scale, paddingHorizontal: 12 * scale }]}
+                onPress={onPress}
+              >
+                <View style={isActive && styles.iconActiveGlow}>
+                  <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
+                </View>
+                <Text style={[styles.itemLabel, { fontSize: 10 * scale, height: 12 * scale }]}>{isActive ? meta.label : ''}</Text>
+              </Pressable>
+            </Fragment>
           );
         })}
       </View>

@@ -63,7 +63,10 @@ export function MoonSunCard({
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#moonsunFill)" />
       </Svg>
       <View style={styles.whiteWash} pointerEvents="none" />
-      <View style={[styles.inner, { padding: 16 * scale }]}>
+      {/* padding stays a literal 16 (not scaled) - same fix/reasoning as
+          FocusCard's own padding (2026-08-20: "паддинг по 16 со всех
+          сторон"). */}
+      <View style={[styles.inner, { padding: 16 }]}>
         <Text style={[styles.title, { fontSize: 22 * scale, lineHeight: 22 * 1.2 * scale, marginBottom: 16 * scale }]}>
           {title}
         </Text>

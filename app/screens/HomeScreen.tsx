@@ -247,7 +247,14 @@ export function HomeScreen() {
         </ScrollView>
 
         <View style={{ marginTop: GAP.cardsToQuote }}>
-          <QuoteCard quote={'Важно не то, как ты идёшь, а то, что ты\nне останавливаешься'} author="Конфуций" />
+          {/* reuses chartWidth - same min(screenWidth-32,380) cap the kit's
+              own 380px reference needs on a narrower-than-380 real device
+              (2026-08-20). */}
+          <QuoteCard
+            width={chartWidth}
+            quote={'Важно не то, как ты идёшь, а то, что ты\nне останавливаешься'}
+            author="Конфуций"
+          />
         </View>
         </View>
       </ScrollView>
