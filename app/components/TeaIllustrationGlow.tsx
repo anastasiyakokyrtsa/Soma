@@ -1,59 +1,52 @@
-import { View, Image, StyleSheet } from 'react-native';
-import { Canvas, Image as SkiaImage, useImage, Blur, Group } from '@shopify/react-native-skia';
+import { View, Image } from 'react-native';
+import { colors } from '../theme';
 
 const IMAGE_W = 193;
 const IMAGE_H = 360;
-// Bleed room around the artwork for the blur passes below to spill into
-// without getting clipped by the Canvas's own bounds.
-export const TEA_GLOW_PAD = 44;
-const CANVAS_W = IMAGE_W + TEA_GLOW_PAD * 2;
-const CANVAS_H = IMAGE_H + TEA_GLOW_PAD * 2;
 
 const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 
-// Care screen's "Чай как ритуал" illustration glow, take 3. Her ask after
-// seeing the box/oval versions: "мне надо чтобы по контуру само травки,
-// чтобы динамичная линия шла... и не идеальной формы" - a rectangle or an
-// oval (this session's earlier attempts) can never satisfy that; neither
-// SVG nor boxShadow can trace a raster PNG's actual alpha silhouette. Skia
-// can - genuine gaussian blur of the artwork's own rendered pixels (real
-// alpha included), same primitive PersonalizationIllustration.tsx already
-// uses for its checkmark glow (Group > Blur > shape, then the crisp shape
-// again on top).
+// Care screen's "Чай как ритуал" illustration glow, take 4. Take 3 (Skia:
+// Canvas + useImage + Blur) shipped and came back "вообще нет никакого
+// свечения" - the follow-up screenshot showed the crisp artwork rendering
+// fine (it had been split out to a plain RN Image specifically to isolate
+// this) but a completely blank result from the Skia Canvas, not just a weak
+// one - proof the Canvas isn't rendering *at all* here, not a tuning issue.
+// This project already has one confirmed Skia/Expo-Go environment gap this
+// session (Reanimated shared values into Skia props don't fire - see
+// project_skia_reanimated_bridge.md) - this is a second, separate one
+// (useImage/Canvas itself, no Reanimated involved), so Skia is no longer a
+// safe bet for this effect at all.
 //
-// Take 3 shipped with the glow AND the crisp artwork both drawn inside the
-// Skia Canvas, gated behind `useImage` resolving - "вообще нет никакого
-// свечения" came back, and since it's a single sandbox with no on-device
-// check possible here, that report can't distinguish "the blur genuinely
-// isn't visible" from "useImage never resolved so the whole Canvas rendered
-// nothing" (this app already hit one confirmed Skia/Expo-Go environment gap
-// this session - see project_skia_reanimated_bridge.md - so a second one
-// isn't out of the question). De-risked both at once: the crisp artwork is
-// back to a plain RN `Image` rendered unconditionally (identical to every
-// version before this Skia rework - can't fail to appear), and ONLY the
-// blur passes live in the Skia Canvas, now much stronger (blur 12->26,
-// opacity 0.4->0.65) - the source art is sparse constellation-style dots/
-// thin lines, not a solid-filled shape like the checkmark this pattern was
-// copied from, so it has far less pixel coverage for a blur to work with
-// and needs real intensity to read as a glow rather than washing out to
-// near-nothing.
+// Dropped Skia entirely. Core React Native's own `Image` component
+// supports `blurRadius` and `tintColor` natively (no third-party native
+// module, been in RN for years, not something this project has any reason
+// to distrust) - `tintColor` recolors the image's opaque pixels to one flat
+// color using its own alpha channel as a mask (exactly a silhouette),
+// `blurRadius` then softens that silhouette into a glow. Genuinely traces
+// the artwork's real shape (same result CSS `filter: drop-shadow()` gives
+// on web) without needing Skia, an SVG approximation, or a boxShadow at
+// all. Two passes (loose+faint behind, tighter+stronger just under the
+// crisp copy) read as one soft aura rather than a single hard ring, kept
+// deliberately restrained per her "не сильно ярко".
 export function TeaIllustrationGlow() {
-  const img = useImage(TEA_ILLUSTRATION);
   return (
-    <View style={{ width: CANVAS_W, height: CANVAS_H, alignItems: 'center', justifyContent: 'center' }}>
-      {img ? (
-        <Canvas style={[StyleSheet.absoluteFillObject]} pointerEvents="none">
-          <Group opacity={0.55}>
-            <Blur blur={26} />
-            <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
-          </Group>
-          <Group opacity={0.65}>
-            <Blur blur={12} />
-            <SkiaImage image={img} x={TEA_GLOW_PAD} y={TEA_GLOW_PAD} width={IMAGE_W} height={IMAGE_H} fit="contain" />
-          </Group>
-        </Canvas>
-      ) : null}
-      <Image source={TEA_ILLUSTRATION} style={{ width: IMAGE_W, height: IMAGE_H }} resizeMode="contain" />
+    <View style={{ width: IMAGE_W, height: IMAGE_H, alignItems: 'center', justifyContent: 'center' }}>
+      <Image
+        source={TEA_ILLUSTRATION}
+        tintColor={colors.violet400}
+        blurRadius={30}
+        resizeMode="contain"
+        style={{ position: 'absolute', width: IMAGE_W, height: IMAGE_H, opacity: 0.55 }}
+      />
+      <Image
+        source={TEA_ILLUSTRATION}
+        tintColor={colors.violet400}
+        blurRadius={14}
+        resizeMode="contain"
+        style={{ position: 'absolute', width: IMAGE_W, height: IMAGE_H, opacity: 0.6 }}
+      />
+      <Image source={TEA_ILLUSTRATION} resizeMode="contain" style={{ width: IMAGE_W, height: IMAGE_H }} />
     </View>
   );
 }

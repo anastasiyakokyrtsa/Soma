@@ -8,7 +8,7 @@ import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
-import { TeaIllustrationGlow, TEA_GLOW_PAD } from '../components/TeaIllustrationGlow';
+import { TeaIllustrationGlow } from '../components/TeaIllustrationGlow';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -136,18 +136,13 @@ export function CareScreen() {
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Box/oval glow attempts (both this session) couldn't satisfy her
-              real ask: "мне надо чтобы по контуру само травки... не
-              идеальной формы" - neither SVG nor boxShadow can trace a
-              raster PNG's actual silhouette. TeaIllustrationGlow renders
-              the artwork itself through Skia with real alpha-aware blur, so
-              the glow genuinely follows the plant's own branches - see that
-              file for the full technique/rationale. TEA_GLOW_PAD compensates
-              the extra canvas bleed room on both the top gap (from the
-              title) and bottom gap (to the caption) so the visible artwork
-              still sits exactly GAP.teaTitleToImage/imageToCaption away,
-              same as before this rework. */}
-          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage - TEA_GLOW_PAD, marginBottom: -TEA_GLOW_PAD }}>
+          {/* Box/oval glow attempts and a Skia alpha-blur attempt (both this
+              session) either couldn't trace the plant's real silhouette, or
+              (Skia) turned out not to render at all in this environment -
+              see TeaIllustrationGlow.tsx for the full history. Current
+              technique: plain RN Image's own blurRadius+tintColor, no
+              Skia/SVG/boxShadow dependency at all - see that file for why. */}
+          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage }}>
             <TeaIllustrationGlow />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
