@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
@@ -7,12 +8,51 @@ import { colors, fontFamily } from '../theme';
 // decorative), for WF's Home screen "42% Низкий ресурс" card. The kit's own
 // ring color is a spinning conic-gradient (no RN equivalent) - approximated
 // here as a static diagonal linear gradient across the ring's own stroke,
-// the same technique already used for SleepWheelPicker's arc. Spin
-// animation intentionally skipped - Figma's own static frame doesn't call
-// for it, and it's a pure nice-to-have on top of an already-faithful ring.
+// the same technique already used for SleepWheelPicker's arc.
+//
+// Spin animation (2026-08-20, "нужно анимировать... прогресс бар") - kit's
+// own `.rr-ring` spec (`rrSpin`, style.css ~L887): one full rotation every
+// 5s, `linear infinite` - "5s" is the loop *duration*, "infinite" means it
+// never stops (her explicit ask: "анимация не 5 секунд, она должна
+// бесконечно идти" - confirming this reads as a single 5s play then stop,
+// not a forever loop). Driven by a plain requestAnimationFrame clock (not
+// Reanimated-into-a-Skia-prop, the confirmed-broken bridge on this Expo Go
+// SDK - see [[project-skia-reanimated-bridge]] - though this is
+// react-native-svg not Skia; kept on the app's one proven rAF-clock pattern
+// anyway for architectural consistency, same shape as PersonalizationScreen's
+// own `useAnimationClock`). The angle is `elapsed % SPIN_DURATION_MS`, not
+// raw elapsed time, so it wraps cleanly forever instead of the number
+// (harmlessly, since only its value-mod-360 ever matters, but still worth
+// keeping bounded) growing without limit for as long as the screen stays
+// mounted. No throttle on the tick rate - a slow/calm rotation shows
+// dropped frames more, not less, than fast motion (see PersonalizationScreen's
+// own TICK_MS=0 lesson), so every rAF frame updates the clock.
+const SPIN_DURATION_MS = 5000;
+
+function useAnimationClock() {
+  const [time, setTime] = useState(0);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let raf: number;
+    const tick = () => {
+      const now = Date.now();
+      if (startRef.current === null) startRef.current = now;
+      setTime(now - startRef.current);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return time;
+}
+
 export function ResourceRing({ value, caption, size = 244 }: { value: number; caption: string; size?: number }) {
   const stroke = 2;
   const r = size / 2 - stroke;
+  const time = useAnimationClock();
+  const angle = ((time % SPIN_DURATION_MS) / SPIN_DURATION_MS) * 360;
 
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>
@@ -26,9 +66,10 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
           2026-08-20, "свечение похоже вокруг квадрата сделал, а не по
           кругу"). Full 4-layer recipe ported now too (previously only the
           2 outward layers were here, the 2 inset ones were missing
-          entirely). */}
+          entirely). Not rotated - kit's own animation is scoped to
+          `.rr-ring` only, the halo stays a static ambient glow. */}
       <View style={[styles.halo, { width: size, height: size, borderRadius: size / 2 }]} />
-      <Svg width={size} height={size} style={styles.ringSvg}>
+      <Svg width={size} height={size} style={[styles.ringSvg, { transform: [{ rotate: `${angle}deg` }] }]}>
         <Defs>
           <LinearGradient id="rrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset={0} stopColor={colors.violet400} />
