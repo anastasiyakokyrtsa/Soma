@@ -50,7 +50,15 @@ export function CareScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.condition}>
-          <Svg width="100%" height={72}>
+          {/* Settings matched to HomeScreen's own "Доброе утро" heading
+              (GreetingHeading: fontSize 28, fontFamily.bold) - was 36/
+              semiBold, her explicit ask 2026-08-20 ("заголовок сделай по
+              настройкам такой же как и на главном"). Y-positions/height
+              scaled down proportionally (28/36) from the original tuned
+              values, this title stays its own fixed 2-line SvgText split
+              (not HomeScreen's real-measured-wrap technique) since it's a
+              known fixed string, not a variable-length name. */}
+          <Svg width="100%" height={56}>
             <Defs>
               <SvgLinearGradient id="conditionGrad" x1="0" y1="0" x2="1" y2="1">
                 <Stop offset={gradients.headingText.locations[0]} stopColor={gradients.headingText.colors[0]} />
@@ -58,10 +66,10 @@ export function CareScreen() {
                 <Stop offset={gradients.headingText.locations[2]} stopColor={gradients.headingText.colors[2]} />
               </SvgLinearGradient>
             </Defs>
-            <SvgText x="0" y="33" fontSize={36} fontFamily={fontFamily.semiBold} fill="url(#conditionGrad)">
+            <SvgText x="0" y="26" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
               Твое состояние
             </SvgText>
-            <SvgText x="0" y="69" fontSize={36} fontFamily={fontFamily.semiBold} fill="url(#conditionGrad)">
+            <SvgText x="0" y="54" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
               сегодня изменчиво
             </SvgText>
           </Svg>
