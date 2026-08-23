@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path, Defs, Filter, FeDropShadow } from 'react-native-svg';
+import Svg, { Path, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors, fontFamily } from '../theme';
 import { NavIcon, type NavIconName } from './icons/NavIcon';
@@ -21,8 +21,11 @@ const TAB_ICONS: Record<string, { icon: NavIconName; iconAlt: NavIconName; label
   Analytics: { icon: 'analytics', iconAlt: 'analyticsAlt', label: 'Analytics' },
 };
 
-const BAR_VIEWBOX_W = 412;
-const BAR_VIEWBOX_H = 125;
+// Exported so any screen that needs to reserve real clearance below its
+// scrollable content (not a guessed flat number) can compute the bar's
+// actual rendered height the same way this component does.
+export const BAR_VIEWBOX_W = 412;
+export const BAR_VIEWBOX_H = 125;
 const DOME_PATH =
   'M 6,50 L 140.12,50 C 159.30,50 158.02,48.79 166.12,31.40 A 44,44 0 0,1 245.88,31.40 C 253.98,48.79 252.70,50 271.88,50 L 406,50 Q 412,50 412,56 L 412,99 Q 412,125 386,125 L 26,125 Q 0,125 0,99 L 0,56 Q 0,50 6,50 Z';
 
@@ -35,27 +38,33 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <View style={[styles.wrap, { width, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
-      {/* Kit's glow is a real filter:drop-shadow() on the SVG, which traces
-          the dome's own alpha silhouette. A View/Svg-level boxShadow (what
-          this used before) shadows the element's rectangular LAYOUT BOX
-          instead - since that box spans the full transparent 125-tall
-          viewBox (headroom above the dome for the FAB bump), the result
-          was a straight glowing line along the box's top edge, not a glow
-          wrapping the dome shape (caught 2026-08-20: "нафига ты сделал
-          горизонтальную светящуюся линию... должна обволакивать саму
-          форму"). Fixed with a real FeDropShadow SVG filter on the Path
-          itself - drawn twice with the identical filter (not two different
-          blurs) to reproduce the kit's own doubled-intensity trick, since
-          FeDropShadow's own output already includes the crisp source
-          graphic composited on top of its shadow. */}
+      {/* Kit's glow is filter:drop-shadow() on the SVG, tracing the dome's
+          own alpha silhouette. First attempt ported this as FeDropShadow on
+          the Path - real bug, not a rendering choice: FeDropShadow's filter
+          region rendered as a solid opaque rectangle instead of a
+          transparent backing on this platform/react-native-svg version
+          (caught 2026-08-20: "зачем над баром ещё кусок черной полосы" -
+          that was the filter region's own bounding box, opaque, sitting
+          above the dome; "свечения не вижу" - FeDropShadow's shadow itself
+          wasn't rendering either). Replaced with the same proven technique
+          this app already uses for stroked glows elsewhere (BiorhythmChart
+          rings/curves): a blurred STROKE outline of the same path, drawn
+          behind the crisp filled dome. Since the dome's own fill (#0C0D1B)
+          isn't the glow color, this traces the path as an unfilled violet
+          outline (not a duplicate of the fill) so only the plain
+          FeGaussianBlur primitive is needed - no FeDropShadow, no risk of
+          the same opaque-region bug. Drawn twice (kit's own doubled-filter
+          trick) - the crisp dark fill on top hides the inward half of each
+          blurred stroke, leaving only the outward-bleeding glow visible. */}
       <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
         <Defs>
-          <Filter id="domeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <FeDropShadow dx={0} dy={0} stdDeviation={3} floodColor="rgba(139,124,246,0.7)" />
+          <Filter id="domeGlowBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <FeGaussianBlur stdDeviation={4} />
           </Filter>
         </Defs>
-        <Path d={DOME_PATH} fill="#0C0D1B" filter="url(#domeGlow)" />
-        <Path d={DOME_PATH} fill="#0C0D1B" filter="url(#domeGlow)" />
+        <Path d={DOME_PATH} fill="none" stroke="rgba(139,124,246,0.9)" strokeWidth={4} filter="url(#domeGlowBlur)" />
+        <Path d={DOME_PATH} fill="none" stroke="rgba(139,124,246,0.9)" strokeWidth={4} filter="url(#domeGlowBlur)" />
+        <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
 
       <View style={[styles.content, { top: 50 * scale, height: 75 * scale, paddingHorizontal: 12 * scale }]}>
@@ -84,15 +93,11 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
                 style={[styles.item, { paddingVertical: 8 * scale, paddingHorizontal: 12 * scale }]}
                 onPress={onPress}
               >
-                {/* glow now lives inside NavIcon itself (an SVG filter on
-                    the icon's own Path), not a boxShadow'd wrapping View -
-                    same square-vs-contour issue as the dome glow above:
-                    a View's boxShadow traces its rectangular box, which
-                    read as a glowing square around the icon instead of a
-                    glow hugging the icon's real outline (2026-08-20: "иконки
-                    у тебя в квадратиках... свечение должно обволакивать не
-                    квадрат а саму иконку"). */}
-                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
+                {/* glow lives inside NavIcon itself now, not a boxShadow'd
+                    wrapping View (see NavIcon.tsx for the technique/history).
+                    30, not the kit's literal 27 - her explicit ask, 2026-08-20
+                    ("сделай их наверное чуть покрупнее"). */}
+                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={30 * scale} />
                 <Text style={[styles.itemLabel, { fontSize: 10 * scale, height: 12 * scale }]}>{isActive ? meta.label : ''}</Text>
               </Pressable>
             </Fragment>
