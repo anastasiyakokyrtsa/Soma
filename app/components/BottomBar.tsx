@@ -39,31 +39,43 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View style={[styles.wrap, { width, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
       {/* Kit's glow is filter:drop-shadow() on the SVG, tracing the dome's
-          own alpha silhouette. Two filter-based attempts both left a real,
-          visible opaque black rectangle above the dome (2026-08-20: first
-          FeDropShadow, then FeGaussianBlur on a stroke - still "эту
-          область черную над баром я все равно вижу" after the switch) -
-          the filter *region* itself (Filter's x/y/width/height, expanded
-          past the dome's own bounding box to give the blur room) appears to
-          rasterize with an opaque backing on this platform, and since the
-          <Svg> clips to its own viewBox by default, that oversized opaque
-          region shows as a black fill across the whole 412x125 canvas,
-          including the transparent headroom above the dome. Dropped SVG
-          `<Filter>` entirely for this shape - no way to be sure any given
-          filter primitive is safe here after two failures with two
-          different primitives. Replaced with a filter-free glow: several
-          plain stroked copies of the same path, widening and fading
-          (manual falloff, no blur), same trick real design tools use when
-          a true Gaussian blur isn't available. Also tuned wider/fainter
-          per her follow-up ("свечение... слишком плотное... в ките оно
-          пошире и более воздушное") - NavIcon's glow (small, tight
-          bounding box) never showed this bug and stays on FeGaussianBlur,
-          see that file. */}
+          own alpha silhouette. Three attempts to get a real glow rendering
+          here, each ruled out for a concrete reason, worth reading in full
+          before touching this again:
+          1. FeDropShadow filter on the Path - the filter *region* itself
+             rasterized as an opaque black rectangle instead of a
+             transparent backing, visible across the whole 412x125 canvas
+             (2026-08-20: "зачем над баром ещё кусок черной полосы").
+          2. FeGaussianBlur on a stroked duplicate (same idea, different
+             primitive) - identical symptom, still there ("эту область
+             черную над баром я все равно вижу"), so it's the `<Filter>`
+             region mechanism itself, not the specific primitive.
+          3. Filter-free multi-layer stroked glow (this technique, kept) +
+             `overflow:'visible'` on the Svg style (to stop the wide outer
+             layers clipping at the dome's edges) - the black rectangle
+             was STILL there after this round. `overflow:'visible'` on an
+             RN-SVG <Svg> is a known trigger for hardware-layer compositing
+             without alpha on Android - almost certainly the same
+             opaque-backing symptom recurring for a third, unrelated
+             reason. Removed it - accepting that the widest glow layers
+             now clip slightly at the dome's left/right/bottom edges
+             (where it sits flush with the viewBox boundary) rather than
+             risk the black rectangle a third time; kept every layer's own
+             `strokeWidth` modest enough that the clipped sliver is minor.
+          Glow itself: went from 4 coarse steps to 7 finer ones, closer
+          together in both width and opacity, to read as a smooth falloff
+          instead of visible discrete rings (2026-08-20: "свечение ужасно
+          смотрится... какими-то слоями... как в ките") - a real blur
+          isn't safely available here (see above), so more/closer steps is
+          the best available approximation. */}
       <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={22} strokeOpacity={0.06} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={15} strokeOpacity={0.1} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={9} strokeOpacity={0.16} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={5} strokeOpacity={0.24} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={16} strokeOpacity={0.035} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={13} strokeOpacity={0.05} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={10} strokeOpacity={0.07} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={8} strokeOpacity={0.1} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={6} strokeOpacity={0.14} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={4} strokeOpacity={0.2} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={2} strokeOpacity={0.28} />
         <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
 
@@ -125,16 +137,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     position: 'relative',
   },
+  // NOT overflow:'visible' - the kit's own .bottombar-svg has it (so its
+  // glow isn't clipped at the dome's edges), but on this Svg it turned out
+  // to trigger the same opaque-black-rectangle symptom as the broken SVG
+  // filters (see the long comment above) - a known RN/Android footgun
+  // where overflow:'visible' forces hardware-layer compositing without
+  // alpha. Left off; the glow's own strokeWidths are kept modest enough
+  // that the resulting edge-clipping is minor.
   svg: {
     position: 'absolute',
     left: 0,
     top: 0,
-    // kit's own .bottombar-svg is explicitly overflow:visible so its glow
-    // isn't clipped at the dome's own edges (the dome sits close to the
-    // viewBox boundary on the sides/bottom) - without this the new
-    // stroke-based glow's outer layers would get cut off right where the
-    // dome nearly touches the SVG's own edge.
-    overflow: 'visible',
   },
   content: {
     position: 'absolute',
