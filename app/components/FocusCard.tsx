@@ -90,8 +90,14 @@ const styles = StyleSheet.create({
   },
   // matches MoonSunCard's own note text (2026-08-20: "body text... сделаем
   // как и в описании в карточках Лунной и солнечной активности").
+  // includeFontPadding:false (Android-only) strips the extra font-metric
+  // padding Android adds below a Text's last line by default - without it,
+  // the visible gap to the card's own 16px bottom padding reads as bigger
+  // than 16 even though the numeric padding really is 16 (2026-08-20: "в
+  // карточках Фокус дня нижний паддинг не 16 а больше").
   text: {
     fontFamily: fontFamily.regular,
     color: colors.textPrimary,
+    includeFontPadding: false,
   },
 });

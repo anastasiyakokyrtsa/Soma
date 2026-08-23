@@ -1,9 +1,9 @@
 import { Fragment } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Defs, Filter, FeDropShadow } from 'react-native-svg';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { colors, fontFamily, glow } from '../theme';
+import { colors, fontFamily } from '../theme';
 import { NavIcon, type NavIconName } from './icons/NavIcon';
 
 // Ports UI Kit's `.bottombar` (index.html #navigation, style.css ~L605-645) -
@@ -35,8 +35,27 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <View style={[styles.wrap, { width, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
+      {/* Kit's glow is a real filter:drop-shadow() on the SVG, which traces
+          the dome's own alpha silhouette. A View/Svg-level boxShadow (what
+          this used before) shadows the element's rectangular LAYOUT BOX
+          instead - since that box spans the full transparent 125-tall
+          viewBox (headroom above the dome for the FAB bump), the result
+          was a straight glowing line along the box's top edge, not a glow
+          wrapping the dome shape (caught 2026-08-20: "нафига ты сделал
+          горизонтальную светящуюся линию... должна обволакивать саму
+          форму"). Fixed with a real FeDropShadow SVG filter on the Path
+          itself - drawn twice with the identical filter (not two different
+          blurs) to reproduce the kit's own doubled-intensity trick, since
+          FeDropShadow's own output already includes the crisp source
+          graphic composited on top of its shadow. */}
       <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
-        <Path d={DOME_PATH} fill="#0C0D1B" />
+        <Defs>
+          <Filter id="domeGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <FeDropShadow dx={0} dy={0} stdDeviation={3} floodColor="rgba(139,124,246,0.7)" />
+          </Filter>
+        </Defs>
+        <Path d={DOME_PATH} fill="#0C0D1B" filter="url(#domeGlow)" />
+        <Path d={DOME_PATH} fill="#0C0D1B" filter="url(#domeGlow)" />
       </Svg>
 
       <View style={[styles.content, { top: 50 * scale, height: 75 * scale, paddingHorizontal: 12 * scale }]}>
@@ -65,9 +84,15 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
                 style={[styles.item, { paddingVertical: 8 * scale, paddingHorizontal: 12 * scale }]}
                 onPress={onPress}
               >
-                <View style={isActive && styles.iconActiveGlow}>
-                  <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
-                </View>
+                {/* glow now lives inside NavIcon itself (an SVG filter on
+                    the icon's own Path), not a boxShadow'd wrapping View -
+                    same square-vs-contour issue as the dome glow above:
+                    a View's boxShadow traces its rectangular box, which
+                    read as a glowing square around the icon instead of a
+                    glow hugging the icon's real outline (2026-08-20: "иконки
+                    у тебя в квадратиках... свечение должно обволакивать не
+                    квадрат а саму иконку"). */}
+                <NavIcon name={isActive ? meta.iconAlt : meta.icon} active={isActive} size={27 * scale} />
                 <Text style={[styles.itemLabel, { fontSize: 10 * scale, height: 12 * scale }]}>{isActive ? meta.label : ''}</Text>
               </Pressable>
             </Fragment>
@@ -99,9 +124,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
-    // dome glow - kit stacks this exact same drop-shadow twice (extra
-    // intensity, not two different blurs) - mirrored here for the same effect.
-    boxShadow: `0px 0px 6px rgba(139,124,246,0.7), 0px 0px 6px rgba(139,124,246,0.7)`,
   },
   content: {
     position: 'absolute',
@@ -115,9 +137,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     gap: 2,
-  },
-  iconActiveGlow: {
-    boxShadow: `0px 0px ${glow.iconGradient.blur}px ${glow.iconGradient.color}`,
   },
   itemLabel: {
     fontFamily: fontFamily.bold,
