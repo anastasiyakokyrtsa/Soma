@@ -135,7 +135,22 @@ export function CareScreen() {
           <NavChip icon="cello" label="Успокаивающая музыка" />
         </View>
 
-        <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
+        <View style={[styles.section, styles.teaSection, { marginTop: GAP.chipsToTea }]}>
+          {/* Design proposal option 2 (visual-designer role, same round as
+              option 1): a warm radial patch behind the whole block, for
+              temperature contrast against the cold starry background
+              elsewhere on the screen - echoes the "Рассвет"/Dawn visual
+              style's own tagline ("тепло вместо холодного неона", see
+              theme/visualStyles.ts). Not a new standing color token - a
+              one-off warm accent scoped to just this block, the app's
+              palette otherwise stays cool/violet per CLAUDE.md. Rendered
+              first so normal-flow siblings (title/image/caption/button)
+              stack visually on top of it; pointerEvents="none" so it never
+              intercepts touches meant for the button/scroll beneath. Trying
+              alongside option 1's glow (not replacing it) per her ask -
+              revert point is still commit 473912a for the fully plain
+              version, or 880857f for "just option 1, no patch". */}
+          <View style={styles.teaPatch} pointerEvents="none" />
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
           {/* Design proposal option 1 (visual-designer role, 2026-08-20:
               "рекомендации как сделать блок... интереснее визуально" ->
@@ -226,6 +241,22 @@ const styles = StyleSheet.create({
     gap: 11,
   },
   section: {},
+  // position:'relative' so teaPatch (position:'absolute') positions itself
+  // against this block, not the whole screen.
+  teaSection: {
+    position: 'relative',
+  },
+  teaPatch: {
+    position: 'absolute',
+    top: -20,
+    left: '50%',
+    marginLeft: -140,
+    width: 280,
+    height: 560,
+    borderRadius: 220,
+    backgroundColor: 'rgba(255,179,122,0.05)',
+    boxShadow: '0px 0px 100px 40px rgba(255,179,122,0.12)',
+  },
   teaImageWrap: {
     alignSelf: 'center',
     width: 193,
