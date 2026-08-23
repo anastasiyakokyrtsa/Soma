@@ -50,7 +50,6 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
   const ready = trackWidth > 0;
   const scaleWidth = Math.min(SCALE_WIDTH, trackWidth);
   const leftOffset = Math.max(0, (trackWidth - scaleWidth) / 2);
-  const posForPct = (p: number) => leftOffset + p * scaleWidth;
 
   const labelInsetLeft = Math.max(0, firstLabelWidth / 2 - (WALL_TO_CARD - WALL_TO_LABEL));
   const labelInsetRight = Math.max(0, lastLabelWidth / 2 - (WALL_TO_CARD - WALL_TO_LABEL));
@@ -102,9 +101,19 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
           <>
             <View style={[styles.trackLine, { left: leftOffset, width: scaleWidth }]} />
             <View style={[styles.trackFill, { left: leftOffset, width: pct * scaleWidth }]} />
-            <View style={[styles.thumb, { left: posForPct(pct) }]} />
           </>
         ) : null}
+        {/* Thumb positioned on the icons/labels' own coordinate system
+            (labelPosForPct), not the line/fill's own (leftOffset+scaleWidth)
+            - the line itself stays untouched (2026-08-20: "длину самой
+            линии слайдера не меняй"), but the two systems don't share the
+            same width/inset (line = fixed 380 capped+centered, icons =
+            real-measured wall clearance), so a thumb driven by the line's
+            own math landed off from the icon underneath it at every stop
+            except the very ends. This was a known, previously-flagged
+            drift ([[project-app-development]] 2026-08-17 entry) - she's
+            now confirmed it's actually visible, so fixing it for real. */}
+        {labelsReady ? <View style={[styles.thumb, { left: labelPosForPct(pct) }]} /> : null}
         <View style={StyleSheet.absoluteFill} {...panResponder.panHandlers} />
       </View>
 
