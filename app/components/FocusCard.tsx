@@ -30,13 +30,15 @@ export function FocusCard({
   // wrong reading of the ask).
   const scale = Math.min(width, 336) / 336;
   return (
-    <View style={[styles.card, { width, padding: 16 * scale, gap: 8 * scale }]}>
+    // padding stays literal 16 (not scaled) per her explicit ask - unlike
+    // MoonSunCard's own padding, which does scale (2026-08-20: "паддинг по
+    // 16 со всех сторон").
+    <View style={[styles.card, { width, padding: 16, gap: 8 * scale }]}>
       <View style={styles.header}>
-        {/* 36, not 32 - bumped alongside the title's move to MoonSunCard's
-            larger 22px title size (was paired with the old 20px title),
-            keeping roughly the same icon-to-title weight ratio (2026-08-20:
-            "думаю тут нужно будет и размер иконки адаптировать"). */}
-        <GradientIcon name={icon} size={36 * scale} />
+        {/* 26, not 36 - the 36 bump (paired with the title's move to 22px)
+            read as way oversized next to the text (2026-08-20: "иконки чуть
+            поменьше... они намного больше шрифта"). */}
+        <GradientIcon name={icon} size={26 * scale} />
         {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
             though "Мягкий старт и обновление" (the one title that actually
             needed it) got shortened to just "Мягкий старт" the same round -
