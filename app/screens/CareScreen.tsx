@@ -8,7 +8,7 @@ import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
-import { TeaIllustrationGlow } from '../components/TeaIllustrationGlow';
+import { TeaIllustrationGlow, TEA_GLOW_PAD } from '../components/TeaIllustrationGlow';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -136,13 +136,18 @@ export function CareScreen() {
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Box/oval glow attempts and a Skia alpha-blur attempt (both this
-              session) either couldn't trace the plant's real silhouette, or
-              (Skia) turned out not to render at all in this environment -
-              see TeaIllustrationGlow.tsx for the full history. Current
-              technique: plain RN Image's own blurRadius+tintColor, no
-              Skia/SVG/boxShadow dependency at all - see that file for why. */}
-          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage }}>
+          {/* Several earlier attempts (box/oval glow, Skia alpha-blur, RN
+              Image blurRadius/tintColor) either couldn't trace the plant's
+              real silhouette or turned out not to render at all in this
+              environment - see TeaIllustrationGlow.tsx for the full
+              history. Current technique: react-native-svg's FeGaussianBlur
+              (the one blur primitive already confirmed working elsewhere
+              in this app) applied to an embedded SVG Image of the same
+              artwork. TEA_GLOW_PAD compensates the glow canvas's own bleed
+              padding on both the top gap (from the title) and bottom gap
+              (to the caption) so the visible artwork still sits exactly
+              GAP.teaTitleToImage/imageToCaption away, same as always. */}
+          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage - TEA_GLOW_PAD, marginBottom: -TEA_GLOW_PAD }}>
             <TeaIllustrationGlow />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
