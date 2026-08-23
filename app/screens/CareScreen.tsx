@@ -1,4 +1,5 @@
-import { View, Text, Image, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, Image, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily, gradients, glow } from '../theme';
@@ -6,6 +7,7 @@ import { ResourceRing } from '../components/ResourceRing';
 import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
+import { StarsBackground } from '../components/StarsBackground';
 
 const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 
@@ -42,14 +44,24 @@ const GAP = {
 
 export function CareScreen() {
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  // Same star background as HomeScreen, same technique/reasoning (2026-08-20:
+  // "звёздный фон добавь так же как в Home") - grow-only so it doesn't
+  // re-stretch/"move" if this screen's own content height ever changes
+  // (see HomeScreen.tsx's own comment on this exact bug for the full story).
+  const [contentHeight, setContentHeight] = useState(0);
 
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 140 }]}
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: insets.bottom + 140 }}
         showsVerticalScrollIndicator={false}
+        onContentSizeChange={(_w, h) => setContentHeight((prev) => Math.max(prev, h))}
       >
-        <View style={styles.condition}>
+        <StarsBackground width={screenWidth} height={contentHeight} />
+
+        <View style={styles.content}>
+          <View style={styles.condition}>
           {/* Settings matched to HomeScreen's own "Доброе утро" heading
               (GreetingHeading: fontSize 28, fontFamily.bold) - was 36/
               semiBold, her explicit ask 2026-08-20 ("заголовок сделай по
@@ -117,6 +129,7 @@ export function CareScreen() {
               <Text style={styles.allArticles}>Все статьи</Text>
             </Pressable>
           </View>
+        </View>
         </View>
       </ScrollView>
     </View>
