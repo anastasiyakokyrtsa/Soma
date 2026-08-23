@@ -40,8 +40,21 @@ const DOME_PATH =
 const GLOW_LAYER_COUNT = 14;
 const GLOW_MAX_WIDTH = 24;
 const GLOW_MIN_WIDTH = 2;
-const GLOW_MAX_OPACITY = 0.3;
-const GLOW_MIN_OPACITY = 0.02;
+// Both cut ~30% from the previous 0.3/0.02 - her ask, 2026-08-20: "убери
+// плотность свечения процентов на 30".
+const GLOW_MAX_OPACITY = 0.21;
+const GLOW_MIN_OPACITY = 0.014;
+// Extra viewBox room on every side so the widest glow layers have somewhere
+// to bleed into. The dome's own peak sits only ~6 units below the
+// viewBox's y=0 (computed from the arc's own radius/chord - nowhere near
+// enough clearance for a 24-wide stroke's 12-unit half-width bleed), so it
+// was getting hard-clipped flat right at the viewBox boundary - exactly
+// the "приплюснуто линией горизонтальной" (squashed flat by a horizontal
+// line) she flagged - the *same* symptom `overflow:'visible'` would fix,
+// but padding the viewBox itself is the technique already proven safe
+// elsewhere in this app (BiorhythmChart's curve-peak clipping, same root
+// cause) rather than risking that style prop's own history of trouble here.
+const GLOW_PAD = 20;
 const GLOW_LAYERS = Array.from({ length: GLOW_LAYER_COUNT }, (_, i) => {
   const t = i / (GLOW_LAYER_COUNT - 1); // 0 = widest/faintest (drawn first), 1 = narrowest/brightest (drawn last)
   return {
@@ -91,7 +104,12 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
           meets the dome's curve read as a straight bar jutting out of the
           hill at wide stroke widths (2026-08-20: "свечение как будто линия
           горизонтальная накрывает"). */}
-      <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
+      <Svg
+        width={width + 2 * GLOW_PAD * scale}
+        height={height + 2 * GLOW_PAD * scale}
+        viewBox={`${-GLOW_PAD} ${-GLOW_PAD} ${BAR_VIEWBOX_W + 2 * GLOW_PAD} ${BAR_VIEWBOX_H + 2 * GLOW_PAD}`}
+        style={[styles.svg, { top: -GLOW_PAD * scale, left: -GLOW_PAD * scale }]}
+      >
         {GLOW_LAYERS.map((layer, i) => (
           <Path
             key={i}
