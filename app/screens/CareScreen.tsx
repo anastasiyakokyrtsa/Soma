@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Image, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { colors, fontFamily, gradients, glow } from '../theme';
 import { ResourceRing } from '../components/ResourceRing';
 import { MiniRitualTile } from '../components/MiniRitualTile';
@@ -137,26 +137,38 @@ export function CareScreen() {
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Option 2 (warm patch behind the whole block) was rejected
-              outright ("второй вариант точно нет"). Option 1 (violet glow)
-              came back reworked per her direct feedback: OVAL, not round -
-              "сделать такое овальное свечение под травкой... потому что
-              само изображение такое" (the illustration itself is an
-              upright, narrow silhouette, not circular) - and no separate
-              flat-colored disk showing through the blur - "убери вот этот
-              странный круг посередине другого цвета" (the earlier version's
-              `backgroundColor` fill on the glow box read as a distinct
-              hard-edged shape under the soft blur). Same fix QuoteCard uses
-              for its own outward glow: NO backgroundColor on the glow box,
-              boxShadow alone (blur+spread) produces the whole visible
-              shape, so there's no separate flat core to read as
-              "another color". Box is narrower than tall + borderRadius
-              capped at half its own width (RN clamps borderRadius to
-              min(width,height)/2) - the wide flat top/bottom + rounded
-              sides read as a soft vertical oval once blurred, matching the
-              plant illustration's own proportions instead of a circle. */}
+          {/* Reworked again per her direct feedback on the boxShadow-only
+              version: "что это за дырка внутри? нужно чтобы свечение было
+              сплошное, под изображением. И сделай не прям точный овал, а
+              вот по контуру изображения." The "hole" was a real mechanical
+              gap, not a rendering bug: CSS/RN box-shadow only paints
+              OUTWARD from a box's edges - it never fills the box's own
+              interior, which is whatever that box's own backgroundColor
+              is. QuoteCard's glow gets away with an empty interior because
+              an opaque card sits on top of it; here the illustration's thin
+              plant lines leave gaps, so the glow box's own untinted middle
+              showed straight through as a literal hole. Switched from
+              boxShadow to the same RadialGradient-fill technique already
+              used for every card background in this app (MoonSunCard/
+              MiniRitualTile/NavChip) - genuinely solid/continuous from the
+              center outward, no interior gap possible. Sized to exactly
+              match teaImageWrap's own 193x360 box (the image's own bounding
+              box, not an arbitrary smaller shape) - r="70.7%" is this
+              session's established farthest-corner recipe, which makes the
+              falloff naturally elongate to the box's own aspect ratio, i.e.
+              hug the image's real proportions instead of forcing a generic
+              round/oval shape unrelated to it. */}
           <View style={[styles.teaImageWrap, { marginTop: GAP.teaTitleToImage }]}>
-            <View style={styles.teaImageGlow} pointerEvents="none" />
+            <Svg width={193} height={360} style={StyleSheet.absoluteFillObject} pointerEvents="none">
+              <Defs>
+                <RadialGradient id="teaGlow" cx="50%" cy="50%" r="70.7%">
+                  <Stop offset="0" stopColor={colors.violet400} stopOpacity={0.45} />
+                  <Stop offset="0.55" stopColor={colors.violet400} stopOpacity={0.26} />
+                  <Stop offset="1" stopColor={colors.violet400} stopOpacity={0} />
+                </RadialGradient>
+              </Defs>
+              <Rect x={0} y={0} width={193} height={360} fill="url(#teaGlow)" />
+            </Svg>
             <Image source={TEA_ILLUSTRATION} style={styles.teaImage} resizeMode="contain" />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
@@ -236,22 +248,6 @@ const styles = StyleSheet.create({
     height: 360,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  // Oval, not circular - width capped well under height so RN's borderRadius
-  // clamp (min(width,height)/2) leaves the sides fully rounded and the
-  // top/bottom relatively flat, reading as a vertical ellipse once the
-  // boxShadow blur softens it - matches the plant illustration's own
-  // upright, narrow silhouette instead of a generic circle. No
-  // backgroundColor on this box (same trick as QuoteCard's own outward
-  // glow) - boxShadow alone paints the whole visible shape, so there's no
-  // separate flat-fill disk to read as a harder-edged "different color"
-  // shape under the blur.
-  teaImageGlow: {
-    position: 'absolute',
-    width: 150,
-    height: 300,
-    borderRadius: 75,
-    boxShadow: '0px 0px 70px 20px rgba(139,124,246,0.28)',
   },
   teaImage: {
     width: 193,
