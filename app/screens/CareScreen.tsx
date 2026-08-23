@@ -136,40 +136,29 @@ export function CareScreen() {
         </View>
 
         <View style={[styles.section, styles.teaSection, { marginTop: GAP.chipsToTea }]}>
-          {/* Design proposal option 2 (visual-designer role, same round as
-              option 1): a warm radial patch behind the whole block, for
-              temperature contrast against the cold starry background
-              elsewhere on the screen - echoes the "Рассвет"/Dawn visual
-              style's own tagline ("тепло вместо холодного неона", see
-              theme/visualStyles.ts). Not a new standing color token - a
-              one-off warm accent scoped to just this block, the app's
-              palette otherwise stays cool/violet per CLAUDE.md. Rendered
-              first so normal-flow siblings (title/image/caption/button)
-              stack visually on top of it; pointerEvents="none" so it never
-              intercepts touches meant for the button/scroll beneath. Trying
-              alongside option 1's glow (not replacing it) per her ask -
-              revert point is still commit 473912a for the fully plain
-              version, or 880857f for "just option 1, no patch". */}
+          {/* Design proposal option 2 (visual-designer role): a warm radial
+              patch behind the whole block, for temperature contrast against
+              the cold starry background elsewhere on the screen - echoes
+              the "Рассвет"/Dawn visual style's own tagline ("тепло вместо
+              холодного неона", see theme/visualStyles.ts). Not a new
+              standing color token - a one-off warm accent scoped to just
+              this block, the app's palette otherwise stays cool/violet per
+              CLAUDE.md. Rendered first so normal-flow siblings
+              (title/image/caption/button) stack visually on top of it;
+              pointerEvents="none" so it never intercepts touches meant for
+              the button/scroll beneath. Option 1 (violet glow ringing the
+              illustration itself) was tried alongside this and then
+              explicitly removed - "убери то первый эффект, а то накладывается
+              все" (the two competed/felt layered on top of each other) -
+              revert points: 473912a = fully plain, 880857f = option 1 only,
+              e96051b = both 1+2 together, if she wants any of those back. */}
           <View style={styles.teaPatch} pointerEvents="none" />
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Design proposal option 1 (visual-designer role, 2026-08-20:
-              "рекомендации как сделать блок... интереснее визуально" ->
-              "попробуй вариант 1") - a soft ambient glow behind the
-              illustration, same violet/pink family as QuoteCard's own
-              outward glow. Not a true alpha-traced glow (the illustration
-              is a raster PNG, not an SVG shape an FeGaussianBlur filter
-              could trace - see this session's BottomBar/ResourceRing/
-              NavIcon work for why that distinction matters) - a soft round
-              halo positioned behind the image is the standard, simpler
-              version of this effect most apps use for illustration/portrait
-              glow, not meant to hug the artwork's own silhouette. First
-              pass, not fine-tuned to the illustration's actual composition -
-              flag if the glow's position/size needs to move once she's
-              looked at it live. */}
-          <View style={[styles.teaImageWrap, { marginTop: GAP.teaTitleToImage }]}>
-            <View style={styles.teaImageGlow} />
-            <Image source={TEA_ILLUSTRATION} style={styles.teaImage} resizeMode="contain" />
-          </View>
+          <Image
+            source={TEA_ILLUSTRATION}
+            style={[styles.teaImage, { alignSelf: 'center', marginTop: GAP.teaTitleToImage }]}
+            resizeMode="contain"
+          />
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
           <Pressable style={[styles.teaButton, { marginTop: GAP.captionToButton }]}>
             <Text style={styles.teaButtonLabel}>Начать чайную церемонию</Text>
@@ -256,29 +245,6 @@ const styles = StyleSheet.create({
     borderRadius: 220,
     backgroundColor: 'rgba(255,179,122,0.05)',
     boxShadow: '0px 0px 100px 40px rgba(255,179,122,0.12)',
-  },
-  teaImageWrap: {
-    alignSelf: 'center',
-    width: 193,
-    height: 360,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Design proposal option 1 - soft ambient halo behind the tea
-  // illustration, same violet glow color/recipe as QuoteCard's own outward
-  // glow (rgba(139,124,246,0.3)) so it reads as the same "light" language
-  // elsewhere in the app. A round View with boxShadow (not an SVG blur) -
-  // boxShadow follows the element's own borderRadius correctly for a plain
-  // circle (confirmed multiple times this session on ResourceRing/NavIcon),
-  // and a circular halo doesn't need to trace the illustration's actual
-  // silhouette to read as ambient light behind it.
-  teaImageGlow: {
-    position: 'absolute',
-    width: 170,
-    height: 170,
-    borderRadius: 85,
-    backgroundColor: 'rgba(139,124,246,0.16)',
-    boxShadow: '0px 0px 60px 20px rgba(139,124,246,0.3)',
   },
   teaImage: {
     width: 193,
