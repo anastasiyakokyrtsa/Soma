@@ -22,14 +22,14 @@ export function MainTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        // Floats the custom dome-shaped BottomBar over the screen content
-        // (transparent gaps either side of the dome are meant to show
-        // content behind them) instead of React Navigation's default of
-        // reserving a solid rectangular strip and shrinking screens to fit
-        // above it - each screen accounts for the bar's own height via its
-        // own bottom padding instead (see e.g. HomeScreen.tsx).
-        tabBarStyle: { position: 'absolute', backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0 },
       }}
+      // `tabBarStyle` (position/backgroundColor/etc.) was removed 2026-08-20 -
+      // it's only ever consumed by react-navigation's own default tab bar's
+      // height calculation and never applied to a custom `tabBar` render
+      // prop's actual output (confirmed by reading the library source), so
+      // it was silently doing nothing here. BottomBar floats over screen
+      // content because its own `wrap` style is `position:'absolute'`
+      // directly - that's the real, load-bearing mechanism, not this prop.
       tabBar={(props) => <BottomBar {...props} />}
     >
       <Tab.Screen name="Home" component={HomeScreen} />

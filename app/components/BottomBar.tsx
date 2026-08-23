@@ -37,7 +37,28 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const height = BAR_VIEWBOX_H * scale;
 
   return (
-    <View style={[styles.wrap, { width, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
+    // Real root cause of the persistent "black area above the bar" - not a
+    // rendering effect at all. `wrap` was `position:'relative'`, so this
+    // component sat in NORMAL FLEX FLOW as a sibling *below* the screens
+    // container inside react-navigation's own layout (MainTabs.tsx's
+    // `tabBarStyle:{position:'absolute',...}` comment claimed this floats
+    // over content, but that style is only used by the *library's own*
+    // default tab bar - it's never applied when a custom `tabBar` render
+    // prop is used, confirmed by reading getTabBarHeight/BottomTabView's
+    // actual source). With no `position:'absolute'` here, react-navigation
+    // reserved real flex space below the screen for this component and the
+    // screen ended flush above it - so the SVG's legitimately-transparent
+    // headroom above the dome had nothing behind it but the app's own
+    // unstyled root background, not the screen's stars/content (2026-08-20:
+    // "мне нужно чтобы фон задний, тексты и тд, было видно выше светящейся
+    // линии" - confirmed nothing was showing through, because nothing was
+    // there to show). Fixed by making `wrap` itself `position:'absolute'`,
+    // anchored to the bottom of whatever contains both the screens and this
+    // bar (any RN View is a valid positioning context for its descendants,
+    // no explicit `position:'relative'` needed the way CSS requires) - now
+    // the screen genuinely fills the full height behind it, matching the
+    // "floats over content" behavior this always should have had.
+    <View style={[styles.wrap, { width, left: (screenWidth - width) / 2, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
       {/* Kit's glow is filter:drop-shadow() on the SVG, tracing the dome's
           own alpha silhouette. Three attempts to get a real glow rendering
           here, each ruled out for a concrete reason, worth reading in full
@@ -68,14 +89,18 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
           смотрится... какими-то слоями... как в ките") - a real blur
           isn't safely available here (see above), so more/closer steps is
           the best available approximation. */}
+      {/* strokeWidths widened ~35% (22/18/14/11/8/6/3, was 16/13/10/8/6/4/2)
+          - her explicit ask, 2026-08-20: "свечение линии чуть усиленнее,
+          именно spread" (spread specifically, not just brightness) -
+          opacities left as-is. */}
       <Svg width={width} height={height} viewBox={`0 0 ${BAR_VIEWBOX_W} ${BAR_VIEWBOX_H}`} style={styles.svg}>
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={16} strokeOpacity={0.035} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={13} strokeOpacity={0.05} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={10} strokeOpacity={0.07} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={8} strokeOpacity={0.1} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={6} strokeOpacity={0.14} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={4} strokeOpacity={0.2} />
-        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={2} strokeOpacity={0.28} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={22} strokeOpacity={0.035} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={18} strokeOpacity={0.05} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={14} strokeOpacity={0.07} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={11} strokeOpacity={0.1} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={8} strokeOpacity={0.14} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={6} strokeOpacity={0.2} />
+        <Path d={DOME_PATH} fill="none" stroke={colors.violet400} strokeWidth={3} strokeOpacity={0.28} />
         <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
 
@@ -134,8 +159,8 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
 
 const styles = StyleSheet.create({
   wrap: {
-    alignSelf: 'center',
-    position: 'relative',
+    position: 'absolute',
+    bottom: 0,
   },
   // NOT overflow:'visible' - the kit's own .bottombar-svg has it (so its
   // glow isn't clipped at the dome's edges), but on this Svg it turned out
