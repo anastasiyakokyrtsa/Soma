@@ -66,7 +66,13 @@ export function CareScreen() {
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: insets.bottom + 140 }}
+        // 160, not insets.bottom + N - her explicit ask, 2026-08-26: "от
+        // Все статьи до самого низа экрана 160 пикселей", the literal
+        // physical screen edge, not a safe-area-relative gap. A flat 160
+        // already clears any realistic insets.bottom (home indicator/nav
+        // bar), so it doesn't need insets.bottom added on top - doing so
+        // would overshoot her stated number on devices with a real inset.
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 160 }}
         showsVerticalScrollIndicator={false}
         onContentSizeChange={(_w, h) => setContentHeight((prev) => Math.max(prev, h))}
       >
