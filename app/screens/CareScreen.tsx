@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily, gradients, glow } from '../theme';
 import { ResourceRing } from '../components/ResourceRing';
@@ -8,7 +9,7 @@ import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
-import { TeaIllustrationGlow, TEA_GLOW_PAD } from '../components/TeaIllustrationGlow';
+import { TeaIllustrationGlow } from '../components/TeaIllustrationGlow';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -46,6 +47,30 @@ const GAP = {
   buttonToArticlesHeader: 60,
   articlesHeaderToList: 20,
 };
+
+// "Начать чайную церемонию" CTA glow, pulsing gently - her ask alongside the
+// tea illustration's sway, 2026-08-26 ("может кнопку тоже немного
+// анимировать"). Only `opacity` is animated (not the boxShadow's own blur/
+// color), per this app's own animation guidance (GPU-compositable
+// properties only, same reasoning already applied to ProgressDots/
+// StyleSwatch's Reanimated work) - a second, static+stronger boxShadow
+// layer sits behind the button's own permanent `glow.btn` shadow, and only
+// its visibility breathes in and out, rather than animating the shadow
+// itself every frame.
+function PulsingButtonGlow() {
+  const pulse = useSharedValue(0);
+
+  useEffect(() => {
+    pulse.value = withRepeat(withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.sin) }), -1, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const style = useAnimatedStyle(() => ({
+    opacity: 0.35 + pulse.value * 0.65,
+  }));
+
+  return <Animated.View pointerEvents="none" style={[styles.teaButtonGlowPulse, style]} />;
+}
 
 export function CareScreen() {
   const insets = useSafeAreaInsets();
@@ -140,20 +165,21 @@ export function CareScreen() {
               Image blurRadius/tintColor) either couldn't trace the plant's
               real silhouette or turned out not to render at all in this
               environment - see TeaIllustrationGlow.tsx for the full
-              history. Current technique: react-native-svg's FeGaussianBlur
-              (the one blur primitive already confirmed working elsewhere
-              in this app) applied to an embedded SVG Image of the same
-              artwork. TEA_GLOW_PAD compensates the glow canvas's own bleed
-              padding on both the top gap (from the title) and bottom gap
-              (to the caption) so the visible artwork still sits exactly
-              GAP.teaTitleToImage/imageToCaption away, same as always. */}
-          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage - TEA_GLOW_PAD, marginBottom: -TEA_GLOW_PAD }}>
+              history, including its own gentle sway animation added
+              2026-08-26. Its glow bleed is absolutely-positioned inside its
+              own IMAGE_W×IMAGE_H box now (not baked into the component's
+              layout size), so this wrapper no longer needs to compensate
+              any padding - a plain marginTop is enough again. */}
+          <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage }}>
             <TeaIllustrationGlow />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
-          <Pressable style={[styles.teaButton, { marginTop: GAP.captionToButton }]}>
-            <Text style={styles.teaButtonLabel}>Начать чайную церемонию</Text>
-          </Pressable>
+          <View style={{ marginTop: GAP.captionToButton }}>
+            <PulsingButtonGlow />
+            <Pressable style={styles.teaButton}>
+              <Text style={styles.teaButtonLabel}>Начать чайную церемонию</Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={[styles.section, { marginTop: GAP.buttonToArticlesHeader }]}>
@@ -235,6 +261,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: `0px 0px ${glow.btn.blur}px ${glow.btn.color}`,
+  },
+  // Sits behind teaButton (same box, absolutely filled) - a stronger, wider
+  // glow than the button's own static one, whose opacity alone breathes.
+  teaButtonGlowPulse: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 16,
+    boxShadow: `0px 0px 34px ${glow.btn.color}`,
   },
   teaButtonLabel: {
     fontFamily: fontFamily.semiBold,
