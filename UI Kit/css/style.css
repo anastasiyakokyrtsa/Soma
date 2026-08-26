@@ -757,11 +757,18 @@ button{font-family:inherit;}
 /* pressed — same violet-tint-fill pattern already used for selected/active chrome elsewhere in the kit, plus the usual scale-down press feedback */
 .list-row:active, .list-row.force-pressed{background:rgba(139,124,246,.12); transform:scale(.98);}
 .list-row-icon{width:48px; height:48px; margin-right:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-.list-row-icon img{width:28px; height:28px;}
+/* 28px->32px (icon) and arrow 16px->28px — her direct Figma reading, 2026-08-26
+   ("иконки в высоту 32 пикселя, а стрелки 28х28"), correcting a real kit/Figma
+   mismatch, not a deliberate app-only deviation. */
+.list-row-icon img{width:32px; height:32px;}
 .list-row-text{width:217px; flex-shrink:0;}
-.list-row-title{font-family:var(--font-nunito); font-weight:600; font-size:18px; line-height:32px; margin:0;}
-.list-row-sub{font-family:var(--font-nunito); font-weight:500; font-size:16px; line-height:1.3; margin:0;}
-.list-row-arrow{width:16px; margin-left:auto;}
+/* One line, not the old 2-line-friendly 32px line-height — same round,
+   2026-08-26: "надо чтобы заголовки помещались в одну строку, если надо
+   уменьши кегль" (title 18px->16px), "соответственно тогда и кегль боди
+   уменьши немного" (sub 16px->14px). */
+.list-row-title{font-family:var(--font-nunito); font-weight:600; font-size:16px; line-height:1.1; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.list-row-sub{font-family:var(--font-nunito); font-weight:500; font-size:14px; line-height:1.3; margin:0;}
+.list-row-arrow{width:28px; height:28px; margin-left:auto;}
 
 /* ============ PERSONALIZATION STEPS ============ */
 .pstep-row{

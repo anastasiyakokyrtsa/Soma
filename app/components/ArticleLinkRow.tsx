@@ -22,28 +22,35 @@ export function ArticleLinkRow({
   return (
     <Pressable style={({ pressed }) => [styles.row, pressed && styles.rowPressed]} onPress={onPress}>
       <View style={styles.iconFrame}>
-        <GradientIcon name={icon} size={28} />
+        <GradientIcon name={icon} size={32} />
       </View>
       <View style={styles.text}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
-      <GradientIcon name="forward" size={16} />
+      <GradientIcon name="forward" size={28} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  // Fixed height:112 (not minHeight) - her direct Figma reading, 2026-08-26
+  // ("в фигме они 380 в длину и 112 в высоту"), was minHeight:112 +
+  // paddingVertical:16 stacked on top of it, growing the card past its real
+  // spec ("получились какие-то слишком толстые"). No vertical padding at
+  // all now - align-items:center on a fixed-height row does the centering,
+  // matches the kit's own .list-row (padding:0 16px, no vertical padding).
   row: {
     width: '100%',
-    minHeight: 112,
+    height: 112,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.borderVioletFlat,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
     gap: 12,
   },
   rowPressed: {
@@ -60,17 +67,22 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
   },
+  // 18->16 so the title reliably holds one line at the row's real (narrower
+  // than the kit's fixed 380) content width - her explicit ask, 2026-08-26
+  // ("надо чтобы заголовки помещались в одну строку, если надо уменьши
+  // кегль"). subtitle dropped 16->14 to follow, "соответственно тогда и
+  // кегль боди уменьши немного".
   title: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: 16,
+    lineHeight: 16 * 1.1,
     color: colors.textPrimary,
   },
   subtitle: {
     marginTop: 4,
     fontFamily: fontFamily.medium,
-    fontSize: 16,
-    lineHeight: 16 * 1.3,
+    fontSize: 14,
+    lineHeight: 14 * 1.3,
     color: colors.textPrimary,
   },
 });

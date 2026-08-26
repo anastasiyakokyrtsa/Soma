@@ -8,7 +8,7 @@ import { MiniRitualTile } from '../components/MiniRitualTile';
 import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
-import { TeaIllustrationGlow } from '../components/TeaIllustrationGlow';
+import { TeaIllustrationSway } from '../components/TeaIllustrationSway';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -136,17 +136,13 @@ export function CareScreen() {
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
           <Text style={styles.sectionTitle}>Чай как ритуал</Text>
-          {/* Several earlier attempts (box/oval glow, Skia alpha-blur, RN
-              Image blurRadius/tintColor) either couldn't trace the plant's
-              real silhouette or turned out not to render at all in this
-              environment - see TeaIllustrationGlow.tsx for the full
-              history, including its own gentle sway animation added
-              2026-08-26. Its glow bleed is absolutely-positioned inside its
-              own IMAGE_W×IMAGE_H box now (not baked into the component's
-              layout size), so this wrapper no longer needs to compensate
-              any padding - a plain marginTop is enough again. */}
+          {/* No glow behind the artwork anymore - several attempts never
+              confirmed working and the last one produced a visible ghost-
+              layer bug during the sway animation. See
+              TeaIllustrationSway.tsx (renamed from ...Glow.tsx) for the
+              full history and the sway's own two-band technique. */}
           <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage }}>
-            <TeaIllustrationGlow />
+            <TeaIllustrationSway />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
           <Pressable style={[styles.teaButton, { marginTop: GAP.captionToButton }]}>
