@@ -742,9 +742,15 @@ button{font-family:inherit;}
    since there's no fill to read the card's edge otherwise). Ring via mask-composite, not the
    padding-box/border-box trick — that trick needs an opaque inner layer to hide the border-box
    gradient bleeding through, and this card's interior is genuinely transparent. */
+/* Height now hugs padding+content (16px top/bottom, 48px icon) instead of a
+   fixed 112px - her explicit per-edge spec, 2026-08-26 ("сверху и снизу по
+   16"); a fixed 112 + align-items:center centering would put ~32px above/
+   below the icon, not the 16px she asked for. Comes out around 80px tall,
+   shorter than the "112" she cited the day before - flagged to her, not
+   silently resolved, in case that outer number was the one to keep. */
 .list-row{
-  position:relative; box-sizing:border-box; width:380px; height:112px; border-radius:30px;
-  display:flex; align-items:center; padding:0 16px; background:transparent; cursor:pointer;
+  position:relative; box-sizing:border-box; width:380px; border-radius:30px;
+  display:flex; align-items:center; padding:16px; background:transparent; cursor:pointer;
   transition:background .15s ease, transform .15s ease;
 }
 .list-row::before{
@@ -756,7 +762,8 @@ button{font-family:inherit;}
 }
 /* pressed — same violet-tint-fill pattern already used for selected/active chrome elsewhere in the kit, plus the usual scale-down press feedback */
 .list-row:active, .list-row.force-pressed{background:rgba(139,124,246,.12); transform:scale(.98);}
-.list-row-icon{width:48px; height:48px; margin-right:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+/* margin-right 12px->8px, her explicit ask 2026-08-26 ("от иконки до текста 8"). */
+.list-row-icon{width:48px; height:48px; margin-right:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
 /* 28px->32px (icon) and arrow 16px->28px — her direct Figma reading, 2026-08-26
    ("иконки в высоту 32 пикселя, а стрелки 28х28"), correcting a real kit/Figma
    mismatch, not a deliberate app-only deviation. */

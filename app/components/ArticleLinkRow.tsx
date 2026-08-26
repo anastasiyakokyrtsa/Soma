@@ -36,22 +36,21 @@ export function ArticleLinkRow({
 }
 
 const styles = StyleSheet.create({
-  // Fixed height:112 (not minHeight) - her direct Figma reading, 2026-08-26
-  // ("в фигме они 380 в длину и 112 в высоту"), was minHeight:112 +
-  // paddingVertical:16 stacked on top of it, growing the card past its real
-  // spec ("получились какие-то слишком толстые"). No vertical padding at
-  // all now - align-items:center on a fixed-height row does the centering,
-  // matches the kit's own .list-row (padding:0 16px, no vertical padding).
+  // Explicit per-edge spacing, her follow-up ask 2026-08-26 ("расстояние от
+  // иконки до левой стенки 16, от иконки до текста 8, от стрелки до
+  // правого края 16. И сверху и снизу по 16") - supersedes the earlier
+  // fixed height:112 (align-items:center in a 112px box put ~32px above/
+  // below the icon, not the 16px she wants here) - height now hugs
+  // padding+content instead of being pinned to a literal number.
   row: {
     width: '100%',
-    height: 112,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.borderVioletFlat,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    gap: 12,
+    paddingVertical: 16,
   },
   rowPressed: {
     backgroundColor: 'rgba(139,124,246,0.12)',
@@ -60,6 +59,7 @@ const styles = StyleSheet.create({
   iconFrame: {
     width: 48,
     height: 48,
+    marginRight: 8,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,

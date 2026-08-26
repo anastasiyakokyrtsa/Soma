@@ -43,8 +43,26 @@ const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 // setup risks, and isn't worth chasing blind without a device to check
 // against - simplified instead: the lower band is now a plain, completely
 // static `View` (no transform, no Animated import needed for it), and only
-// the upper "tips" band still rotates - a single, clean, easy-to-reason-
-// about oscillation, nothing to compound with.
+// the upper "tips" band still moves - a single, clean oscillation, nothing
+// to compound with.
+//
+// Still had one more artifact even after that simplification: "веточка
+// лаванды с самого левого края странно анимируется, ее верхняя часть ходит
+// вверх вниз" - a real, well-understood consequence of `rotate` on an
+// asymmetric composition. Rotating around a CENTERED pivot moves any point
+// offset horizontally from that center along an arc, and that arc has a
+// real vertical component proportional to the point's horizontal distance
+// from the pivot (`dx * sin(angle)`) - the further left/right a branch
+// sits from center, the more it visibly bobs up/down as the whole band
+// rotates, on top of swinging sideways. Fixed by switching `rotate` to
+// `skewX`: a shear transform shifts every point horizontally by an amount
+// proportional to its *vertical* distance from the transform origin, and
+// leaves Y completely untouched for every point regardless of X - so
+// nothing can bob vertically, ever, no matter how far left or right a
+// given branch sits. `transformOrigin:'50% 100%'` still anchors the shear
+// to zero movement at the very bottom (the band's own base) and maximum
+// lean at the top, same "rooted, sways more at the tips" feel as before,
+// just via the transform primitive that's actually free of the bug.
 function useSway(amplitude: number, duration: number) {
   const angle = useSharedValue(0);
   useEffect(() => {
@@ -64,7 +82,7 @@ function useSway(amplitude: number, duration: number) {
 
 export function TeaIllustrationSway() {
   const upperAngle = useSway(3.5, 1500);
-  const upperStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${upperAngle.value}deg` }] }));
+  const upperStyle = useAnimatedStyle(() => ({ transform: [{ skewX: `${upperAngle.value}deg` }] }));
 
   return (
     <View style={{ width: IMAGE_W, height: IMAGE_H }}>
