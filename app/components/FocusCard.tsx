@@ -31,11 +31,12 @@ export function FocusCard({
     // 16 со всех сторон").
     <View style={[styles.card, { width, padding: 16, gap: 8 * scale }]}>
       <View style={styles.header}>
-        {/* 26, not 36 - 36 read as way oversized next to the text
-            (2026-08-20: "иконки чуть поменьше... они намного больше
-            шрифта"). Still 26 after the title dropped to 16px 2026-08-26 -
-            she didn't ask to revisit the icon itself, only the text. */}
-        <GradientIcon name={icon} size={26 * scale} />
+        {/* 26->29 - 36 read as way oversized next to the text (2026-08-20:
+            "иконки чуть поменьше... они намного больше шрифта"), but once
+            the title dropped to 16px (2026-08-26) 26 read as too small next
+            to it the other way - her follow-up ask same day: "иконки прям
+            совсем маленькие, можешь увеличить на пару пикселей". */}
+        <GradientIcon name={icon} size={29 * scale} />
         {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
             though "Мягкий старт и обновление" (the one title that actually
             needed it) got shortened to just "Мягкий старт" the same round -

@@ -232,23 +232,31 @@ export function HomeScreen() {
           style={{ marginTop: GAP.focusTitleToCards }}
           contentContainerStyle={styles.focusScroll}
         >
+          {/* Text reworded 2026-08-27 ("мне сейчас не нравится рисунок
+              текста... в последней строке всего одно слово") - card 1's
+              text wrapped to a single orphaned word on its last line.
+              Rephrased all three (not just card 1) so each ends on a short
+              phrase rather than one dangling word - can't simulate exact
+              on-device wrapping from this sandbox, so this is an editorial
+              best effort, not a verified fix; flag whichever card (if any)
+              still wraps awkwardly. */}
           <FocusCard
             width={cardWidth}
             icon="lotus"
             title="Мягкий старт"
-            text="Не время для рекордов, но идеальное время для «входа» в ритм. Подойдет пилатес, растяжка или долгая прогулка. Это поднимет серотонин и сгладит эмоциональный провал."
+            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка — это поднимет серотонин и сгладит эмоциональный спад."
           />
           <FocusCard
             width={cardWidth}
             icon="idea"
             title="Планирование"
-            text="Идеальный момент для аналитической работы в одиночестве. Пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений."
+            text="Хороший момент для спокойной аналитической работы в одиночестве — пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений сегодня."
           />
           <FocusCard
             width={cardWidth}
             icon="broom"
             title="Пространство"
-            text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого даст чувство контроля и облегчения, что очень важно при низком эмоциональном биоритме."
+            text="Выбросьте лишнее из дома и цифрового пространства — избавление от старого возвращает чувство контроля. Это особенно ценно при низком эмоциональном биоритме."
           />
         </ScrollView>
 
