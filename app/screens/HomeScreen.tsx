@@ -232,24 +232,26 @@ export function HomeScreen() {
           style={{ marginTop: GAP.focusTitleToCards }}
           contentContainerStyle={styles.focusScroll}
         >
-          {/* Text reworded 2026-08-27, take 2. First pass (rephrasing all 3
-              without seeing real wrapping) still left cards 1 and 3 with a
-              single orphaned word on their last line - her follow-up
-              screenshot showed it plainly ("первая и третья карточка, там
-              тексты все еще не прям красиво выглядят"). This round used
-              that screenshot's actual line breaks to measure the real
-              per-line character budget for this card width (~34 chars/
-              line), kept the already-correctly-wrapping opening of each
-              text as-is, and only rewrote each ending so the final
-              sentence is short enough to land as a full short line (2+
-              words) instead of one word alone - a targeted fix off real
-              data this time, not another blind guess. Card 2 untouched -
-              she didn't flag it. */}
+          {/* Text reworded 2026-08-27, take 3. Take 2 fixed the orphaned
+              last word on cards 1/3 but shortened them enough to fall
+              short of card 2's own line count - "в первой карточке не
+              хватает одной строки, а в последней целых две, некрасиво
+              когда пустота" (uneven card heights in this horizontally-
+              scrolling row read as broken). Simulated real word-wrap at
+              this card width's measured ~34-char/line budget (calibrated
+              off her actual screenshot) for all 3 texts: card 2 (untouched
+              throughout) wraps to 6 lines, card 1 was only 5, card 3 only
+              4 - exactly matching what she reported (short by 1 and 2
+              lines respectively). Lengthened cards 1 and 3 just enough to
+              also land at 6 lines each, re-simulated to confirm, and kept
+              each ending on a multi-word final line (not reintroducing the
+              orphan-word problem take 2 had just fixed). Card 2 still
+              untouched. */}
           <FocusCard
             width={cardWidth}
             icon="lotus"
             title="Мягкий старт"
-            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка. Это поднимет настроение и вернёт лёгкость."
+            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка на свежем воздухе. Это поднимет настроение, вернёт лёгкость и немного сил."
           />
           <FocusCard
             width={cardWidth}
@@ -261,7 +263,7 @@ export function HomeScreen() {
             width={cardWidth}
             icon="broom"
             title="Пространство"
-            text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого возвращает контроль и ясность."
+            text="Выбросьте лишнее из дома и цифрового пространства: старые вещи, ненужные файлы, лишние подписки. Избавление от старого возвращает контроль, добавляет лёгкости и ясность."
           />
         </ScrollView>
 
