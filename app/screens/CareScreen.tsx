@@ -47,7 +47,7 @@ const GAP = {
   articlesHeaderToList: 20,
 };
 
-export function CareScreen() {
+export function CareScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   // Same star background as HomeScreen, same technique/reasoning (2026-08-20:
@@ -113,7 +113,16 @@ export function CareScreen() {
         <View style={[styles.whatHelps, { marginTop: GAP.ringToWhatHelps }]}>
           <Text style={styles.sectionTitle}>Что поможет сейчас</Text>
           <View style={styles.tilesRow}>
-            <MiniRitualTile width={tileWidth} icon="breathingCircle" title="Дыхание" time="3 мин" />
+            {/* Opens straight into the practice already picked for her
+                current state (WF 25-28) - no picker screen exists yet since
+                there's only ever one practice, 2026-08-27. */}
+            <MiniRitualTile
+              width={tileWidth}
+              icon="breathingCircle"
+              title="Дыхание"
+              time="3 мин"
+              onPress={() => navigation.navigate('BreathingInfo')}
+            />
             {/* explicit break, not left to auto-wrap. iconMarginBottom
                 restored (30, not the default 44) to compensate for this
                 title's real 2nd line - the fixed-title-height trick that

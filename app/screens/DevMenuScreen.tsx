@@ -25,6 +25,9 @@ const ROUTES = [
   'ProfileMenstrualCycle',
   'ProfileMood',
   'Main',
+  'BreathingInfo',
+  'BreathingSession',
+  'BreathingComplete',
 ];
 
 export function DevMenuScreen({ navigation }: any) {

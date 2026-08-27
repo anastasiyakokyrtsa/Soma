@@ -20,6 +20,9 @@ import { ProfileSleepScheduleScreen } from '../screens/onboarding/ProfileSleepSc
 import { ProfileMenstrualCycleScreen } from '../screens/onboarding/ProfileMenstrualCycleScreen';
 import { ProfileMoodScreen } from '../screens/onboarding/ProfileMoodScreen';
 import { DevMenuScreen } from '../screens/DevMenuScreen';
+import { BreathingInfoScreen } from '../screens/BreathingInfoScreen';
+import { BreathingSessionScreen } from '../screens/BreathingSessionScreen';
+import { BreathingCompleteScreen } from '../screens/BreathingCompleteScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -72,6 +75,12 @@ export function RootNavigator() {
         <Stack.Screen name="ProfileMenstrualCycle" component={ProfileMenstrualCycleScreen} />
         <Stack.Screen name="ProfileMood" component={ProfileMoodScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
+        {/* Pushed from Care's "Дыхание" Mini Ritual Tile, not part of the
+            tab flow - see CareScreen.tsx and each screen's own comment for
+            the full WF25-28 breathing-session flow. */}
+        <Stack.Screen name="BreathingInfo" component={BreathingInfoScreen} />
+        <Stack.Screen name="BreathingSession" component={BreathingSessionScreen} />
+        <Stack.Screen name="BreathingComplete" component={BreathingCompleteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
