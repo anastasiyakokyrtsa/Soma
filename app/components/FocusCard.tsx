@@ -20,14 +20,10 @@ export function FocusCard({
 }) {
   // Same scale MoonSunCard computes off its own `width` prop - both cards
   // get the exact same `cardWidth` from HomeScreen, so this reproduces the
-  // exact same factor. Needed because the title/text below are meant to
-  // visually match MoonSunCard's, but MoonSunCard's own sizes are already
-  // scaled by its width - a literal (unscaled) 22/16 here rendered *larger*
-  // than MoonSunCard's actual (scaled-down, on her narrower-than-336 real
-  // device) title/note, so the two never actually matched despite using
-  // the same base numbers (caught from her screenshot 2026-08-20, "на
-  // скрине видно, что ты не выполнил мое задание" - real miss, not a
-  // wrong reading of the ask).
+  // exact same factor. Only drives the icon size and the header-to-text gap
+  // now - title/text themselves switched to literal, unscaled sizes
+  // 2026-08-26 to match ArticleLinkRow's literal sizes exactly (see
+  // `styles.title`/`styles.text`), so `scale` no longer applies to them.
   const scale = Math.min(width, 336) / 336;
   return (
     // padding stays literal 16 (not scaled) per her explicit ask - unlike
@@ -35,9 +31,10 @@ export function FocusCard({
     // 16 со всех сторон").
     <View style={[styles.card, { width, padding: 16, gap: 8 * scale }]}>
       <View style={styles.header}>
-        {/* 26, not 36 - the 36 bump (paired with the title's move to 22px)
-            read as way oversized next to the text (2026-08-20: "иконки чуть
-            поменьше... они намного больше шрифта"). */}
+        {/* 26, not 36 - 36 read as way oversized next to the text
+            (2026-08-20: "иконки чуть поменьше... они намного больше
+            шрифта"). Still 26 after the title dropped to 16px 2026-08-26 -
+            she didn't ask to revisit the icon itself, only the text. */}
         <GradientIcon name={icon} size={26 * scale} />
         {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
             though "Мягкий старт и обновление" (the one title that actually
@@ -47,15 +44,11 @@ export function FocusCard({
             other cards' titles down with it (see [[project-app-
             development]] 2026-08-20 for the original reasoning).
             flexShrink:1 gives Text a real width to measure against. */}
-        <Text
-          style={[styles.title, { fontSize: 22 * scale, lineHeight: 22 * 1.2 * scale }]}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-        >
+        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
           {title}
         </Text>
       </View>
-      <Text style={[styles.text, { fontSize: 16 * scale, lineHeight: 16 * 1.3 * scale }]}>{text}</Text>
+      <Text style={styles.text}>{text}</Text>
     </View>
   );
 }
@@ -74,30 +67,44 @@ const styles = StyleSheet.create({
     borderColor: colors.violet300,
     borderRadius: radius.md,
   },
+  // center, not flex-end - the title dropped from 22px to 16px (see below),
+  // no longer close to the icon's own 26*scale height, so bottom-aligning
+  // now stranded it low with visible daylight above it. Direct consequence
+  // of the title-size change, not a separate ask.
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 4,
   },
-  // fontSize/lineHeight set inline (scaled), only non-scaled properties
-  // stay here - matches MoonSunCard's own title (2026-08-20: "настройки
-  // шрифта такие же как у заголовка в карточке Лунная активность") - bold,
-  // not this card's own previous semiBold.
+  // Literal (not scaled by this card's own `scale`) 16px/semiBold, matching
+  // ArticleLinkRow's title exactly - her consistency ask, 2026-08-26: "взять
+  // такой же кегль и такую же жирность шрифта у заголовка как... в блоке О
+  // теле и ритмах". Deliberately NOT multiplied by `scale` here (unlike this
+  // card's icon/gap) - the whole point is matching Care screen's literal
+  // size everywhere, not a proportionally-scaled version of it.
   title: {
     flexShrink: 1,
-    fontFamily: fontFamily.bold,
+    fontFamily: fontFamily.semiBold,
+    fontSize: 16,
+    lineHeight: 16 * 1.1,
     color: colors.textPrimary,
   },
-  // matches MoonSunCard's own note text (2026-08-20: "body text... сделаем
-  // как и в описании в карточках Лунной и солнечной активности").
-  // includeFontPadding:false (Android-only) strips the extra font-metric
-  // padding Android adds below a Text's last line by default - without it,
-  // the visible gap to the card's own 16px bottom padding reads as bigger
-  // than 16 even though the numeric padding really is 16 (2026-08-20: "в
-  // карточках Фокус дня нижний паддинг не 16 а больше").
+  // Literal 14px/medium, matching ArticleLinkRow's subtitle - same
+  // consistency ask, "и боди тоже". includeFontPadding:false (Android-only)
+  // already strips the extra font-metric padding Android adds below a
+  // Text's last line - kept from the original 2026-08-20 fix for the exact
+  // same "bottom padding reads bigger than 16" complaint. marginBottom:-3 is
+  // a further, approximate compensation for the remaining line-height
+  // leading below the last line (the header row's icon has none, so the top
+  // gap reads tighter than the pure-text bottom gap even with the numeric
+  // padding equal on both sides) - an estimate, not a measured fix; flag the
+  // exact remaining gap in px if it's still visibly off after this.
   text: {
-    fontFamily: fontFamily.regular,
+    fontFamily: fontFamily.medium,
+    fontSize: 14,
+    lineHeight: 14 * 1.3,
     color: colors.textPrimary,
     includeFontPadding: false,
+    marginBottom: -3,
   },
 });
