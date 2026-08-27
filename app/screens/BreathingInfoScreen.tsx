@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fontFamily, radius, glow } from '../theme';
-import { BreathingOrb } from '../components/BreathingOrb';
+import { BreathingOrb, ORB_TOP_OFFSET } from '../components/BreathingOrb';
 import { CloseIcon } from '../components/icons/CloseIcon';
 import { StarsBackground } from '../components/StarsBackground';
 
@@ -30,16 +30,23 @@ export function BreathingInfoScreen({ navigation, route }: any) {
         <CloseIcon />
       </Pressable>
 
-      <View style={styles.orbArea}>
+      {/* Fixed offset from the top, not centered in the leftover flex space
+          above the card - centering made the orb sit higher here than on
+          the Session screen (that screen has much less content below it,
+          so "centered in what's left" landed at a different Y). A spacer
+          below absorbs whatever room remains so the card still docks flush
+          to the bottom regardless of screen height. */}
+      <View style={[styles.orbWrap, { marginTop: insets.top + ORB_TOP_OFFSET }]}>
         <BreathingOrb running={false} wrapSize={300} />
       </View>
+      <View style={{ flex: 1 }} />
 
       <View style={[styles.card, { paddingBottom: insets.bottom + 24 }]}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.duration}>{durationLabel}</Text>
         <Text style={styles.description}>{description}</Text>
         <Pressable
-          style={styles.cta}
+          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
           onPress={() => navigation.navigate('BreathingSession', { title, durationMs })}
         >
           <Text style={styles.ctaLabel}>Я готов</Text>
@@ -63,10 +70,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  orbArea: {
-    flex: 1,
+  orbWrap: {
     alignItems: 'center',
-    justifyContent: 'center',
   },
   // Rounded-top sheet, flush to the bottom edge - same card-fill family
   // used everywhere else in the app, just with only the top two corners
@@ -112,6 +117,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: `0px 0px ${glow.btn.blur}px ${glow.btn.color}`,
+  },
+  // Standing rule for every primary CTA in this app (feedback_rn_app_ui_defaults) -
+  // was missing here entirely, her explicit catch, 2026-08-27: "забыл кнопке
+  // добавить состояние pressed".
+  ctaPressed: {
+    backgroundColor: colors.violet300,
+    boxShadow: `0px 0px 15px ${colors.violet300}`,
+    transform: [{ scale: 0.97 }],
   },
   ctaLabel: {
     fontFamily: fontFamily.semiBold,

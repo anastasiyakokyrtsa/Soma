@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import { colors, fontFamily } from '../theme';
 
 // Ports UI Kit's "Breathing Session" orb (index.html #breathing, style.css
@@ -10,18 +11,26 @@ import { colors, fontFamily } from '../theme';
 // second - matches the kit's own "12 steps... matches the 12 reference
 // frames exactly"), transcribed from the kit's own preset table, decomposed
 // into numeric blur/opacity fields (rather than the kit's pre-built CSS
-// strings) so they can be smoothly interpolated here instead of only
-// snapping between presets.
+// strings) so they can be smoothly interpolated instead of only snapping
+// between presets.
 //
-// Driven by a plain rAF clock, not Reanimated - this orb's own "glow"
-// visual is a boxShadow string recomputed every frame from the current
-// interpolated preset, which is exactly the class of continuous, per-frame,
-// non-transform animation this app's established pattern already covers
-// (see ResourceRing.tsx/PersonalizationIllustration.tsx's own
-// useAnimationClock) - no need to introduce a second animation system
-// (Reanimated) just for this one component. `paused` freezes the clock in
-// place rather than hiding the animation, so resuming continues smoothly
-// from wherever the cycle actually was.
+// Take 2: first pass drove this off a plain rAF clock + `useState` (the
+// pattern ResourceRing/PersonalizationIllustration use for their own
+// per-frame animation) - on her device it didn't visibly animate at all
+// ("вначале должно быть состояние Плей... а анимация... её просто нет").
+// Those other components animate a `transform` (rotate) or repaint a Skia
+// canvas; this one was re-rendering width/height/boxShadow (real layout-
+// triggering properties) via plain JS `setState` every frame, which is a
+// much heavier ask of the JS thread/reconciler than a transform-only
+// re-render and apparently didn't hold up on-device. Switched to
+// Reanimated `withTiming`, chained one 1-second step at a time (matching
+// the kit's own "transition ... 1s linear" applied per-step) and read back
+// inside `useAnimatedStyle` - real UI-thread-driven animation, the same
+// class of technique already proven elsewhere in this app
+// (StyleSwatch/ProgressDots), just applied to width/height/boxShadow
+// instead of transform/opacity. `cancelAnimation` on pause freezes the
+// orb at exactly its current interpolated state rather than letting the
+// in-flight 1s step finish first.
 type LevelKey = 'A' | 'B' | 'C' | 'D' | 'E';
 
 const LEVELS: Record<LevelKey, { size: number; inset1Blur: number; inset1Op: number; inset2Blur: number; inset2Op: number; outerBlur: number; outerOp: number }> = {
@@ -47,34 +56,15 @@ const STEPS: { name: string; sec: number; level: LevelKey }[] = [
   { name: 'Выдох', sec: 1, level: 'A' },
 ];
 
-const CYCLE_MS = STEPS.length * 1000;
+// Shared by every breathing-flow screen so the orb sits at the exact same
+// vertical position on all of them (measured from the safe area) - her
+// explicit ask, 2026-08-27: the Info screen's orb had drifted higher than
+// the Session screen's own position ("поставь его туда где он и на
+// последующих экранах находится").
+export const ORB_TOP_OFFSET = 100;
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-
-function useAnimationClock(paused: boolean) {
-  const [time, setTime] = useState(0);
-  const pausedAtRef = useRef(0);
-
-  useEffect(() => {
-    if (paused) return;
-    let raf: number;
-    const base = Date.now() - pausedAtRef.current;
-    const tick = () => {
-      const elapsed = Date.now() - base;
-      pausedAtRef.current = elapsed;
-      setTime(elapsed);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [paused]);
-
-  return time;
-}
-
-function boxShadowFor(size: number, inset1Blur: number, inset1Op: number, inset2Blur: number, inset2Op: number, outerBlur: number, outerOp: number) {
+function boxShadowFor(inset1Blur: number, inset1Op: number, inset2Blur: number, inset2Op: number, outerBlur: number, outerOp: number) {
+  'worklet';
   return `inset 0px 0px ${inset1Blur}px rgba(139,124,246,${inset1Op}), inset 0px 0px ${inset2Blur}px rgba(139,124,246,${inset2Op}), 0px 0px ${outerBlur}px rgba(139,124,246,${outerOp})`;
 }
 
@@ -83,47 +73,67 @@ export function BreathingOrb({
   wrapSize = 300,
   showInstruction = false,
 }: {
-  // false = calm "ready" preview (Info screen) - level A, no phase cycling.
+  // false = calm "ready" preview (level A, no phase cycling).
   running: boolean;
   wrapSize?: number;
   // Adds the "Вдыхай через нос 4 секунды"-style line below the orb - only
   // meaningful while running (see instructionFor below).
   showInstruction?: boolean;
 }) {
-  const time = useAnimationClock(running);
+  // Continuously-incrementing "step position" (0,1,2,3,...), animated 1
+  // unit at a time over 1s so useAnimatedStyle can read a smooth
+  // in-between value - not wrapped to 0-11 at the driving level, only when
+  // reading it (see the worklet below), so each new withTiming call is a
+  // simple "+1 from wherever we are" with no seam at the 12->0 wrap.
+  const stepProgress = useSharedValue(0);
+  const stepRef = useRef(0);
+  const [stepIndex, setStepIndex] = useState(0);
 
-  let size = LEVELS.A.size;
-  let boxShadow = boxShadowFor(LEVELS.A.size, LEVELS.A.inset1Blur, LEVELS.A.inset1Op, LEVELS.A.inset2Blur, LEVELS.A.inset2Op, LEVELS.A.outerBlur, LEVELS.A.outerOp);
-  let phase = 'Вдыхай';
-  let seconds: number | null = null;
+  useEffect(() => {
+    if (!running) {
+      cancelAnimation(stepProgress);
+      return;
+    }
+    const advance = () => {
+      stepRef.current += 1;
+      stepProgress.value = withTiming(stepRef.current, { duration: 1000, easing: Easing.linear });
+      setStepIndex(stepRef.current % STEPS.length);
+    };
+    advance();
+    const interval = setInterval(advance, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running]);
 
-  if (running) {
-    const cycleMs = time % CYCLE_MS;
-    const stepIndex = Math.floor(cycleMs / 1000) % STEPS.length;
-    const localT = (cycleMs % 1000) / 1000;
-    const cur = STEPS[stepIndex];
-    const next = STEPS[(stepIndex + 1) % STEPS.length];
-    const curLevel = LEVELS[cur.level];
-    const nextLevel = LEVELS[next.level];
+  const animatedStyle = useAnimatedStyle(() => {
+    const t = stepProgress.value % STEPS.length;
+    const idx = Math.floor(t);
+    const localT = t - idx;
+    const cur = LEVELS[STEPS[idx].level];
+    const next = LEVELS[STEPS[(idx + 1) % STEPS.length].level];
+    const size = cur.size + (next.size - cur.size) * localT;
+    return {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      boxShadow: boxShadowFor(
+        cur.inset1Blur + (next.inset1Blur - cur.inset1Blur) * localT,
+        cur.inset1Op + (next.inset1Op - cur.inset1Op) * localT,
+        cur.inset2Blur + (next.inset2Blur - cur.inset2Blur) * localT,
+        cur.inset2Op + (next.inset2Op - cur.inset2Op) * localT,
+        cur.outerBlur + (next.outerBlur - cur.outerBlur) * localT,
+        cur.outerOp + (next.outerOp - cur.outerOp) * localT
+      ),
+    };
+  }, [running]);
 
-    size = lerp(curLevel.size, nextLevel.size, localT);
-    boxShadow = boxShadowFor(
-      size,
-      lerp(curLevel.inset1Blur, nextLevel.inset1Blur, localT),
-      lerp(curLevel.inset1Op, nextLevel.inset1Op, localT),
-      lerp(curLevel.inset2Blur, nextLevel.inset2Blur, localT),
-      lerp(curLevel.inset2Op, nextLevel.inset2Op, localT),
-      lerp(curLevel.outerBlur, nextLevel.outerBlur, localT),
-      lerp(curLevel.outerOp, nextLevel.outerOp, localT)
-    );
-    phase = cur.name;
-    seconds = cur.sec;
-  }
+  const phase = running ? STEPS[stepIndex].name : 'Вдыхай';
+  const seconds = running ? STEPS[stepIndex].sec : null;
 
   return (
     <View style={styles.column}>
       <View style={[styles.wrap, { width: wrapSize, height: wrapSize }]}>
-        <View style={[styles.orb, { width: size, height: size, borderRadius: size / 2, boxShadow }]} />
+        <Animated.View style={[styles.orb, animatedStyle]} />
         <View style={styles.textWrap} pointerEvents="none">
           <Text style={styles.phase}>{phase}</Text>
           {seconds !== null ? <Text style={styles.timer}>{seconds} сек</Text> : null}
@@ -143,10 +153,10 @@ function declineSeconds(n: number) {
 }
 
 function instructionFor(phase: string, sec: number) {
-  const s = `${sec} ${declineSeconds(sec)}`;
-  if (phase === 'Вдох') return `Вдыхай через нос ${s}`;
-  if (phase === 'Задержка') return `Задержи дыхание на ${s}`;
-  return `Выдыхай через рот ${s}`;
+  const s = `${sec} ${declineSeconds(sec)}`;
+  if (phase === 'Вдох') return `Вдыхай через нос ${s}`;
+  if (phase === 'Задержка') return `Задержи дыхание на ${s}`;
+  return `Выдыхай через рот ${s}`;
 }
 
 const styles = StyleSheet.create({
@@ -157,8 +167,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Solid/opaque now, not the kit's own near-transparent rgba(5,8,22,.03) -
+  // her explicit ask, 2026-08-27: "не будем делать шар прозрачным, чтобы
+  // звезды не было видно через него, чтобы это было как планета". The kit
+  // gets away with a near-invisible fill because its own page background is
+  // a flat dark color; this app's screens sit on a starfield with visible
+  // individual stars, which showed straight through the orb's core at 3%
+  // opacity - all other settings (the box-shadow glow itself) unchanged.
   orb: {
-    backgroundColor: 'rgba(5,8,22,0.03)',
+    backgroundColor: colors.bg0,
   },
   textWrap: {
     position: 'absolute',
