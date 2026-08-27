@@ -232,19 +232,24 @@ export function HomeScreen() {
           style={{ marginTop: GAP.focusTitleToCards }}
           contentContainerStyle={styles.focusScroll}
         >
-          {/* Text reworded 2026-08-27 ("мне сейчас не нравится рисунок
-              текста... в последней строке всего одно слово") - card 1's
-              text wrapped to a single orphaned word on its last line.
-              Rephrased all three (not just card 1) so each ends on a short
-              phrase rather than one dangling word - can't simulate exact
-              on-device wrapping from this sandbox, so this is an editorial
-              best effort, not a verified fix; flag whichever card (if any)
-              still wraps awkwardly. */}
+          {/* Text reworded 2026-08-27, take 2. First pass (rephrasing all 3
+              without seeing real wrapping) still left cards 1 and 3 with a
+              single orphaned word on their last line - her follow-up
+              screenshot showed it plainly ("первая и третья карточка, там
+              тексты все еще не прям красиво выглядят"). This round used
+              that screenshot's actual line breaks to measure the real
+              per-line character budget for this card width (~34 chars/
+              line), kept the already-correctly-wrapping opening of each
+              text as-is, and only rewrote each ending so the final
+              sentence is short enough to land as a full short line (2+
+              words) instead of one word alone - a targeted fix off real
+              data this time, not another blind guess. Card 2 untouched -
+              she didn't flag it. */}
           <FocusCard
             width={cardWidth}
             icon="lotus"
             title="Мягкий старт"
-            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка — это поднимет серотонин и сгладит эмоциональный спад."
+            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка. Это поднимет настроение и вернёт лёгкость."
           />
           <FocusCard
             width={cardWidth}
@@ -256,7 +261,7 @@ export function HomeScreen() {
             width={cardWidth}
             icon="broom"
             title="Пространство"
-            text="Выбросьте лишнее из дома и цифрового пространства — избавление от старого возвращает чувство контроля. Это особенно ценно при низком эмоциональном биоритме."
+            text="Выбросьте лишнее из дома и цифрового пространства. Избавление от старого возвращает контроль и ясность."
           />
         </ScrollView>
 
