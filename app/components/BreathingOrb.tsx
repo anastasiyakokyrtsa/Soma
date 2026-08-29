@@ -190,10 +190,13 @@ export function BreathingOrb({
     const t = idleProgress.value;
     const cur = LEVELS.A;
     const next = IDLE_HIGH;
-    const size = cur.size + (next.size - cur.size) * t;
-    // -1..1, a gentle flicker riding on top of the slow breathe - glow only,
-    // size stays driven purely by the slow pulse so the orb's own outline
-    // doesn't jitter, just its light.
+    // Size itself no longer animates - her explicit ask, 2026-08-28:
+    // "убери анимацию увеличения и уменьшения сферы, верни в изначальный
+    // размер, оставь только вот это дыхание свечением". Fixed at level A;
+    // `t`/`shimmerAmt` still drive the glow's own blur/opacity below - that
+    // "breathing" stays, only the physical growing/shrinking is gone.
+    const size = cur.size;
+    // -1..1, a gentle flicker riding on top of the slow breathe - glow only.
     const shimmerAmt = (shimmer.value - 0.5) * 2;
     return {
       width: size,
