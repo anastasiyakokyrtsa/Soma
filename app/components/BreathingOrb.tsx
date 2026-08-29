@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 
 // Ports UI Kit's "Breathing Session" orb (index.html #breathing, style.css
@@ -66,6 +67,47 @@ const STEPS: { name: string; sec: number; level: LevelKey }[] = [
 // way, matching the unhurried pace of someone reading the info card below.
 const IDLE_HIGH = { size: 158, inset1Blur: 42, inset1Op: 0.5, inset2Blur: 205, inset2Op: 0.16, outerBlur: 95, outerOp: 0.28 };
 
+// "Волна" around the violet rim, her follow-up ask same day: "хотелось бы
+// заанимировать окантовку, чтобы по ней волна шла". CSS boxShadow (what the
+// core's own glow is built from) is radially uniform - it has no way to
+// make a highlight travel *around* a ring, only pulse in and out evenly.
+// Reused ResourceRing.tsx's own technique instead: a thin circle stroked
+// with a gradient that has a bright pink/white peak, continuously rotated
+// via transform - the shape never changes, only the gradient's angular
+// position does, which reads as a highlight sweeping around the ring. Same
+// gradient stops as ResourceRing for visual consistency with the rest of
+// the app. Fixed radius, not synced to the pulsing core's own animated
+// size (that would need react-native-svg props driven by Reanimated
+// useAnimatedProps - a new, unverified-in-this-app technique combination -
+// vs. this being a well-proven one already shipped); sized to sit just
+// outside the idle pulse's own max size (158) with a clear gap. Only
+// rendered at rest (`!running`) - her ask was specifically about the state
+// shown right now on the Info screen, not the active session, and a fixed-
+// size ring would visually collide with the core at its much larger
+// in-session peak (300px).
+const WAVE_RING_SIZE = 210;
+const WAVE_RING_STROKE = 2;
+const WAVE_SPIN_DURATION_MS = 6000;
+
+function useAnimationClock() {
+  const [time, setTime] = useState(0);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let raf: number;
+    const tick = () => {
+      const now = Date.now();
+      if (startRef.current === null) startRef.current = now;
+      setTime(now - startRef.current);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return time;
+}
+
 // Shared by every breathing-flow screen so the orb sits at the exact same
 // vertical position on all of them (measured from the safe area) - her
 // explicit ask, 2026-08-27: the Info screen's orb had drifted higher than
@@ -100,6 +142,8 @@ export function BreathingOrb({
   const [stepIndex, setStepIndex] = useState(0);
   // Idle pulse, 0->1->0 forever while at rest - see IDLE_HIGH above.
   const idleProgress = useSharedValue(0);
+  const waveTime = useAnimationClock();
+  const waveAngle = ((waveTime % WAVE_SPIN_DURATION_MS) / WAVE_SPIN_DURATION_MS) * 360;
 
   useEffect(() => {
     if (!running) {
@@ -167,6 +211,38 @@ export function BreathingOrb({
   return (
     <View style={styles.column}>
       <View style={[styles.wrap, { width: wrapSize, height: wrapSize }]}>
+        {!running ? (
+          <Svg
+            width={WAVE_RING_SIZE}
+            height={WAVE_RING_SIZE}
+            style={[
+              styles.waveRing,
+              {
+                top: (wrapSize - WAVE_RING_SIZE) / 2,
+                left: (wrapSize - WAVE_RING_SIZE) / 2,
+                transform: [{ rotate: `${waveAngle}deg` }],
+              },
+            ]}
+          >
+            <Defs>
+              <LinearGradient id="breathWaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <Stop offset={0} stopColor={colors.violet400} />
+                <Stop offset={0.47} stopColor="#FFC6F1" />
+                <Stop offset={0.5} stopColor="#FFE3F6" />
+                <Stop offset={0.53} stopColor="#FFC6F1" />
+                <Stop offset={1} stopColor={colors.violet400} />
+              </LinearGradient>
+            </Defs>
+            <Circle
+              cx={WAVE_RING_SIZE / 2}
+              cy={WAVE_RING_SIZE / 2}
+              r={WAVE_RING_SIZE / 2 - WAVE_RING_STROKE}
+              stroke="url(#breathWaveGrad)"
+              strokeWidth={WAVE_RING_STROKE}
+              fill="none"
+            />
+          </Svg>
+        ) : null}
         <Animated.View style={[styles.orb, animatedStyle]} />
         {/* No text at all while at rest - her explicit ask, 2026-08-28:
             "слово из шара на этом моменте надо убрать" (the leftover
@@ -206,6 +282,9 @@ const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  waveRing: {
+    position: 'absolute',
   },
   // Solid/opaque now, not the kit's own near-transparent rgba(5,8,22,.03) -
   // her explicit ask, 2026-08-27: "не будем делать шар прозрачным, чтобы
