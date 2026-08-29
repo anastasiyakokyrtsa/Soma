@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fontFamily, radius } from '../theme';
+import { colors, fontFamily, radius, glow } from '../theme';
 import { BackIcon } from '../components/icons/BackIcon';
 import { CheckmarkIcon } from '../components/icons/CheckmarkIcon';
 import { StarsBackground } from '../components/StarsBackground';
@@ -10,11 +10,14 @@ import { StarsBackground } from '../components/StarsBackground';
 // follows the true circle, not a boxy silhouette - established rule this
 // whole session) rather than inventing a new glow.
 //
-// "К другим дыхательным практикам" ships disabled - her explicit call,
-// 2026-08-27 ("можешь кнопку... пока оставить неактивной"): there's only
-// ever been one breathing practice in the app so far, no practice-list
-// screen exists yet for this to actually navigate to. A dead button that
-// pretends to work would be worse than an honestly disabled one.
+// "К другим дыхательным практикам" - active now, her follow-up ask
+// 2026-08-28 ("сделай кнопку активной, как обычно мы кнопки делаем...
+// пусть ведет обратно на Care экран пока"). Was shipped disabled the round
+// before (no practice-list screen exists yet for it to really lead to) -
+// now navigates back to the Care tab specifically as a placeholder
+// destination, not just `goBack()` (which would land on the Session
+// screen mid-flow, wrong) and not a plain `navigate('Main')` (would land
+// on whatever tab was last active, not necessarily Care).
 export function BreathingCompleteScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
@@ -34,7 +37,10 @@ export function BreathingCompleteScreen({ navigation }: any) {
         <Text style={styles.title}>Поздравляем!{'\n'}Ты выполнил практику</Text>
       </View>
 
-      <Pressable style={[styles.cta, { marginBottom: insets.bottom + 40 }]} disabled>
+      <Pressable
+        style={({ pressed }) => [styles.cta, { marginBottom: insets.bottom + 40 }, pressed && styles.ctaPressed]}
+        onPress={() => navigation.navigate('Main', { screen: 'Care' })}
+      >
         <Text style={styles.ctaLabel}>К другим дыхательным практикам</Text>
       </Pressable>
     </View>
@@ -88,20 +94,27 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
   },
+  // Standard active primary CTA, same recipe used everywhere else in this
+  // app (BreathingInfoScreen's own "Я готов", CareScreen's tea-ceremony
+  // button, etc.) - violet400 fill + glow.btn, pressed state per the
+  // standing rule (feedback_rn_app_ui_defaults).
   cta: {
     marginHorizontal: 16,
     height: 60,
     borderRadius: radius.md,
-    backgroundColor: colors.cardFillFallback,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
+    backgroundColor: colors.violet400,
     alignItems: 'center',
     justifyContent: 'center',
-    opacity: 0.5,
+    boxShadow: `0px 0px ${glow.btn.blur}px ${glow.btn.color}`,
+  },
+  ctaPressed: {
+    backgroundColor: colors.violet300,
+    boxShadow: `0px 0px 15px ${colors.violet300}`,
+    transform: [{ scale: 0.97 }],
   },
   ctaLabel: {
     fontFamily: fontFamily.semiBold,
     fontSize: 16,
-    color: colors.textSecondary,
+    color: colors.bg0,
   },
 });
