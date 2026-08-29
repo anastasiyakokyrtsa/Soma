@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import { colors, fontFamily } from '../theme';
 
 // Ports UI Kit's "Breathing Session" orb (index.html #breathing, style.css
@@ -56,6 +56,16 @@ const STEPS: { name: string; sec: number; level: LevelKey }[] = [
   { name: 'Выдох', sec: 1, level: 'A' },
 ];
 
+// Slow idle "alive" pulse for whenever the orb is at rest (Info screen
+// while she reads, Session screen before pressing play) - her explicit ask,
+// 2026-08-28: "слово из шара на этом моменте убрать, и хочется анимации
+// добавить, чтобы этот шар планету оживить... как-то натурально, как
+// космическое тело". A calm, slow breathe of size+glow between level A and
+// this slightly bigger/brighter point - not the real counted breathing
+// cycle (that starts only once `running`), just ambient life. 4.5s each
+// way, matching the unhurried pace of someone reading the info card below.
+const IDLE_HIGH = { size: 158, inset1Blur: 42, inset1Op: 0.5, inset2Blur: 205, inset2Op: 0.16, outerBlur: 95, outerOp: 0.28 };
+
 // Shared by every breathing-flow screen so the orb sits at the exact same
 // vertical position on all of them (measured from the safe area) - her
 // explicit ask, 2026-08-27: the Info screen's orb had drifted higher than
@@ -88,12 +98,17 @@ export function BreathingOrb({
   const stepProgress = useSharedValue(0);
   const stepRef = useRef(0);
   const [stepIndex, setStepIndex] = useState(0);
+  // Idle pulse, 0->1->0 forever while at rest - see IDLE_HIGH above.
+  const idleProgress = useSharedValue(0);
 
   useEffect(() => {
     if (!running) {
       cancelAnimation(stepProgress);
-      return;
+      idleProgress.value = withRepeat(withTiming(1, { duration: 4500, easing: Easing.inOut(Easing.sin) }), -1, true);
+      return () => cancelAnimation(idleProgress);
     }
+    cancelAnimation(idleProgress);
+    idleProgress.value = 0;
     const advance = () => {
       stepRef.current += 1;
       stepProgress.value = withTiming(stepRef.current, { duration: 1000, easing: Easing.linear });
@@ -106,38 +121,63 @@ export function BreathingOrb({
   }, [running]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const t = stepProgress.value % STEPS.length;
-    const idx = Math.floor(t);
-    const localT = t - idx;
-    const cur = LEVELS[STEPS[idx].level];
-    const next = LEVELS[STEPS[(idx + 1) % STEPS.length].level];
-    const size = cur.size + (next.size - cur.size) * localT;
+    if (running) {
+      const t = stepProgress.value % STEPS.length;
+      const idx = Math.floor(t);
+      const localT = t - idx;
+      const cur = LEVELS[STEPS[idx].level];
+      const next = LEVELS[STEPS[(idx + 1) % STEPS.length].level];
+      const size = cur.size + (next.size - cur.size) * localT;
+      return {
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        boxShadow: boxShadowFor(
+          cur.inset1Blur + (next.inset1Blur - cur.inset1Blur) * localT,
+          cur.inset1Op + (next.inset1Op - cur.inset1Op) * localT,
+          cur.inset2Blur + (next.inset2Blur - cur.inset2Blur) * localT,
+          cur.inset2Op + (next.inset2Op - cur.inset2Op) * localT,
+          cur.outerBlur + (next.outerBlur - cur.outerBlur) * localT,
+          cur.outerOp + (next.outerOp - cur.outerOp) * localT
+        ),
+      };
+    }
+    const t = idleProgress.value;
+    const cur = LEVELS.A;
+    const next = IDLE_HIGH;
+    const size = cur.size + (next.size - cur.size) * t;
     return {
       width: size,
       height: size,
       borderRadius: size / 2,
       boxShadow: boxShadowFor(
-        cur.inset1Blur + (next.inset1Blur - cur.inset1Blur) * localT,
-        cur.inset1Op + (next.inset1Op - cur.inset1Op) * localT,
-        cur.inset2Blur + (next.inset2Blur - cur.inset2Blur) * localT,
-        cur.inset2Op + (next.inset2Op - cur.inset2Op) * localT,
-        cur.outerBlur + (next.outerBlur - cur.outerBlur) * localT,
-        cur.outerOp + (next.outerOp - cur.outerOp) * localT
+        cur.inset1Blur + (next.inset1Blur - cur.inset1Blur) * t,
+        cur.inset1Op + (next.inset1Op - cur.inset1Op) * t,
+        cur.inset2Blur + (next.inset2Blur - cur.inset2Blur) * t,
+        cur.inset2Op + (next.inset2Op - cur.inset2Op) * t,
+        cur.outerBlur + (next.outerBlur - cur.outerBlur) * t,
+        cur.outerOp + (next.outerOp - cur.outerOp) * t
       ),
     };
   }, [running]);
 
-  const phase = running ? STEPS[stepIndex].name : 'Вдыхай';
+  const phase = running ? STEPS[stepIndex].name : '';
   const seconds = running ? STEPS[stepIndex].sec : null;
 
   return (
     <View style={styles.column}>
       <View style={[styles.wrap, { width: wrapSize, height: wrapSize }]}>
         <Animated.View style={[styles.orb, animatedStyle]} />
-        <View style={styles.textWrap} pointerEvents="none">
-          <Text style={styles.phase}>{phase}</Text>
-          {seconds !== null ? <Text style={styles.timer}>{seconds} сек</Text> : null}
-        </View>
+        {/* No text at all while at rest - her explicit ask, 2026-08-28:
+            "слово из шара на этом моменте надо убрать" (the leftover
+            "Вдыхай" placeholder didn't make sense before a session is
+            actually running). */}
+        {running ? (
+          <View style={styles.textWrap} pointerEvents="none">
+            <Text style={styles.phase}>{phase}</Text>
+            {seconds !== null ? <Text style={styles.timer}>{seconds} сек</Text> : null}
+          </View>
+        ) : null}
       </View>
       {/* Richer per-phase instruction below the orb (WF 26/27: "Вдыхай через
           нос 4 секунды") - single source of truth for the current
