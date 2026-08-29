@@ -120,6 +120,7 @@ export function BreathingOrb({
   wrapSize = 300,
   showInstruction = false,
   onCycleComplete,
+  onStepChange,
 }: {
   // false = calm "ready" preview (level A, no phase cycling).
   running: boolean;
@@ -131,6 +132,11 @@ export function BreathingOrb({
   // completed so far - lets the screen own "how many of N reps" without
   // duplicating the step-advance clock here.
   onCycleComplete?: (completedCycles: number) => void;
+  // Fires every step (once/second while running) with progress through the
+  // *current* cycle (0 = just started, close to 1 = about to wrap) - lets
+  // a progress bar fill the in-progress segment smoothly instead of only
+  // jumping at cycle boundaries.
+  onStepChange?: (fraction: number) => void;
 }) {
   // Continuously-incrementing "step position" (0,1,2,3,...), animated 1
   // unit at a time over 1s so useAnimatedStyle can read a smooth
@@ -165,6 +171,7 @@ export function BreathingOrb({
       stepProgress.value = withTiming(stepRef.current, { duration: 1000, easing: Easing.linear });
       const idx = stepRef.current % STEPS.length;
       setStepIndex(idx);
+      onStepChange?.((idx + 1) / STEPS.length);
       if (idx === 0) {
         cycleRef.current += 1;
         onCycleComplete?.(cycleRef.current);

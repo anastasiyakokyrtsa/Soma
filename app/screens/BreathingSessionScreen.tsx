@@ -13,38 +13,32 @@ import { StarsBackground } from '../components/StarsBackground';
 
 const TOTAL_CYCLES = 6;
 
-// WF 26/27 "Breathing session" - the active practice, take 3.
+// WF 26/27 "Breathing session" - the active practice, take 4.
 //
 // Sound control from the wireframe dropped deliberately, not an oversight -
 // this app has no audio playback engine at all yet (no expo-av/expo-audio
 // dependency, no ambient track asset) - a mute toggle with nothing to mute
 // would be a fake control.
 //
-// This round's changes, all her direct feedback 2026-08-28:
-//  - Completion is now cycle-based, not time-based: a full 4-phase box-
-//    breath (Вдох/Задержка/Выдох/Задержка) repeats TOTAL_CYCLES=6 times
-//    ("я думаю наверное стоит повторить весь процесс 6 раз"), tracked via
-//    BreathingOrb's onCycleComplete callback rather than a wall-clock
-//    countdown. `durationMs`/route param is gone - BreathingInfoScreen's own
-//    duration label was updated to match this new real length (16s/cycle x
-//    6 = 96s) instead of the old fixed "3 минуты".
-//  - Progress shown via BreathingProgress (see that file for why a dot row,
-//    not a ring around the orb).
-//  - Controls rebuilt as a symmetric 3-icon row: Bookmark - Play/Pause FAB -
-//    Heart (like) - "кнопка лайк у тебя отсутствует, сделай по такому же
-//    принципу как и Сохранить". Both side buttons use a new outline style
-//    (transparent fill, glowing violet border, icon tinted violet) that
-//    fills solid violet (icon flips dark) once toggled on - her explicit
-//    spec: "сделать окантовку сиреневую и светящуюся... при нажатии пусть
-//    полностью окрашивается в фиолетовый". This is a new button treatment,
-//    not literally the kit's own `.btn-icon` (a borderless bare-glyph style
-//    with only a translucent press-tint) - built to her precise description
-//    instead of forcing the existing kit class to fit; worth folding back
-//    into the kit later if she wants to keep it.
-//  - Because two real, equal-weight buttons now flank the FAB, the row goes
-//    back to a plain centered flex row - no longer needs the absolute-
-//    positioning trick the previous single-bookmark-plus-ghost-spacer
-//    layout required to fake symmetry.
+// Completion is cycle-based: a full 4-phase box-breath (Вдох/Задержка/
+// Выдох/Задержка) repeats TOTAL_CYCLES=6 times ("я думаю наверное стоит
+// повторить весь процесс 6 раз"), tracked via BreathingOrb's
+// onCycleComplete/onStepChange callbacks rather than a wall-clock
+// countdown - BreathingInfoScreen's duration label matches this real
+// length (16s/cycle x 6 = 96s).
+//
+// Header is now one row: back arrow + BreathingProgress filling the rest
+// of the width (was a separate absolute-positioned dot cluster in the top-
+// right corner - replaced along with the dots themselves, see that file).
+//
+// Controls: a symmetric bookmark/FAB/heart row. Both side buttons are
+// opaque at rest now (`colors.bg0`, not transparent) - "не надо чтобы
+// звезды виднелись сквозь кнопки Сохранить и лайк" - the violet glowing
+// border still reads as an outline against that solid dark disc, it just
+// doesn't let the starfield show through anymore. Toggled-on state (a
+// persistent saved/liked flag, not a transient press ripple) still fills
+// fully violet with the icon flipping dark for contrast, matching Play's
+// own dark-on-violet triangle.
 export function BreathingSessionScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
@@ -55,22 +49,30 @@ export function BreathingSessionScreen({ navigation, route }: any) {
   const [saved, setSaved] = useState(false);
   const [liked, setLiked] = useState(false);
   const [completedCycles, setCompletedCycles] = useState(0);
+  const [currentFraction, setCurrentFraction] = useState(0);
 
   return (
     <View style={styles.container}>
       <StarsBackground width={screenWidth} height={screenHeight} />
-      <Pressable style={[styles.backButton, { top: insets.top + 16 }]} onPress={() => navigation.goBack()} hitSlop={8}>
-        <BackIcon />
-      </Pressable>
-      <View style={[styles.progressWrap, { top: insets.top + 16 }]}>
-        <BreathingProgress total={TOTAL_CYCLES} completed={completedCycles} />
+
+      <View style={[styles.header, { marginTop: insets.top + 16 }]}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()} hitSlop={8}>
+          <BackIcon />
+        </Pressable>
+        <BreathingProgress total={TOTAL_CYCLES} completedCycles={completedCycles} currentFraction={currentFraction} />
       </View>
 
-      <View style={[styles.orbWrap, { marginTop: insets.top + ORB_TOP_OFFSET }]}>
+      {/* Header is now a real 40px-tall row starting at insets.top+16 (was
+          absolute-positioned, no flow height) - to keep the orb landing at
+          the same ORB_TOP_OFFSET from the screen's top it did before,
+          subtract the header's own footprint (16+40=56) from the margin
+          applied *after* it in normal flow. */}
+      <View style={[styles.orbWrap, { marginTop: ORB_TOP_OFFSET - 56 }]}>
         <BreathingOrb
           running={!paused}
           wrapSize={300}
           showInstruction
+          onStepChange={setCurrentFraction}
           onCycleComplete={(n) => {
             setCompletedCycles(n);
             if (n >= TOTAL_CYCLES) {
@@ -108,20 +110,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg0,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    gap: 16,
+  },
   backButton: {
-    position: 'absolute',
-    left: 16,
-    zIndex: 1,
     width: 40,
     height: 40,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressWrap: {
-    position: 'absolute',
-    right: 16,
-    zIndex: 1,
-    height: 40,
     justifyContent: 'center',
   },
   orbWrap: {
@@ -144,14 +142,18 @@ const styles = StyleSheet.create({
     boxShadow: `0px 0px ${glow.btn.blur}px ${glow.btn.color}`,
   },
   // New outline treatment, her explicit spec 2026-08-28 - not the kit's own
-  // borderless `.btn-icon` (see the top-of-file comment).
+  // borderless `.btn-icon` (checked: `style.css` ~L334-344 is a fully
+  // transparent/borderless "bare glyph" style with only a translucent
+  // press-tint, not what she described here). Opaque `colors.bg0` fill at
+  // rest (not transparent) so the starfield doesn't show through the
+  // circle - only the border+glow read as violet until toggled on.
   outlineButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
     borderWidth: 1.5,
     borderColor: colors.violet400,
-    backgroundColor: 'transparent',
+    backgroundColor: colors.bg0,
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: '0px 0px 12px rgba(139,124,246,0.5)',
