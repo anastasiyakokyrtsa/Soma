@@ -335,6 +335,15 @@
         </div>
       </div>
 
+      <div class="kit-block">
+        <p class="kit-block-title">Icon Button — Outline</p>
+        <div class="state-strip">
+          <div class="state-item"><button class="btn-icon-outline"><img src="assets/icons-clean/favorite.svg" alt=""></button><span class="state-item-label">Default</span></div>
+          <div class="state-item"><button class="btn-icon-outline is-selected"><img src="assets/icons-clean/favorite.svg" alt=""></button><span class="state-item-label">Selected</span></div>
+          <div class="state-item"><button class="btn-icon-outline" disabled><img src="assets/icons-clean/favorite.svg" alt=""></button><span class="state-item-label">Disabled</span></div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ============ CHIPS & BADGES ============ -->
@@ -936,6 +945,24 @@ Z" fill="#0C0D1B"/>
     <!-- ============ BREATHING ============ -->
     <section class="kit-section" id="breathing">
       <div class="kit-section-head"><h2 class="kit-section-title">Breathing Session</h2></div>
+
+      <div class="kit-block">
+        <p class="kit-block-title">Repeat Progress</p>
+        <!-- Ported from the app, 2026-08-28 - a Stories/Reels-style segmented bar for a session that
+             repeats N times (breathing's own 6 reps), one segment per rep: done segments fill solid,
+             the current rep's own segment fills live as it plays (a static ~40% here for the demo),
+             remaining reps stay empty. Static markup only - no live JS wiring, same "static swatch,
+             live logic stays in the app" precedent as Sleep Duration Dial/Calendar Range Picker. -->
+        <div class="breath-progress">
+          <div class="breath-progress-track"><div class="breath-progress-fill" style="width:100%"></div></div>
+          <div class="breath-progress-track"><div class="breath-progress-fill" style="width:100%"></div></div>
+          <div class="breath-progress-track"><div class="breath-progress-fill" style="width:40%"></div></div>
+          <div class="breath-progress-track"></div>
+          <div class="breath-progress-track"></div>
+          <div class="breath-progress-track"></div>
+        </div>
+      </div>
+
       <div class="breath-stage">
         <div class="breath-orb-wrap">
           <div class="breath-orb" id="breathOrb"></div>

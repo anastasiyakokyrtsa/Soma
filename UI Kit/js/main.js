@@ -319,7 +319,13 @@ const BREATH_LEVELS = {
   D: { size: 260, shadow: 'inset 0 0 220px rgba(139,124,246,1), inset 0 0 50px rgba(139,124,246,.7), 0 0 90px rgba(139,124,246,.6)' },
   E: { size: 300, shadow: 'inset 0 0 250px rgba(139,124,246,1), inset 0 0 50px rgba(139,124,246,.7), 0 0 90px rgba(139,124,246,.7)' },
 };
-// one step per second, 12 steps total — matches the 12 reference frames exactly
+// one step per second, 16 steps total (4 phases x 4-3-2-1s) — real box
+// breathing holds on BOTH full and empty lungs. Was 12 (Вдох/Задержка/
+// Выдох only, straight back into the next inhale with no post-exhale
+// hold) - a real gap in this recipe, caught porting it to the app
+// (2026-08-28: "перед новым вдохом тоже была задержка на 4 сек"). The
+// second hold is held flat at level A (resting size - lungs are empty,
+// unlike the post-inhale hold which peaks at E/D since they're full).
 const breathSteps = [
   { name: 'Вдох', sec: 4, level: 'A' },
   { name: 'Вдох', sec: 3, level: 'B' },
@@ -333,6 +339,10 @@ const breathSteps = [
   { name: 'Выдох', sec: 3, level: 'C' },
   { name: 'Выдох', sec: 2, level: 'B' },
   { name: 'Выдох', sec: 1, level: 'A' },
+  { name: 'Задержка', sec: 4, level: 'A' },
+  { name: 'Задержка', sec: 3, level: 'A' },
+  { name: 'Задержка', sec: 2, level: 'A' },
+  { name: 'Задержка', sec: 1, level: 'A' },
 ];
 let breathRunning = false;
 let breathStepIndex = 0;

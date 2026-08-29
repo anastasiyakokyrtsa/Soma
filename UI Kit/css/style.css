@@ -343,6 +343,24 @@ button{font-family:inherit;}
 .btn-icon.is-selected img{filter:none;}
 .btn-icon:disabled, .btn-icon.force-disabled{opacity:.35; cursor:not-allowed;}
 
+/* New variant, ported back from the app - Breathing Session's own Сохранить/Лайк controls,
+   2026-08-28 ("сделать окантовку сиреневую и светящуюся, при нажатии пусть полностью
+   окрашивается в фиолетовый"). Different from .btn-icon above: a real glowing border at rest
+   (not borderless), opaque bg-0 fill (not transparent - on a starfield background a transparent
+   circle let stars show through), and a *persistent* selected state (not just a press ripple) that
+   fills solid violet-400. In the app the icon itself also recolors violet-400->bg-0 on select for
+   contrast against the now-solid fill; kept the same icon color here in both states to avoid adding
+   dark-tinted icon variants just for this kit demo - a minor simplification, not a spec difference. */
+.btn-icon-outline{
+  width:44px; height:44px; border-radius:50%; background:var(--bg-0);
+  border:1.5px solid var(--violet-400); box-shadow:0 0 12px rgba(139,124,246,.5);
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:all .15s ease;
+}
+.btn-icon-outline img{width:18px; height:18px;}
+.btn-icon-outline.is-selected{background:var(--violet-400);}
+.btn-icon-outline:disabled, .btn-icon-outline.force-disabled{opacity:.35; cursor:not-allowed;}
+
 .btn-fab{
   width:64px; height:64px; border-radius:50%; background:var(--violet-400);
   box-shadow:var(--glow-btn); border:none; cursor:pointer;
@@ -973,6 +991,11 @@ button{font-family:inherit;}
 .breath-phase{font-size:18px; font-weight:800;}
 .breath-timer{font-size:13px; color:var(--text-secondary); margin-top:2px;}
 .breath-controls{display:flex; align-items:center; justify-content:center; gap:var(--sp-4); width:340px;}
+
+/* Repeat progress bar - ported from the app 2026-08-28, see index.html's own comment for why. */
+.breath-progress{display:flex; gap:4px; width:340px;}
+.breath-progress-track{flex:1; height:4px; border-radius:2px; background:rgba(255,255,255,.15); overflow:hidden;}
+.breath-progress-fill{height:4px; border-radius:2px; background:var(--violet-400); box-shadow:0 0 6px var(--violet-400);}
 
 /* ============ INLINE ICON SHAPES ============ */
 .icon-plus{position:relative; width:30px; height:30px; display:inline-block; transition:transform .2s ease;}
