@@ -27,9 +27,11 @@ const TOTAL_CYCLES = 6;
 // countdown - BreathingInfoScreen's duration label matches this real
 // length (16s/cycle x 6 = 96s).
 //
-// Header is now one row: back arrow + BreathingProgress filling the rest
-// of the width (was a separate absolute-positioned dot cluster in the top-
-// right corner - replaced along with the dots themselves, see that file).
+// BreathingProgress sits at the bottom of the screen now, its own flush
+// strip below the controls (a `flex:1` spacer pushes it down regardless of
+// screen height) - her explicit ask, 2026-08-28: "прогресс бар не лучше ли
+// внизу сделать?". Was in the header next to the back button for one round
+// first; the back button is back to its own standalone top-left button.
 //
 // Controls: a symmetric bookmark/FAB/heart row. Both side buttons are
 // opaque at rest now (`colors.bg0`, not transparent) - "не надо чтобы
@@ -54,20 +56,11 @@ export function BreathingSessionScreen({ navigation, route }: any) {
   return (
     <View style={styles.container}>
       <StarsBackground width={screenWidth} height={screenHeight} />
+      <Pressable style={[styles.backButton, { top: insets.top + 16 }]} onPress={() => navigation.goBack()} hitSlop={8}>
+        <BackIcon />
+      </Pressable>
 
-      <View style={[styles.header, { marginTop: insets.top + 16 }]}>
-        <Pressable style={styles.backButton} onPress={() => navigation.goBack()} hitSlop={8}>
-          <BackIcon />
-        </Pressable>
-        <BreathingProgress total={TOTAL_CYCLES} completedCycles={completedCycles} currentFraction={currentFraction} />
-      </View>
-
-      {/* Header is now a real 40px-tall row starting at insets.top+16 (was
-          absolute-positioned, no flow height) - to keep the orb landing at
-          the same ORB_TOP_OFFSET from the screen's top it did before,
-          subtract the header's own footprint (16+40=56) from the margin
-          applied *after* it in normal flow. */}
-      <View style={[styles.orbWrap, { marginTop: ORB_TOP_OFFSET - 56 }]}>
+      <View style={[styles.orbWrap, { marginTop: insets.top + ORB_TOP_OFFSET }]}>
         <BreathingOrb
           running={!paused}
           wrapSize={300}
@@ -101,6 +94,16 @@ export function BreathingSessionScreen({ navigation, route }: any) {
           <HeartIcon size={18} color={liked ? colors.bg0 : colors.violet400} />
         </Pressable>
       </View>
+
+      {/* Moved down here from the header, her explicit ask 2026-08-28:
+          "прогресс бар не лучше ли внизу сделать?" - a spacer absorbs
+          whatever room is left so this sits flush near the bottom edge
+          regardless of screen height, a plain video-player-style strip
+          rather than competing with the back button up top. */}
+      <View style={{ flex: 1 }} />
+      <View style={[styles.progressWrap, { marginBottom: insets.bottom + 24 }]}>
+        <BreathingProgress total={TOTAL_CYCLES} completedCycles={completedCycles} currentFraction={currentFraction} />
+      </View>
     </View>
   );
 }
@@ -110,13 +113,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg0,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    gap: 16,
-  },
   backButton: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
     width: 40,
     height: 40,
     alignItems: 'center',
@@ -124,6 +124,9 @@ const styles = StyleSheet.create({
   },
   orbWrap: {
     alignItems: 'center',
+  },
+  progressWrap: {
+    paddingHorizontal: 16,
   },
   controls: {
     marginTop: 40,

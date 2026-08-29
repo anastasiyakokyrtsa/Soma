@@ -18,11 +18,11 @@ export function BreathingInfoScreen({ navigation, route }: any) {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const p = route?.params ?? {};
   const title: string = p.title ?? 'Дыхание для возвращения в тело';
-  // 1 мин 36 сек, not the earlier flat "3 минуты" - the session is now
-  // 6 repeats of a 16s cycle (4 phases x 4-3-2-1s), her explicit ask,
-  // 2026-08-28 ("повторить весь процесс 6 раз"), not a fixed wall-clock
-  // duration anymore - see BreathingSessionScreen.tsx.
-  const durationLabel: string = p.durationLabel ?? '1 мин 36 сек';
+  // "2 минуты" - the real length (6 reps x 16s = 96s = 1 мин 36 сек) was
+  // used literally here for one round, then reverted: "давай вначале в
+  // информации все-таки напишем 2 минуты, а не 1 мин 36 сек" - a rounder,
+  // friendlier label over the precise-but-fussy one.
+  const durationLabel: string = p.durationLabel ?? '2 минуты';
   const description: string =
     p.description ?? 'Эта практика помогает замедлиться и выровнять дыхание. Подходит, если внутри есть напряжение или усталость.';
 

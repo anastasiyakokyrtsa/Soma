@@ -115,12 +115,14 @@ export function CareScreen({ navigation }: any) {
           <View style={styles.tilesRow}>
             {/* Opens straight into the practice already picked for her
                 current state (WF 25-28) - no picker screen exists yet since
-                there's only ever one practice, 2026-08-27. */}
+                there's only ever one practice, 2026-08-27. `time` matches
+                the practice's real length (6 reps x 16s = 96s, rounded to
+                "2 мин" as of 2026-08-28 - see BreathingInfoScreen.tsx). */}
             <MiniRitualTile
               width={tileWidth}
               icon="breathingCircle"
               title="Дыхание"
-              time="3 мин"
+              time="2 мин"
               onPress={() => navigation.navigate('BreathingInfo')}
             />
             {/* explicit break, not left to auto-wrap. iconMarginBottom

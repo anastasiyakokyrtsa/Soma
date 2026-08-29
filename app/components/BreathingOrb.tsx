@@ -151,10 +151,37 @@ export function BreathingOrb({
   const idleProgress = useSharedValue(0);
   // Faster secondary flicker layered onto the idle glow - see SHIMMER_DURATION_MS above.
   const shimmer = useSharedValue(0);
+  // Was `running` ever true this mount? Distinguishes "genuinely at rest,
+  // never started" (Info screen, Session screen before the first play tap -
+  // show the ambient idle pulse) from "paused mid-session" (her explicit
+  // catch, 2026-08-28: "нажимаю на паузу, почему-то появляется сфера в
+  // исходном положении, а мне надо чтобы ты замораживал экран вот какой он
+  // есть в этот момент" - pausing was snapping the orb back to the idle
+  // preset instead of freezing exactly where it was). A `boolean` SharedValue
+  // (not a plain ref) because `useAnimatedStyle`'s worklet needs to read it
+  // on the UI thread.
+  const wasRunning = useSharedValue(false);
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    if (running) {
+      wasRunning.value = true;
+      setHasStarted(true);
+    }
+  }, [running]);
 
   useEffect(() => {
     if (!running) {
+      // Freeze the breathing clock exactly where it is - don't let it keep
+      // animating toward whatever step it was mid-transition into.
       cancelAnimation(stepProgress);
+      if (wasRunning.value) {
+        // Paused mid-session: stay frozen, no idle pulse at all.
+        cancelAnimation(idleProgress);
+        cancelAnimation(shimmer);
+        return;
+      }
+      // Genuinely never started - ambient idle pulse.
       idleProgress.value = withRepeat(withTiming(1, { duration: 4500, easing: Easing.inOut(Easing.sin) }), -1, true);
       shimmer.value = withRepeat(withTiming(1, { duration: SHIMMER_DURATION_MS, easing: Easing.inOut(Easing.sin) }), -1, true);
       return () => {
@@ -184,7 +211,11 @@ export function BreathingOrb({
   }, [running]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (running) {
+    if (running || wasRunning.value) {
+      // Same math whether actively running (stepProgress keeps advancing)
+      // or paused mid-session (stepProgress is frozen via cancelAnimation
+      // above, so this naturally re-renders the exact same static frame
+      // every time instead of falling through to the idle-pulse branch).
       const t = stepProgress.value % STEPS.length;
       const idx = Math.floor(t);
       const localT = t - idx;
@@ -226,8 +257,10 @@ export function BreathingOrb({
     };
   }, [running]);
 
-  const phase = running ? STEPS[stepIndex].name : '';
-  const seconds = running ? STEPS[stepIndex].sec : null;
+  // Frozen text on pause too, not just the orb itself - same
+  // hasStarted-vs-running distinction as the orb's own animatedStyle above.
+  const phase = hasStarted ? STEPS[stepIndex].name : '';
+  const seconds = hasStarted ? STEPS[stepIndex].sec : null;
 
   return (
     <View style={styles.column}>
@@ -240,7 +273,7 @@ export function BreathingOrb({
           reference's own orb has no text on it at all) into a plain title
           -> subtitle -> seconds stack below, each a visibly different
           weight/size/color instead of the old single all-in-one sentence. */}
-      {showInstruction && running && seconds !== null ? (
+      {showInstruction && hasStarted && seconds !== null ? (
         <View style={styles.textBlock}>
           <Text style={styles.phaseTitle}>{phase}</Text>
           <Text style={styles.phaseSubtitle}>{subtitleFor(phase)}</Text>
