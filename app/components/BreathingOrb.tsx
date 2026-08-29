@@ -6,31 +6,17 @@ import { colors, fontFamily } from '../theme';
 // Ports UI Kit's "Breathing Session" orb (index.html #breathing, style.css
 // ~L959-975, js/main.js ~L305-372) - a real, Figma-effect-sourced component
 // that was sitting unused in the kit (never wired into the app) until this
-// screen needed it. 5 size/glow presets (A-E) and a 12-step box-breathing
-// sequence (Вдох 4-3-2-1, Задержка 4-3-2-1, Выдох 4-3-2-1, one step per
-// second - matches the kit's own "12 steps... matches the 12 reference
-// frames exactly"), transcribed from the kit's own preset table, decomposed
-// into numeric blur/opacity fields (rather than the kit's pre-built CSS
-// strings) so they can be smoothly interpolated instead of only snapping
-// between presets.
+// screen needed it. 5 size/glow presets (A-E), decomposed into numeric
+// blur/opacity fields (rather than the kit's pre-built CSS strings) so they
+// can be smoothly interpolated instead of only snapping between presets.
 //
-// Take 2: first pass drove this off a plain rAF clock + `useState` (the
-// pattern ResourceRing/PersonalizationIllustration use for their own
-// per-frame animation) - on her device it didn't visibly animate at all
-// ("вначале должно быть состояние Плей... а анимация... её просто нет").
-// Those other components animate a `transform` (rotate) or repaint a Skia
-// canvas; this one was re-rendering width/height/boxShadow (real layout-
-// triggering properties) via plain JS `setState` every frame, which is a
-// much heavier ask of the JS thread/reconciler than a transform-only
-// re-render and apparently didn't hold up on-device. Switched to
-// Reanimated `withTiming`, chained one 1-second step at a time (matching
-// the kit's own "transition ... 1s linear" applied per-step) and read back
-// inside `useAnimatedStyle` - real UI-thread-driven animation, the same
-// class of technique already proven elsewhere in this app
-// (StyleSwatch/ProgressDots), just applied to width/height/boxShadow
-// instead of transform/opacity. `cancelAnimation` on pause freezes the
-// orb at exactly its current interpolated state rather than letting the
-// in-flight 1s step finish first.
+// Cycle is 4 phases x 4-3-2-1 seconds = 16 steps, not the kit's own 12 -
+// her explicit ask, 2026-08-28: the kit (and this component's first pass)
+// only has Вдох/Задержка/Выдох, going straight back into the next inhale
+// with no hold after the exhale - real box breathing holds on BOTH empty
+// and full lungs. Added a second "Задержка" phase after Выдох, held flat
+// at level A (resting size, no pulse within the hold itself - unlike the
+// post-inhale hold, which peaks at E/D since the lungs are actually full).
 type LevelKey = 'A' | 'B' | 'C' | 'D' | 'E';
 
 const LEVELS: Record<LevelKey, { size: number; inset1Blur: number; inset1Op: number; inset2Blur: number; inset2Op: number; outerBlur: number; outerOp: number }> = {
@@ -54,16 +40,24 @@ const STEPS: { name: string; sec: number; level: LevelKey }[] = [
   { name: 'Выдох', sec: 3, level: 'C' },
   { name: 'Выдох', sec: 2, level: 'B' },
   { name: 'Выдох', sec: 1, level: 'A' },
+  { name: 'Задержка', sec: 4, level: 'A' },
+  { name: 'Задержка', sec: 3, level: 'A' },
+  { name: 'Задержка', sec: 2, level: 'A' },
+  { name: 'Задержка', sec: 1, level: 'A' },
 ];
 
 // Slow idle "alive" pulse for whenever the orb is at rest (Info screen
 // while she reads, Session screen before pressing play) - her explicit ask,
 // 2026-08-28: "слово из шара на этом моменте убрать, и хочется анимации
 // добавить, чтобы этот шар планету оживить... как-то натурально, как
-// космическое тело". A calm, slow breathe of size+glow between level A and
-// this slightly bigger/brighter point - not the real counted breathing
-// cycle (that starts only once `running`), just ambient life. 4.5s each
-// way, matching the unhurried pace of someone reading the info card below.
+// космическое тело". A calm, slow breathe of glow between level A and this
+// slightly bigger/brighter point - not the real counted breathing cycle
+// (that starts only once `running`), just ambient life. 4.5s each way,
+// matching the unhurried pace of someone reading the info card below.
+// Size itself no longer animates here (her follow-up: "убери анимацию
+// увеличения и уменьшения сферы... оставь только дыхание свечением") -
+// only IDLE_HIGH's glow fields are actually used now, `size` stays fixed
+// at LEVELS.A.size.
 const IDLE_HIGH = { size: 158, inset1Blur: 42, inset1Op: 0.5, inset2Blur: 205, inset2Op: 0.16, outerBlur: 95, outerOp: 0.28 };
 
 // Same-round follow-up: her actual ask was about the orb's own violet
@@ -115,25 +109,37 @@ function boxShadowFor(inset1Blur: number, inset1Op: number, inset2Blur: number, 
   return `inset 0px 0px ${inset1Blur}px rgba(139,124,246,${clamp01(inset1Op)}), inset 0px 0px ${inset2Blur}px rgba(139,124,246,${clamp01(inset2Op)}), 0px 0px ${outerBlur}px rgba(139,124,246,${clamp01(outerOp)})`;
 }
 
+function subtitleFor(phase: string) {
+  if (phase === 'Вдох') return 'Вдыхай через нос';
+  if (phase === 'Задержка') return 'Задержи дыхание';
+  return 'Выдыхай через рот';
+}
+
 export function BreathingOrb({
   running,
   wrapSize = 300,
   showInstruction = false,
+  onCycleComplete,
 }: {
   // false = calm "ready" preview (level A, no phase cycling).
   running: boolean;
   wrapSize?: number;
-  // Adds the "Вдыхай через нос 4 секунды"-style line below the orb - only
-  // meaningful while running (see instructionFor below).
+  // Adds the phase title/subtitle/seconds block below the orb - only
+  // meaningful while running.
   showInstruction?: boolean;
+  // Fires every time a full 16-step cycle finishes, with the running total
+  // completed so far - lets the screen own "how many of N reps" without
+  // duplicating the step-advance clock here.
+  onCycleComplete?: (completedCycles: number) => void;
 }) {
   // Continuously-incrementing "step position" (0,1,2,3,...), animated 1
   // unit at a time over 1s so useAnimatedStyle can read a smooth
-  // in-between value - not wrapped to 0-11 at the driving level, only when
+  // in-between value - not wrapped to 0-15 at the driving level, only when
   // reading it (see the worklet below), so each new withTiming call is a
-  // simple "+1 from wherever we are" with no seam at the 12->0 wrap.
+  // simple "+1 from wherever we are" with no seam at the cycle wrap.
   const stepProgress = useSharedValue(0);
   const stepRef = useRef(0);
+  const cycleRef = useRef(0);
   const [stepIndex, setStepIndex] = useState(0);
   // Idle pulse, 0->1->0 forever while at rest - see IDLE_HIGH above.
   const idleProgress = useSharedValue(0);
@@ -157,7 +163,12 @@ export function BreathingOrb({
     const advance = () => {
       stepRef.current += 1;
       stepProgress.value = withTiming(stepRef.current, { duration: 1000, easing: Easing.linear });
-      setStepIndex(stepRef.current % STEPS.length);
+      const idx = stepRef.current % STEPS.length;
+      setStepIndex(idx);
+      if (idx === 0) {
+        cycleRef.current += 1;
+        onCycleComplete?.(cycleRef.current);
+      }
     };
     advance();
     const interval = setInterval(advance, 1000);
@@ -190,11 +201,6 @@ export function BreathingOrb({
     const t = idleProgress.value;
     const cur = LEVELS.A;
     const next = IDLE_HIGH;
-    // Size itself no longer animates - her explicit ask, 2026-08-28:
-    // "убери анимацию увеличения и уменьшения сферы, верни в изначальный
-    // размер, оставь только вот это дыхание свечением". Fixed at level A;
-    // `t`/`shimmerAmt` still drive the glow's own blur/opacity below - that
-    // "breathing" stays, only the physical growing/shrinking is gone.
     const size = cur.size;
     // -1..1, a gentle flicker riding on top of the slow breathe - glow only.
     const shimmerAmt = (shimmer.value - 0.5) * 2;
@@ -220,35 +226,22 @@ export function BreathingOrb({
     <View style={styles.column}>
       <View style={[styles.wrap, { width: wrapSize, height: wrapSize }]}>
         <Animated.View style={[styles.orb, animatedStyle]} />
-        {/* No text at all while at rest - her explicit ask, 2026-08-28:
-            "слово из шара на этом моменте надо убрать" (the leftover
-            "Вдыхай" placeholder didn't make sense before a session is
-            actually running). */}
-        {running ? (
-          <View style={styles.textWrap} pointerEvents="none">
-            <Text style={styles.phase}>{phase}</Text>
-            {seconds !== null ? <Text style={styles.timer}>{seconds} сек</Text> : null}
-          </View>
-        ) : null}
       </View>
-      {/* Richer per-phase instruction below the orb (WF 26/27: "Вдыхай через
-          нос 4 секунды") - single source of truth for the current
-          phase/seconds stays here rather than duplicating the clock/step
-          math in the screen that wants this line. */}
-      {showInstruction && seconds !== null ? <Text style={styles.instruction}>{instructionFor(phase, seconds)}</Text> : null}
+      {/* Text hierarchy redesigned per her Mobbin reference, 2026-08-28:
+          "иерархия текста - заголовок побольше, ниже текст менее яркого
+          цвета и внизу секунды" - moved out of the orb entirely (the
+          reference's own orb has no text on it at all) into a plain title
+          -> subtitle -> seconds stack below, each a visibly different
+          weight/size/color instead of the old single all-in-one sentence. */}
+      {showInstruction && running && seconds !== null ? (
+        <View style={styles.textBlock}>
+          <Text style={styles.phaseTitle}>{phase}</Text>
+          <Text style={styles.phaseSubtitle}>{subtitleFor(phase)}</Text>
+          <Text style={styles.phaseSeconds}>{seconds} сек</Text>
+        </View>
+      ) : null}
     </View>
   );
-}
-
-function declineSeconds(n: number) {
-  return n === 1 ? 'секунду' : 'секунды';
-}
-
-function instructionFor(phase: string, sec: number) {
-  const s = `${sec} ${declineSeconds(sec)}`;
-  if (phase === 'Вдох') return `Вдыхай через нос ${s}`;
-  if (phase === 'Задержка') return `Задержи дыхание на ${s}`;
-  return `Выдыхай через рот ${s}`;
 }
 
 const styles = StyleSheet.create({
@@ -269,26 +262,25 @@ const styles = StyleSheet.create({
   orb: {
     backgroundColor: colors.bg0,
   },
-  textWrap: {
-    position: 'absolute',
+  textBlock: {
+    marginTop: 28,
     alignItems: 'center',
+    gap: 6,
   },
-  phase: {
+  phaseTitle: {
     fontFamily: fontFamily.bold,
-    fontSize: 18,
+    fontSize: 30,
     color: colors.textPrimary,
   },
-  timer: {
+  phaseSubtitle: {
     fontFamily: fontFamily.medium,
-    fontSize: 13,
+    fontSize: 16,
     color: colors.textSecondary,
-    marginTop: 2,
   },
-  instruction: {
-    marginTop: 24,
+  phaseSeconds: {
+    marginTop: 6,
     fontFamily: fontFamily.medium,
-    fontSize: 18,
-    color: colors.textPrimary,
-    textAlign: 'center',
+    fontSize: 14,
+    color: colors.textTertiary,
   },
 });

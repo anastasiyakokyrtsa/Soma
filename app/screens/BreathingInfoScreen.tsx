@@ -18,8 +18,11 @@ export function BreathingInfoScreen({ navigation, route }: any) {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const p = route?.params ?? {};
   const title: string = p.title ?? 'Дыхание для возвращения в тело';
-  const durationLabel: string = p.durationLabel ?? '3 минуты';
-  const durationMs: number = p.durationMs ?? 3 * 60 * 1000;
+  // 1 мин 36 сек, not the earlier flat "3 минуты" - the session is now
+  // 6 repeats of a 16s cycle (4 phases x 4-3-2-1s), her explicit ask,
+  // 2026-08-28 ("повторить весь процесс 6 раз"), not a fixed wall-clock
+  // duration anymore - see BreathingSessionScreen.tsx.
+  const durationLabel: string = p.durationLabel ?? '1 мин 36 сек';
   const description: string =
     p.description ?? 'Эта практика помогает замедлиться и выровнять дыхание. Подходит, если внутри есть напряжение или усталость.';
 
@@ -47,7 +50,7 @@ export function BreathingInfoScreen({ navigation, route }: any) {
         <Text style={styles.description}>{description}</Text>
         <Pressable
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
-          onPress={() => navigation.navigate('BreathingSession', { title, durationMs })}
+          onPress={() => navigation.navigate('BreathingSession', { title })}
         >
           <Text style={styles.ctaLabel}>Я готов</Text>
         </Pressable>
