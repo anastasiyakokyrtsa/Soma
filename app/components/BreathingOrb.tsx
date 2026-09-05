@@ -17,13 +17,26 @@ import { colors, fontFamily } from '../theme';
 // and full lungs. Added a second "Задержка" phase after Выдох, held flat
 // at level A (resting size, no pulse within the hold itself - unlike the
 // post-inhale hold, which peaks at E/D since the lungs are actually full).
-type LevelKey = 'A' | 'B' | 'C' | 'D' | 'E';
+type LevelKey = 'A' | 'A2' | 'B' | 'C' | 'D' | 'D2' | 'E';
 
 const LEVELS: Record<LevelKey, { size: number; inset1Blur: number; inset1Op: number; inset2Blur: number; inset2Op: number; outerBlur: number; outerOp: number }> = {
   A: { size: 140, inset1Blur: 24, inset1Op: 0.4, inset2Blur: 192, inset2Op: 0.1, outerBlur: 80, outerOp: 0.2 },
+  // 20% of the way from A to B - a small-amplitude "breathing" pulse for the
+  // empty-lungs hold below, not a real inhale step (2026-09-05: "когда
+  // задержка дыхания, сфера тоже должна немного дышать, с небольшой
+  // амплитудой" - the old A/A/A/A hold was fully static for 4s straight,
+  // which read as the orb abruptly freezing after 12 seconds of continuous
+  // motion everywhere else in the cycle).
+  A2: { size: 148, inset1Blur: 41, inset1Op: 0.42, inset2Blur: 160, inset2Op: 0.16, outerBlur: 80, outerOp: 0.22 },
   B: { size: 180, inset1Blur: 110, inset1Op: 0.5, inset2Blur: 30, inset2Op: 0.4, outerBlur: 80, outerOp: 0.3 },
   C: { size: 220, inset1Blur: 150, inset1Op: 0.7, inset2Blur: 40, inset2Op: 0.5, outerBlur: 80, outerOp: 0.4 },
   D: { size: 260, inset1Blur: 220, inset1Op: 1, inset2Blur: 50, inset2Op: 0.7, outerBlur: 90, outerOp: 0.6 },
+  // ~15% of the way from D to E - the hold's own last second was landing
+  // exactly back on D right as Выдох's first step also starts at D, so that
+  // whole second interpolated a value to itself and sat dead still (2026-09-06:
+  // "все равно есть моменты где сфера замирает"). A small nudge off D keeps
+  // the settle gentle instead of another full-size jump.
+  D2: { size: 266, inset1Blur: 225, inset1Op: 1, inset2Blur: 50, inset2Op: 0.7, outerBlur: 90, outerOp: 0.62 },
   E: { size: 300, inset1Blur: 250, inset1Op: 1, inset2Blur: 50, inset2Op: 0.7, outerBlur: 90, outerOp: 0.7 },
 };
 
@@ -35,15 +48,15 @@ const STEPS: { name: string; sec: number; level: LevelKey }[] = [
   { name: 'Задержка', sec: 4, level: 'E' },
   { name: 'Задержка', sec: 3, level: 'D' },
   { name: 'Задержка', sec: 2, level: 'E' },
-  { name: 'Задержка', sec: 1, level: 'D' },
+  { name: 'Задержка', sec: 1, level: 'D2' },
   { name: 'Выдох', sec: 4, level: 'D' },
   { name: 'Выдох', sec: 3, level: 'C' },
   { name: 'Выдох', sec: 2, level: 'B' },
-  { name: 'Выдох', sec: 1, level: 'A' },
+  { name: 'Выдох', sec: 1, level: 'A2' },
   { name: 'Задержка', sec: 4, level: 'A' },
-  { name: 'Задержка', sec: 3, level: 'A' },
+  { name: 'Задержка', sec: 3, level: 'A2' },
   { name: 'Задержка', sec: 2, level: 'A' },
-  { name: 'Задержка', sec: 1, level: 'A' },
+  { name: 'Задержка', sec: 1, level: 'A2' },
 ];
 
 // Slow idle "alive" pulse for whenever the orb is at rest (Info screen

@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View, Text, Image, StyleSheet, PanResponder, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { colors, glow, fontFamily, gradients, spacing } from '../theme';
 
 // WF20 "Как ты чувствуешь себя сегодня?" — ported from the UI Kit's already
@@ -85,6 +86,21 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
 
   const pct = index / (MOODS.length - 1);
 
+  // Station-to-station motion is a spring, not an instant jump to the new
+  // stop (2026-09-05: "слишком резко скачет" - she wants the same 5-station
+  // snapping, just eased between stops rather than teleporting).
+  const animatedPct = useSharedValue(pct);
+  useEffect(() => {
+    animatedPct.value = withSpring(pct, { damping: 16, stiffness: 180, mass: 0.6 });
+  }, [pct, animatedPct]);
+
+  const thumbAnimStyle = useAnimatedStyle(() => ({
+    left: labelInsetLeft + animatedPct.value * labelUsableWidth,
+  }));
+  const fillAnimStyle = useAnimatedStyle(() => ({
+    width: Math.max(animatedPct.value * scaleWidth, MIN_FILL_WIDTH),
+  }));
+
   return (
     <View style={styles.card}>
       <Svg width="100%" height={32}>
@@ -108,7 +124,7 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
         {ready ? (
           <>
             <View style={[styles.trackLine, { left: leftOffset, width: scaleWidth }]} />
-            <View style={[styles.trackFill, { left: leftOffset, width: Math.max(pct * scaleWidth, MIN_FILL_WIDTH) }]} />
+            <Animated.View style={[styles.trackFill, { left: leftOffset }, fillAnimStyle]} />
           </>
         ) : null}
         {/* Thumb positioned on the icons/labels' own coordinate system
@@ -121,7 +137,7 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
             except the very ends. This was a known, previously-flagged
             drift ([[project-app-development]] 2026-08-17 entry) - she's
             now confirmed it's actually visible, so fixing it for real. */}
-        {labelsReady ? <View style={[styles.thumb, { left: labelPosForPct(pct) }]} /> : null}
+        {labelsReady ? <Animated.View style={[styles.thumb, thumbAnimStyle]} /> : null}
         <View style={StyleSheet.absoluteFill} {...panResponder.panHandlers} />
       </View>
 

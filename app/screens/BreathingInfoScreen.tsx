@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, fontFamily, radius, glow } from '../theme';
 import { BreathingOrb, ORB_TOP_OFFSET } from '../components/BreathingOrb';
 import { CloseIcon } from '../components/icons/CloseIcon';
@@ -27,7 +28,9 @@ export function BreathingInfoScreen({ navigation, route }: any) {
     p.description ?? 'Эта практика помогает замедлиться и выровнять дыхание. Подходит, если внутри есть напряжение или усталость.';
 
   return (
-    <View style={styles.container}>
+    // Единый fade-in вход по всему приложению (2026-09-06: "на всех
+    // экранах должен быть такой переход для единообразия") - см. HomeScreen.
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
       <StarsBackground width={screenWidth} height={screenHeight} />
       <Pressable style={[styles.closeButton, { top: insets.top + 16 }]} onPress={() => navigation.goBack()} hitSlop={8}>
         <CloseIcon />
@@ -55,7 +58,7 @@ export function BreathingInfoScreen({ navigation, route }: any) {
           <Text style={styles.ctaLabel}>Я готов</Text>
         </Pressable>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

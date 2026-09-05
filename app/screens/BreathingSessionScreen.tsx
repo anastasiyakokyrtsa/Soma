@@ -1,24 +1,44 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAudioPlayer } from 'expo-audio';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, glow } from '../theme';
 import { BreathingOrb, ORB_TOP_OFFSET } from '../components/BreathingOrb';
 import { BreathingProgress } from '../components/BreathingProgress';
 import { BackIcon } from '../components/icons/BackIcon';
 import { BookmarkIcon } from '../components/icons/BookmarkIcon';
-import { HeartIcon } from '../components/icons/HeartIcon';
+import { SoundIcon } from '../components/icons/SoundIcon';
 import { PauseIcon } from '../components/icons/PauseIcon';
 import { PlayIcon } from '../components/icons/PlayIcon';
 import { StarsBackground } from '../components/StarsBackground';
 
 const TOTAL_CYCLES = 6;
 
+// 2026-09-05: она хочет спокойную медитативную фоновую мелодию во время
+// сессии. Реального аудиофайла в проекте пока нет (см. чат) - `require()` с
+// несуществующим путём валит бандл Metro сразу при сборке, поэтому источник
+// держим `null`, пока файл не появится. Как включить:
+// 1. Положить лицензионный/её собственный зацикливаемый трек (mp3/m4a) в
+//    app/assets/audio/breathing-ambient.mp3
+// 2. Заменить строку ниже на:
+//    const AMBIENT_SOUND = require('../assets/audio/breathing-ambient.mp3');
+const AMBIENT_SOUND: number | null = null;
+
+// BookmarkIcon's glyph is taller than wide; SoundIcon renders as a fixed
+// square footprint - matching that square to Bookmark's real rendered
+// height is what reads as "same size" side by side (2026-09-06: "сделай
+// его по высоте таким же как значок Сохранить").
+const BOOKMARK_SIZE = 18;
+const SOUND_ICON_SIZE = BOOKMARK_SIZE * (47.24 / 36.24);
+
 // WF 26/27 "Breathing session" - the active practice, take 4.
 //
-// Sound control from the wireframe dropped deliberately, not an oversight -
-// this app has no audio playback engine at all yet (no expo-av/expo-audio
-// dependency, no ambient track asset) - a mute toggle with nothing to mute
-// would be a fake control.
+// Sound control: the like/heart button was a straight duplicate of the
+// bookmark button (both just toggled a persisted flag, no functional
+// difference) - 2026-09-05, she caught this and asked to replace it with a
+// real mute toggle for the new ambient track. Wired to expo-audio; see
+// AMBIENT_SOUND above for why it's a no-op until a real audio file is added.
 //
 // Completion is cycle-based: a full 4-phase box-breath (Вдох/Задержка/
 // Выдох/Задержка) repeats TOTAL_CYCLES=6 times ("я думаю наверное стоит
@@ -49,12 +69,25 @@ export function BreathingSessionScreen({ navigation, route }: any) {
 
   const [paused, setPaused] = useState(true);
   const [saved, setSaved] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const [muted, setMuted] = useState(false);
   const [completedCycles, setCompletedCycles] = useState(0);
   const [currentFraction, setCurrentFraction] = useState(0);
 
+  const player = useAudioPlayer(AMBIENT_SOUND);
+  useEffect(() => {
+    if (!AMBIENT_SOUND) return;
+    player.loop = true;
+  }, [player]);
+  useEffect(() => {
+    if (!AMBIENT_SOUND) return;
+    if (!paused && !muted) player.play();
+    else player.pause();
+  }, [paused, muted, player]);
+
   return (
-    <View style={styles.container}>
+    // Единый fade-in вход по всему приложению (2026-09-06: "на всех
+    // экранах должен быть такой переход для единообразия") - см. HomeScreen.
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
       <StarsBackground width={screenWidth} height={screenHeight} />
       <Pressable style={[styles.backButton, { top: insets.top + 16 }]} onPress={() => navigation.goBack()} hitSlop={8}>
         <BackIcon />
@@ -81,17 +114,26 @@ export function BreathingSessionScreen({ navigation, route }: any) {
           onPress={() => setSaved((v) => !v)}
           hitSlop={8}
         >
-          <BookmarkIcon size={18} color={saved ? colors.bg0 : colors.violet400} />
+          <BookmarkIcon size={BOOKMARK_SIZE} color={saved ? colors.bg0 : colors.violet400} />
         </Pressable>
         <Pressable style={styles.fab} onPress={() => setPaused((v) => !v)} hitSlop={8}>
           {paused ? <PlayIcon size={22} color={colors.bg0} /> : <PauseIcon size={22} color={colors.bg0} />}
         </Pressable>
+        {/* Та же "заливка в негатив" при переключении, что у Save - её
+            явный ask 2026-09-06: "мне нравится [как ведёт себя Save],
+            надо также с иконкой Звук сделать". */}
         <Pressable
-          style={[styles.outlineButton, liked && styles.outlineButtonActive]}
-          onPress={() => setLiked((v) => !v)}
+          style={[styles.outlineButton, muted && styles.outlineButtonActive]}
+          onPress={() => setMuted((v) => !v)}
           hitSlop={8}
         >
-          <HeartIcon size={18} color={liked ? colors.bg0 : colors.violet400} />
+          {/* Оба SVG-канваса и заполнение глифа внутри проверены математически
+              равными (см. чат 2026-09-06) - тёмная заливка на сиреневом фоне
+              оптически читается мельче/тоньше, чем сиреневая на тёмном (тот
+              же эффект, из-за которого dark-on-light текст в типографике
+              делают чуть крупнее для равного визуального веса). Небольшая
+              компенсация размера только в замьюченном состоянии. */}
+          <SoundIcon size={muted ? SOUND_ICON_SIZE * 1.07 : SOUND_ICON_SIZE} muted={muted} color={muted ? colors.bg0 : colors.violet400} />
         </Pressable>
       </View>
 
@@ -104,7 +146,7 @@ export function BreathingSessionScreen({ navigation, route }: any) {
       <View style={[styles.progressWrap, { marginBottom: insets.bottom + 24 }]}>
         <BreathingProgress total={TOTAL_CYCLES} completedCycles={completedCycles} currentFraction={currentFraction} />
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, fontFamily, gradients } from '../theme';
 import { BiorhythmChart } from '../components/BiorhythmChart';
 import { MoonSunCard } from '../components/MoonSunCard';
@@ -125,7 +126,7 @@ function GreetingHeading({ text }: { text: string }) {
 
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   // Capped at 380 (the kit's own reference width) but shrinks on anything
   // narrower - was a hardcoded 380 that clipped the axis ("18" cut off) on
   // any phone under 412 logical px wide (2026-08-17 review).
@@ -139,26 +140,19 @@ export function HomeScreen() {
   // "если ширина экрана 412, а ширина карточки 336... край карточки
   // не видно, чтобы его увидеть надо скроллить").
   const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
-  // Real content height, measured off the ScrollView itself - the star
-  // background needs to span the *whole* scrollable column (it's meant to
-  // scroll together with the content, not sit fixed behind the viewport,
-  // matching Figma's own "Star Field" frame being part of the tall
-  // scrollable Home v2 frame) - can't know this size ahead of a render since
-  // it depends on real text wrapping/device width.
-  //
-  // Only ever grows, never shrinks: `paragraph`'s length (and so the
-  // ScrollView's real content height) changes with the selected day, and
-  // re-setting this on every change re-stretched the star SVG
-  // (preserveAspectRatio="none") to the new height each time - visible as
-  // the whole starfield "moving" when tapping a different date. Clamping to
-  // the max height ever seen keeps it visually static after it first
-  // settles, while still fully covering the tallest real content.
-  const [contentHeight, setContentHeight] = useState(0);
   const [selectedDay, setSelectedDay] = useState(14);
   const paragraph = DAY_PARAGRAPHS[selectedDay] ?? DAY_PARAGRAPHS[14];
 
   return (
-    <View style={styles.container}>
+    // Единый fade-in вход по всему приложению вместо native-stack transition
+    // (`animation: 'none'` в RootNavigator) - её явный ask 2026-09-06: "на
+    // всех экранах должен быть такой переход для единообразия".
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
+      {/* Fixed backdrop, not part of the scrollable column (2026-09-05:
+          "звезды как бы на одном месте остаются" while content scrolls over
+          them) - sized to the viewport, sibling of the ScrollView rather than
+          its first child. */}
+      <StarsBackground width={screenWidth} height={screenHeight} />
       <ScrollView
         // 160, matching Care screen's own flat bottom spacing - her
         // explicit ask, 2026-08-26 ("от карточки с цитатой до самого низа
@@ -168,10 +162,7 @@ export function HomeScreen() {
         // width) with a flat distance-to-screen-edge number instead.
         contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 160 }}
         showsVerticalScrollIndicator={false}
-        onContentSizeChange={(_w, h) => setContentHeight((prev) => Math.max(prev, h))}
       >
-        <StarsBackground width={screenWidth} height={contentHeight} />
-
         <View style={styles.content}>
           <View style={styles.greetingRow}>
             <GreetingHeading text={`Доброе утро, ${USER_NAME}`} />
@@ -279,7 +270,7 @@ export function HomeScreen() {
         </View>
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 

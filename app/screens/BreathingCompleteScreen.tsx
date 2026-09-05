@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, fontFamily, radius, glow } from '../theme';
 import { BackIcon } from '../components/icons/BackIcon';
 import { CheckmarkIcon } from '../components/icons/CheckmarkIcon';
@@ -23,7 +24,12 @@ export function BreathingCompleteScreen({ navigation }: any) {
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
 
   return (
-    <View style={styles.container}>
+    // Navigator-wide screen transitions are `animation: 'none'` (see
+    // RootNavigator.tsx) - every real transition in this app is a screen's
+    // own entering fade instead (OnboardingSlide/SplashScreen's own pattern).
+    // This screen never had one, so replace()-ing here from the session
+    // screen cut in instantly (2026-09-06: "переход... очень резкий").
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
       <StarsBackground width={screenWidth} height={screenHeight} />
       <Pressable style={[styles.backButton, { top: insets.top + 16 }]} onPress={() => navigation.goBack()} hitSlop={8}>
         <BackIcon />
@@ -32,7 +38,7 @@ export function BreathingCompleteScreen({ navigation }: any) {
       <View style={styles.center}>
         <View style={styles.circle}>
           <View style={styles.halo} />
-          <CheckmarkIcon size={64} color={colors.violet400} />
+          <CheckmarkIcon size={64} color={colors.violet400} glow />
         </View>
         <Text style={styles.title}>Поздравляем!{'\n'}Ты выполнил практику</Text>
       </View>
@@ -43,7 +49,7 @@ export function BreathingCompleteScreen({ navigation }: any) {
       >
         <Text style={styles.ctaLabel}>К другим дыхательным практикам</Text>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 }
 

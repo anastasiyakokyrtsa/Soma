@@ -1,13 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, type } from '../theme';
 
 // Stand-in until each tab's real screen is built from Figma — swap out one at a
 // time, same principle as the UI Kit: add what's missing as we get to it.
 export function PlaceholderScreen({ label }: { label: string }) {
   return (
-    <View style={styles.container}>
+    // Единый fade-in вход по всему приложению (2026-09-06: "на всех
+    // экранах должен быть такой переход для единообразия") - см. HomeScreen.
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
       <Text style={styles.label}>{label}</Text>
-    </View>
+    </Animated.View>
   );
 }
 
