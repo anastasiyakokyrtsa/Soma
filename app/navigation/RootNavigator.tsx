@@ -23,6 +23,9 @@ import { DevMenuScreen } from '../screens/DevMenuScreen';
 import { BreathingInfoScreen } from '../screens/BreathingInfoScreen';
 import { BreathingSessionScreen } from '../screens/BreathingSessionScreen';
 import { BreathingCompleteScreen } from '../screens/BreathingCompleteScreen';
+import { TeaCategoriesScreen } from '../screens/TeaCategoriesScreen';
+import { TeaCeremonyScreen } from '../screens/TeaCeremonyScreen';
+import { BiorhythmsScreen } from '../screens/BiorhythmsScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -81,6 +84,13 @@ export function RootNavigator() {
         <Stack.Screen name="BreathingInfo" component={BreathingInfoScreen} />
         <Stack.Screen name="BreathingSession" component={BreathingSessionScreen} />
         <Stack.Screen name="BreathingComplete" component={BreathingCompleteScreen} />
+        {/* Pushed from Care's "Начать чайную церемонию" button - WF29. Only
+            its first category ("Успокоение на вечер") leads anywhere real. */}
+        <Stack.Screen name="TeaCategories" component={TeaCategoriesScreen} />
+        {/* Pushed from TeaCategories' one available card - WF30-35. */}
+        <Stack.Screen name="TeaCeremony" component={TeaCeremonyScreen} />
+        {/* Pushed from Analytics' "Биоритмы" card - WF38. */}
+        <Stack.Screen name="Biorhythms" component={BiorhythmsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

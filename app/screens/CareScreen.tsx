@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, fontFamily, gradients, glow } from '../theme';
 import { ResourceRing } from '../components/ResourceRing';
 import { MiniRitualTile } from '../components/MiniRitualTile';
@@ -49,12 +49,7 @@ const GAP = {
 
 export function CareScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
-  const { width: screenWidth } = useWindowDimensions();
-  // Same star background as HomeScreen, same technique/reasoning (2026-08-20:
-  // "звёздный фон добавь так же как в Home") - grow-only so it doesn't
-  // re-stretch/"move" if this screen's own content height ever changes
-  // (see HomeScreen.tsx's own comment on this exact bug for the full story).
-  const [contentHeight, setContentHeight] = useState(0);
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   // 3 tiles + 2×12px gaps + 2×16px side margins, derived from the real
   // screen width instead of MiniRitualTile's own literal 116 - that only
   // held on the Figma reference width, overflowed on a narrower real
@@ -64,7 +59,13 @@ export function CareScreen({ navigation }: any) {
   const tileWidth = (screenWidth - SIDE_MARGIN * 2 - TILE_GAP * 2) / 3;
 
   return (
-    <View style={styles.container}>
+    // Единый fade-in вход по всему приложению (2026-09-06: "на всех
+    // экранах должен быть такой переход для единообразия") - см. HomeScreen.
+    <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
+      {/* Fixed backdrop, same change as HomeScreen (2026-09-05) - sized to
+          the viewport and a sibling of the ScrollView, not part of the
+          scrollable column, so it stays put while content scrolls over it. */}
+      <StarsBackground width={screenWidth} height={screenHeight} />
       <ScrollView
         // 160, not insets.bottom + N - her explicit ask, 2026-08-26: "от
         // Все статьи до самого низа экрана 160 пикселей", the literal
@@ -74,10 +75,7 @@ export function CareScreen({ navigation }: any) {
         // would overshoot her stated number on devices with a real inset.
         contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 160 }}
         showsVerticalScrollIndicator={false}
-        onContentSizeChange={(_w, h) => setContentHeight((prev) => Math.max(prev, h))}
       >
-        <StarsBackground width={screenWidth} height={contentHeight} />
-
         <View style={styles.content}>
           <View style={styles.condition}>
           {/* Settings matched to HomeScreen's own "Доброе утро" heading
@@ -162,7 +160,10 @@ export function CareScreen({ navigation }: any) {
             <TeaIllustrationSway />
           </View>
           <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
-          <Pressable style={[styles.teaButton, { marginTop: GAP.captionToButton }]}>
+          <Pressable
+            style={({ pressed }) => [styles.teaButton, { marginTop: GAP.captionToButton }, pressed && styles.teaButtonPressed]}
+            onPress={() => navigation.navigate('TeaCategories')}
+          >
             <Text style={styles.teaButtonLabel}>Начать чайную церемонию</Text>
           </Pressable>
         </View>
@@ -171,7 +172,12 @@ export function CareScreen({ navigation }: any) {
           <Text style={styles.sectionTitle}>О теле и ритмах</Text>
           <Text style={styles.sectionDesc}>Небольшие статьи о том, что ежедневно влияет на наше состояние</Text>
           <View style={[styles.articlesList, { marginTop: GAP.articlesHeaderToList }]}>
-            <ArticleLinkRow icon="water" title="Вода как основа баланса" subtitle="Коротко о том, как тело сигнализирует о жажде" />
+            <ArticleLinkRow
+              icon="water"
+              title="Вода как основа баланса"
+              subtitle="Коротко о том, как тело сигнализирует о жажде"
+              onPress={() => navigation.navigate('ArticleWater')}
+            />
             <ArticleLinkRow icon="moonSymbol" title="Свет и внутренние часы" subtitle="Почему освещение влияет на энергию и сон" />
             <ArticleLinkRow icon="battery" title="Паузы и восстановление" subtitle="Как короткий отдых помогает нервной системе" />
             <Pressable>
@@ -181,7 +187,7 @@ export function CareScreen({ navigation }: any) {
         </View>
         </View>
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -246,6 +252,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: `0px 0px ${glow.btn.blur}px ${glow.btn.color}`,
+  },
+  // Standing rule for every primary CTA in this app (feedback_rn_app_ui_defaults) -
+  // was missing here since this button was never actually wired up before.
+  teaButtonPressed: {
+    backgroundColor: colors.violet300,
+    boxShadow: `0px 0px 15px ${colors.violet300}`,
+    transform: [{ scale: 0.97 }],
   },
   teaButtonLabel: {
     fontFamily: fontFamily.semiBold,

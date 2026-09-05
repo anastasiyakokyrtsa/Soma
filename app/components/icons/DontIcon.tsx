@@ -1,0 +1,15 @@
+import Svg, { Path } from 'react-native-svg';
+
+// Ported from UI Kit/assets/icons-clean/donts.svg - the "avoid" bullet
+// marker on the Biorhythms detail screen's two-column lists (WF38). Fixed
+// color (#E891A8, pink), same reasoning as DoIcon's own note.
+export function DontIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0.24 0.24 43.52 43.52" fill="none">
+      <Path
+        d="M21.9999 4.3999C12.2803 4.3999 4.3999 12.2803 4.3999 21.9999C4.3999 31.7195 12.2803 39.5999 21.9999 39.5999C31.7195 39.5999 39.5999 31.7195 39.5999 21.9999C39.5999 12.2803 31.7195 4.3999 21.9999 4.3999ZM30.7999 23.4666H13.1999C12.3903 23.4666 11.7332 22.811 11.7332 21.9999C11.7332 21.1888 12.3903 20.5332 13.1999 20.5332H30.7999C31.6095 20.5332 32.2666 21.1888 32.2666 21.9999C32.2666 22.811 31.6095 23.4666 30.7999 23.4666Z"
+        fill="#E891A8"
+      />
+    </Svg>
+  );
+}

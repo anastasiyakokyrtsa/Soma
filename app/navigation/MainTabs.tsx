@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { CareScreen } from '../screens/CareScreen';
+import { AnalyticsScreen } from '../screens/AnalyticsScreen';
 import { BottomBar } from '../components/BottomBar';
 
 // Real Bottom Bar now ported (BottomBar.tsx - SVG dome shape, FAB,
@@ -35,7 +36,7 @@ export function MainTabs() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Care" component={CareScreen} />
       <Tab.Screen name="Journal">{() => <PlaceholderScreen label="Дневник" />}</Tab.Screen>
-      <Tab.Screen name="Analytics">{() => <PlaceholderScreen label="Статистика" />}</Tab.Screen>
+      <Tab.Screen name="Analytics" component={AnalyticsScreen} />
     </Tab.Navigator>
   );
 }
