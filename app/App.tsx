@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts,
@@ -61,14 +62,22 @@ export default function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <RootNavigator />
-      <StatusBar style="light" />
-    </SafeAreaProvider>
+    // Required root wrapper for react-native-gesture-handler (InfoSheet's
+    // swipe-to-dismiss, added 2026-09-13) - gestures silently don't register
+    // without it, this isn't optional decoration.
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <RootNavigator />
+        <StatusBar style="light" />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   loading: {
     flex: 1,
     backgroundColor: colors.bg0,
