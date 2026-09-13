@@ -9,6 +9,9 @@ import { GradientIcon } from '../components/icons/GradientIcon';
 import { CareHandIcon } from '../components/icons/CareHandIcon';
 import { DoIcon } from '../components/icons/DoIcon';
 import { DontIcon } from '../components/icons/DontIcon';
+import { InfoIcon } from '../components/icons/InfoIcon';
+import { InfoSheet } from '../components/InfoSheet';
+import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
 
 type Level = {
   title: string;
@@ -64,6 +67,7 @@ export function BiorhythmsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [selectedDay, setSelectedDay] = useState(14);
+  const [infoVisible, setInfoVisible] = useState(false);
   const chartWidth = Math.min(screenWidth - 40, 380);
 
   return (
@@ -75,7 +79,17 @@ export function BiorhythmsScreen({ navigation }: any) {
             <Text style={styles.backLabel}>← Вернуться в галерею данных</Text>
           </Pressable>
 
-          <Text style={styles.title}>Биоритмы</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>Биоритмы</Text>
+            <Pressable
+              onPress={() => setInfoVisible(true)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Что означают биоритмы"
+            >
+              <InfoIcon size={18} color={colors.textTertiary} />
+            </Pressable>
+          </View>
 
           <BiorhythmChart width={chartWidth} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
 
@@ -125,6 +139,12 @@ export function BiorhythmsScreen({ navigation }: any) {
           ))}
         </View>
       </ScrollView>
+      <InfoSheet
+        visible={infoVisible}
+        onClose={() => setInfoVisible(false)}
+        title={BIORHYTHM_INFO_TITLE}
+        paragraphs={BIORHYTHM_INFO_PARAGRAPHS}
+      />
     </Animated.View>
   );
 }
@@ -145,8 +165,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
   },
-  title: {
+  titleRow: {
     marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  title: {
     fontFamily: fontFamily.bold,
     fontSize: 28,
     color: colors.textPrimary,

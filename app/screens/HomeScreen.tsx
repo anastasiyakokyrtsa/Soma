@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
@@ -9,7 +9,10 @@ import { MoonSunCard } from '../components/MoonSunCard';
 import { FocusCard } from '../components/FocusCard';
 import { QuoteCard } from '../components/QuoteCard';
 import { ProfileIcon } from '../components/icons/ProfileIcon';
+import { InfoIcon } from '../components/icons/InfoIcon';
 import { StarsBackground } from '../components/StarsBackground';
+import { InfoSheet } from '../components/InfoSheet';
+import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -136,9 +139,10 @@ function GreetingHeading({ text }: { text: string }) {
   );
 }
 
-export function HomeScreen() {
+export function HomeScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const [infoVisible, setInfoVisible] = useState(false);
   // Capped at 380 (the kit's own reference width) but shrinks on anything
   // narrower - was a hardcoded 380 that clipped the axis ("18" cut off) on
   // any phone under 412 logical px wide (2026-08-17 review).
@@ -182,8 +186,20 @@ export function HomeScreen() {
           </View>
 
         <View style={[styles.biorhythmHeader, { marginTop: GAP.greetingToBiorhythmTitle }]}>
-          <Text style={styles.biorhythmTitle}>Биоритмы</Text>
-          <Text style={styles.moreLink}>Подробнее</Text>
+          <View style={styles.biorhythmTitleRow}>
+            <Text style={styles.biorhythmTitle}>Биоритмы</Text>
+            <Pressable
+              onPress={() => setInfoVisible(true)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Что означают биоритмы"
+            >
+              <InfoIcon size={16} color={colors.textTertiary} />
+            </Pressable>
+          </View>
+          <Pressable onPress={() => navigation.navigate('Biorhythms')} hitSlop={8}>
+            <Text style={styles.moreLink}>Подробнее</Text>
+          </Pressable>
         </View>
 
         <View style={{ marginTop: GAP.titleToChart }}>
@@ -282,6 +298,12 @@ export function HomeScreen() {
         </View>
         </View>
       </ScrollView>
+      <InfoSheet
+        visible={infoVisible}
+        onClose={() => setInfoVisible(false)}
+        title={BIORHYTHM_INFO_TITLE}
+        paragraphs={BIORHYTHM_INFO_PARAGRAPHS}
+      />
     </Animated.View>
   );
 }
@@ -313,6 +335,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  biorhythmTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   biorhythmTitle: {
     fontFamily: fontFamily.semiBold,
