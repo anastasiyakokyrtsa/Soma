@@ -187,14 +187,14 @@ export function HomeScreen({ navigation }: any) {
 
         <View style={[styles.biorhythmHeader, { marginTop: GAP.greetingToBiorhythmTitle }]}>
           <View style={styles.biorhythmTitleRow}>
-            <Text style={styles.biorhythmTitle}>Биоритмы</Text>
+            <Text style={[styles.biorhythmTitle, { lineHeight: 24 * 1.1 }]}>Биоритмы</Text>
             <Pressable
               onPress={() => setInfoVisible(true)}
               hitSlop={10}
               accessibilityRole="button"
               accessibilityLabel="Что означают биоритмы"
             >
-              <InfoIcon size={16} color={colors.textTertiary} />
+              <InfoIcon size={20} color={colors.textSecondary} />
             </Pressable>
           </View>
           <Pressable onPress={() => navigation.navigate('Biorhythms')} hitSlop={8}>

@@ -87,7 +87,7 @@ export function BiorhythmsScreen({ navigation }: any) {
               accessibilityRole="button"
               accessibilityLabel="Что означают биоритмы"
             >
-              <InfoIcon size={18} color={colors.textTertiary} />
+              <InfoIcon size={22} color={colors.textSecondary} />
             </Pressable>
           </View>
 

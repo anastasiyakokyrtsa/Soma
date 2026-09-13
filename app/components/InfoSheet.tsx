@@ -49,15 +49,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(3,4,10,0.55)',
   },
+  // Tokens matched to BreathingInfoScreen's own bottom card (2026-09-13, her
+  // ask) - cardFillFallback/radius.card/32px top padding/centered bold title
+  // all come from there, for the two info-panels in the app to feel like one
+  // family. Paragraph body stays textSecondary (not Breathing's textPrimary)
+  // and left-aligned (not centered) on purpose: Breathing's description is
+  // one short centered line of primary content, this is 3 full paragraphs of
+  // supplementary reading - centering multi-line body text makes it harder
+  // to read, and this is meant to sit quieter than the screen's real content.
   sheet: {
-    backgroundColor: colors.cardFillSmFallback,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
+    backgroundColor: colors.cardFillFallback,
+    borderTopLeftRadius: radius.card,
+    borderTopRightRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     borderBottomWidth: 0,
     paddingHorizontal: 24,
-    paddingTop: 14,
+    paddingTop: 32,
   },
   handle: {
     alignSelf: 'center',
@@ -65,19 +73,22 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 999,
     backgroundColor: colors.borderDefault,
-    marginBottom: 18,
+    marginBottom: 20,
   },
   title: {
     fontFamily: fontFamily.bold,
-    fontSize: 16,
+    fontSize: 24,
+    lineHeight: 24 * 1.2,
     color: colors.textPrimary,
-    marginBottom: 10,
+    textAlign: 'center',
+    marginBottom: 20,
   },
   paragraph: {
     fontFamily: fontFamily.regular,
-    fontSize: 15,
-    lineHeight: 15 * 1.6,
+    fontSize: 16,
+    lineHeight: 16 * 1.4,
     color: colors.textSecondary,
+    textAlign: 'left',
   },
   paragraphSpacing: {
     marginTop: 14,
