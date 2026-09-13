@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -71,7 +71,12 @@ export function InfoSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <View style={styles.root}>
+      {/* Modal renders its content on its own native surface, separate from
+          the app's root - the <GestureHandlerRootView> in App.tsx doesn't
+          reach in here, so this Modal needs its own, or the gesture below
+          silently never fires. Documented gesture-handler + Modal
+          limitation, not something specific to this screen. */}
+      <GestureHandlerRootView style={styles.root}>
         <Pressable style={styles.scrimTap} onPress={onClose} accessibilityRole="button" accessibilityLabel="Закрыть" />
         <GestureDetector gesture={pan}>
           <Animated.View style={[styles.sheet, { paddingBottom: insets.bottom + 24 }, sheetStyle]}>
@@ -84,7 +89,7 @@ export function InfoSheet({
             ))}
           </Animated.View>
         </GestureDetector>
-      </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
