@@ -194,7 +194,7 @@ export function HomeScreen({ navigation }: any) {
               accessibilityRole="button"
               accessibilityLabel="Что означают биоритмы"
             >
-              <InfoIcon size={20} color={colors.textSecondary} />
+              <InfoIcon size={20} color={colors.textPrimary} />
             </Pressable>
           </View>
           <Pressable onPress={() => navigation.navigate('Biorhythms')} hitSlop={8}>
