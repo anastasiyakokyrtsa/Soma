@@ -92,8 +92,17 @@ export function MoodCheckIn() {
 }
 
 const styles = StyleSheet.create({
+  // Border ported from FocusCard, not from a button - 2026-09-14, per
+  // ui-designer: glow always means "press me once, one-off action" in this
+  // app's visual language (every button), while a plain violet border is
+  // the existing signal for "distinct interactive object" (FocusCard) vs.
+  // "atmospheric read-only content" (MoonSunCard's own borderless fill,
+  // which the card fill itself was ported from). This card is a daily
+  // 5-way choice, not a CTA, so it gets the border language, not glow.
   card: {
     borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.violet300,
     overflow: 'hidden',
   },
   // Second --card-fill layer (a uniform light wash on top of the radial
@@ -142,6 +151,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(11,14,31,0.6)',
+    borderWidth: 1,
+    borderColor: colors.violet300,
     borderRadius: radius.pill,
     paddingVertical: 8,
     paddingHorizontal: 14,
