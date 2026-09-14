@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { colors, fontFamily, radius } from '../theme';
 import { MOODS } from './MoodScale';
@@ -48,23 +49,43 @@ export function MoodCheckIn() {
 
   return (
     <Animated.View style={styles.card} entering={FadeIn.duration(200)} exiting={FadeOut.duration(150)}>
-      <Text style={styles.prompt}>Как ты сегодня?</Text>
-      <View style={styles.row}>
-        {MOODS.map((m, i) => (
-          <Pressable
-            key={i}
-            onPress={() => setSelected(i)}
-            hitSlop={4}
-            style={styles.option}
-            accessibilityRole="button"
-            accessibilityLabel={m.label}
-          >
-            <Image source={m.img} style={styles.optionIcon} resizeMode="contain" />
-            <Text style={styles.optionLabel} numberOfLines={1} adjustsFontSizeToFit>
-              {m.label}
-            </Text>
-          </Pressable>
-        ))}
+      {/* Real --card-fill port, same recipe as MoonSunCard.tsx (2026-08-20
+          fix there): a flat opaque fallback here made the card read as a
+          solid box blocking the starfield right at the top of Home, the
+          most visible spot on the screen - she caught this on-device
+          2026-09-14, ui-designer confirmed it's the same known issue and
+          recommended porting the identical gradient rather than inventing
+          a second treatment. */}
+      <Svg style={StyleSheet.absoluteFillObject}>
+        <Defs>
+          <RadialGradient id="moodFill" cx="50%" cy="50%" r="70.7%">
+            <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
+            <Stop offset="0.318" stopColor="#000000" stopOpacity={0.1} />
+            <Stop offset="1" stopColor={colors.violet300} stopOpacity={0.2} />
+          </RadialGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#moodFill)" />
+      </Svg>
+      <View style={styles.whiteWash} pointerEvents="none" />
+      <View style={styles.inner}>
+        <Text style={styles.prompt}>Как ты сегодня?</Text>
+        <View style={styles.row}>
+          {MOODS.map((m, i) => (
+            <Pressable
+              key={i}
+              onPress={() => setSelected(i)}
+              hitSlop={4}
+              style={styles.option}
+              accessibilityRole="button"
+              accessibilityLabel={m.label}
+            >
+              <Image source={m.img} style={styles.optionIcon} resizeMode="contain" />
+              <Text style={styles.optionLabel} numberOfLines={1} adjustsFontSizeToFit>
+                {m.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     </Animated.View>
   );
@@ -72,10 +93,17 @@ export function MoodCheckIn() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardFillFallback,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
     borderRadius: radius.card,
+    overflow: 'hidden',
+  },
+  // Second --card-fill layer (a uniform light wash on top of the radial
+  // gradient) - same as MoonSunCard's own whiteWash, too subtle to need
+  // its own gradient.
+  whiteWash: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+  },
+  inner: {
     paddingVertical: 20,
     paddingHorizontal: 16,
   },
@@ -104,13 +132,16 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
   },
+  // Chip stays a plain translucent tint, not the full radial-gradient
+  // treatment - ui-designer's call: at ~38px tall a radial gradient reads
+  // as indistinguishable from a flat fill, not worth the extra SVG layer.
+  // A translucent (not opaque) color still lets the starfield show through
+  // faintly, consistent in spirit with the card without overbuilding it.
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: colors.cardFillFallback,
-    borderWidth: 1,
-    borderColor: colors.borderSoft,
+    backgroundColor: 'rgba(11,14,31,0.6)',
     borderRadius: radius.pill,
     paddingVertical: 8,
     paddingHorizontal: 14,
