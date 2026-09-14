@@ -12,6 +12,7 @@ import { ProfileIcon } from '../components/icons/ProfileIcon';
 import { InfoIcon } from '../components/icons/InfoIcon';
 import { StarsBackground } from '../components/StarsBackground';
 import { InfoSheet } from '../components/InfoSheet';
+import { MoodCheckIn } from '../components/MoodCheckIn';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
@@ -25,10 +26,18 @@ const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
 const SIDE_MARGIN = 16;
 
 const GAP = {
-  greetingToBiorhythmTitle: 32,
+  // Mood check-in (audit findings #6/#11, built 2026-09-14) sits between
+  // the greeting and Биоритмы - it needs to happen before the day's
+  // interpretation text is read, not after, so it can't go lower on the
+  // screen than this. 32 to greeting (matches the old direct
+  // greeting->Биоритмы gap this replaced), 60 down to Биоритмы (the
+  // established between-blocks rhythm used everywhere else on this screen).
+  greetingToMood: 32,
+  moodToBiorhythmTitle: 60,
   titleToChart: 20,
   chartToParagraph: 20,
-  // block-to-block gaps: tried unifying to 32 (matching greetingToBiorhythmTitle)
+  // block-to-block gaps: tried unifying to 32 (matching the old direct
+  // greetingToBiorhythmTitle gap, since renamed/split above)
   // 2026-08-20, then reverted the same day ("ты наверное прав, давай между
   // блоками вернем 60 пикселей") - back to a uniform 60 for every block
   // transition (not the original non-uniform literal Figma deltas 60/67/110).
@@ -185,7 +194,11 @@ export function HomeScreen({ navigation }: any) {
             <ProfileIcon size={28} />
           </View>
 
-        <View style={[styles.biorhythmHeader, { marginTop: GAP.greetingToBiorhythmTitle }]}>
+        <View style={{ marginTop: GAP.greetingToMood }}>
+          <MoodCheckIn />
+        </View>
+
+        <View style={[styles.biorhythmHeader, { marginTop: GAP.moodToBiorhythmTitle }]}>
           <View style={styles.biorhythmTitleRow}>
             <Text style={[styles.biorhythmTitle, { lineHeight: 24 * 1.1 }]}>Биоритмы</Text>
             <Pressable

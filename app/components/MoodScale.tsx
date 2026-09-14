@@ -13,7 +13,9 @@ import { colors, glow, fontFamily, gradients, spacing } from '../theme';
 // uniform violet), same track recipe (thumb + thin line only, no small
 // dots, everything positioned at true 0/25/50/75/100% so each element's
 // *center* lands exactly on its stop), same gradient title treatment.
-const MOODS = [
+// Exported for MoodCheckIn.tsx (Home's compact daily check-in card) - same
+// 5 moods/images/order everywhere in the app, one source, not a copy.
+export const MOODS = [
   { label: 'Ужасно', img: require('../assets/mood/picture-mood-scala-very-bad.png') },
   { label: 'Плохо', img: require('../assets/mood/picture-mood-scala-bad.png') },
   { label: 'Нейтрально', img: require('../assets/mood/picture-mood-scala-neutral.png') },
