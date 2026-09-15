@@ -27,6 +27,7 @@ import { BreathingCompleteScreen } from '../screens/BreathingCompleteScreen';
 import { TeaCategoriesScreen } from '../screens/TeaCategoriesScreen';
 import { TeaCeremonyScreen } from '../screens/TeaCeremonyScreen';
 import { BiorhythmsScreen } from '../screens/BiorhythmsScreen';
+import { ArticleWaterScreen } from '../screens/ArticleWaterScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -96,6 +97,10 @@ export function RootNavigator() {
         <Stack.Screen name="TeaCeremony" component={TeaCeremonyScreen} />
         {/* Pushed from Analytics' "Биоритмы" card - WF38. */}
         <Stack.Screen name="Biorhythms" component={BiorhythmsScreen} />
+        {/* Was a broken route (Care already called navigate('ArticleWater'),
+            no screen existed) - built 2026-09-16 now that she supplied the
+            real full text. */}
+        <Stack.Screen name="ArticleWater" component={ArticleWaterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
