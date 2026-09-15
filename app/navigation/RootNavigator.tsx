@@ -16,6 +16,7 @@ import { StylePreviewScreen } from '../screens/onboarding/StylePreviewScreen';
 import { PersonalizationScreen } from '../screens/onboarding/PersonalizationScreen';
 import { ProfileStartScreen } from '../screens/onboarding/ProfileStartScreen';
 import { ProfileDateOfBirthScreen } from '../screens/onboarding/ProfileDateOfBirthScreen';
+import { BiorhythmInsightScreen } from '../screens/onboarding/BiorhythmInsightScreen';
 import { ProfileSleepScheduleScreen } from '../screens/onboarding/ProfileSleepScheduleScreen';
 import { ProfileMenstrualCycleScreen } from '../screens/onboarding/ProfileMenstrualCycleScreen';
 import { ProfileMoodScreen } from '../screens/onboarding/ProfileMoodScreen';
@@ -74,6 +75,10 @@ export function RootNavigator() {
         <Stack.Screen name="Personalization" component={PersonalizationScreen} />
         <Stack.Screen name="ProfileStart" component={ProfileStartScreen} />
         <Stack.Screen name="ProfileDateOfBirth" component={ProfileDateOfBirthScreen} />
+        {/* Inserted 2026-09-15 (audit finding #7, habit-designer's early-value
+            recommendation) - real content computed from the date just entered,
+            not a placeholder. See BiorhythmInsightScreen.tsx. */}
+        <Stack.Screen name="BiorhythmInsight" component={BiorhythmInsightScreen} />
         <Stack.Screen name="ProfileSleepSchedule" component={ProfileSleepScheduleScreen} />
         <Stack.Screen name="ProfileMenstrualCycle" component={ProfileMenstrualCycleScreen} />
         <Stack.Screen name="ProfileMood" component={ProfileMoodScreen} />

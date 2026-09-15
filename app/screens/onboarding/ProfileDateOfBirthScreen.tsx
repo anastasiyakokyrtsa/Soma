@@ -11,7 +11,7 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
       step={1}
       title="Когда ты родился?"
       description="Дата рождения нужна, чтобы рассчитать индивидуальные биоритмы и ритмы восстановления"
-      onPressNext={() => navigation.navigate('ProfileSleepSchedule')}
+      onPressNext={() => navigation.navigate('BiorhythmInsight', { birth: date })}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >
