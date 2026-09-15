@@ -86,21 +86,27 @@ export function CareScreen({ navigation }: any) {
               values, this title stays its own fixed 2-line SvgText split
               (not HomeScreen's real-measured-wrap technique) since it's a
               known fixed string, not a variable-length name. */}
-          <Svg width="100%" height={56}>
-            <Defs>
-              <SvgLinearGradient id="conditionGrad" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset={gradients.headingText.locations[0]} stopColor={gradients.headingText.colors[0]} />
-                <Stop offset={gradients.headingText.locations[1]} stopColor={gradients.headingText.colors[1]} />
-                <Stop offset={gradients.headingText.locations[2]} stopColor={gradients.headingText.colors[2]} />
-              </SvgLinearGradient>
-            </Defs>
-            <SvgText x="0" y="26" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
-              Твое состояние
-            </SvgText>
-            <SvgText x="0" y="54" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
-              сегодня изменчиво
-            </SvgText>
-          </Svg>
+          {/* accessible+accessibilityLabel collapses this into one
+              screen-reader element reading the real title - same fix as
+              HomeScreen's GreetingHeading (audit finding #16, 2026-09-16):
+              SvgText has no guaranteed screen-reader support. */}
+          <View accessible accessibilityRole="header" accessibilityLabel="Твое состояние сегодня изменчиво">
+            <Svg width="100%" height={56}>
+              <Defs>
+                <SvgLinearGradient id="conditionGrad" x1="0" y1="0" x2="1" y2="1">
+                  <Stop offset={gradients.headingText.locations[0]} stopColor={gradients.headingText.colors[0]} />
+                  <Stop offset={gradients.headingText.locations[1]} stopColor={gradients.headingText.colors[1]} />
+                  <Stop offset={gradients.headingText.locations[2]} stopColor={gradients.headingText.colors[2]} />
+                </SvgLinearGradient>
+              </Defs>
+              <SvgText x="0" y="26" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
+                Твое состояние
+              </SvgText>
+              <SvgText x="0" y="54" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
+                сегодня изменчиво
+              </SvgText>
+            </Svg>
+          </View>
           <Text style={styles.subtitle}>Дай себе мягкое восстановление</Text>
         </View>
 

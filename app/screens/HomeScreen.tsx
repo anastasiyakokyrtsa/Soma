@@ -124,7 +124,13 @@ function GreetingHeading({ text }: { text: string }) {
   const height = lines ? Math.max(...lines.map((l) => l.y)) + 12 : 80;
 
   return (
-    <View style={styles.greetingTextWrap}>
+    // accessible+accessibilityLabel on the wrapper collapses the whole
+    // subtree into one screen-reader element that reads `text` - without
+    // this, VoiceOver/TalkBack have no guaranteed way to read a heading
+    // that's drawn as SvgText (for the gradient fill) rather than plain
+    // RN Text (audit finding #16, 2026-09-16). Same fix applied to
+    // CareScreen's own gradient title.
+    <View style={styles.greetingTextWrap} accessible accessibilityRole="header" accessibilityLabel={text}>
       <Text style={styles.greetingMeasure} onTextLayout={onTextLayout}>
         {text}
       </Text>
