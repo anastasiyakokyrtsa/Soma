@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { colors, fontFamily } from '../../theme';
-import type { BirthDate } from '../../lib/biorhythm';
+import { formatBirthDate, type BirthDate } from '../../lib/biorhythm';
 
 // Audit finding #13 (platform-conformance): date pickers are one of the
 // component types that must diverge by platform, not share one custom look
@@ -30,24 +30,8 @@ import type { BirthDate } from '../../lib/biorhythm';
 const today = new Date();
 const MIN_DATE = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
 
-const MONTHS_GENITIVE = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-];
-
 const dateToValue = (d: Date): BirthDate => ({ day: d.getDate(), month: d.getMonth(), year: d.getFullYear() });
 const valueToDate = (v: BirthDate): Date => new Date(v.year, v.month, v.day);
-const formatRuDate = (v: BirthDate) => `${v.day} ${MONTHS_GENITIVE[v.month]} ${v.year}`;
 
 export function ProfileDateOfBirthScreen({ navigation }: any) {
   const [date, setDate] = useState<BirthDate>({ day: 14, month: 5, year: 1995 });
@@ -82,7 +66,7 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
         ) : (
           <>
             <Pressable style={styles.androidField} onPress={() => setAndroidPickerOpen(true)}>
-              <Text style={styles.androidFieldText}>{formatRuDate(date)}</Text>
+              <Text style={styles.androidFieldText}>{formatBirthDate(date)}</Text>
             </Pressable>
             {androidPickerOpen ? (
               <DateTimePicker value={valueToDate(date)} mode="date" display="default" onChange={onChange} maximumDate={today} minimumDate={MIN_DATE} />

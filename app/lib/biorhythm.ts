@@ -34,6 +34,28 @@ export function getBiorhythmValues(birth: BirthDate, on: Date = new Date()): Bio
   };
 }
 
+const MONTHS_GENITIVE = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
+  'мая',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря',
+];
+
+// One formatter, not a copy in every screen that shows a birth date -
+// ProfileDateOfBirthScreen.tsx (its Android field) and BiorhythmsScreen.tsx
+// (finding #17's self-check line, 2026-09-18) both use this.
+export function formatBirthDate(v: BirthDate): string {
+  return `${v.day} ${MONTHS_GENITIVE[v.month]} ${v.year}`;
+}
+
 export type CycleId = 'physical' | 'emotional' | 'intellect';
 
 // Which of the 3 cycles reads most extreme today (furthest from the 50

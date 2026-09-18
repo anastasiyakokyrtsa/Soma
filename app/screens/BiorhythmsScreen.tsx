@@ -12,6 +12,7 @@ import { DontIcon } from '../components/icons/DontIcon';
 import { InfoIcon } from '../components/icons/InfoIcon';
 import { InfoSheet } from '../components/InfoSheet';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
+import { formatBirthDate, type BirthDate } from '../lib/biorhythm';
 
 type Level = {
   title: string;
@@ -62,6 +63,21 @@ const LEVELS: Level[] = [
 
 const SUMMARY =
   'Сегодня твоё состояние неравномерно: ум работает ясно и стабильно, физический ресурс — на среднем уровне, а эмоциональный фон находится в чувствительной фазе. Это день, когда важно не требовать от себя слишком многого и опираться на сильные стороны.';
+
+// Finding #17's other half (audit-qa/owner, 2026-09-18): automated
+// validation can only catch impossible dates (future, 120+ years back -
+// already done on the picker), never a plausible-but-wrong one (a typo
+// that still lands on a real date). ux-architect + ui-designer both
+// recommended putting the entered date here, inside this screen's own
+// InfoSheet, not as a permanent visible element and not repeated on
+// Home's copy of the same sheet - Home is "state right now", this screen
+// is "how the calculation works," and someone doubting the numbers opens
+// this (i) anyway. Mock date for now, matching every other number on
+// this screen (chart/rings/summary are all still the hand-authored demo
+// data, not wired to a real entered date yet) - swap for the real value
+// once birth date actually flows from onboarding through app state.
+const MOCK_BIRTH_DATE: BirthDate = { day: 14, month: 5, year: 1995 };
+const BIRTH_DATE_NOTE = `Расчёт использует дату рождения, которую ты указала при регистрации: ${formatBirthDate(MOCK_BIRTH_DATE)}.`;
 
 export function BiorhythmsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -143,7 +159,7 @@ export function BiorhythmsScreen({ navigation }: any) {
         visible={infoVisible}
         onClose={() => setInfoVisible(false)}
         title={BIORHYTHM_INFO_TITLE}
-        paragraphs={BIORHYTHM_INFO_PARAGRAPHS}
+        paragraphs={[...BIORHYTHM_INFO_PARAGRAPHS, BIRTH_DATE_NOTE]}
       />
     </Animated.View>
   );
