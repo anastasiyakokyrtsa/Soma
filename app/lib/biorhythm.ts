@@ -9,8 +9,10 @@ export type BiorhythmValues = { physical: number; emotional: number; intellect: 
 // would contradict the whole point of that screen and everything already
 // decided about honest claims (audit findings #3/#9).
 //
-// `month` follows DateWheelPicker's own DateValue convention (0-indexed,
-// same as JS Date) - not a second convention to track.
+// `month` is 0-indexed, same as JS Date - not a second convention to track
+// (ProfileDateOfBirthScreen.tsx converts to/from a real Date for the native
+// date picker, this shape is just the plain-data form carried between
+// screens).
 //
 // Scale: 0-100, 50 = the cycle's zero-crossing, not a negative/positive
 // split - matches BiorhythmChart's own established "no negatives" convention
