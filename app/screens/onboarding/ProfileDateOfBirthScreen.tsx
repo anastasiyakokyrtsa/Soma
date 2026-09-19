@@ -4,29 +4,45 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { colors, fontFamily } from '../../theme';
 import { formatBirthDate, type BirthDate } from '../../lib/biorhythm';
+import { DateWheelPicker } from '../../components/DateWheelPicker';
 
 // Audit finding #13 (platform-conformance): date pickers are one of the
 // component types that must diverge by platform, not share one custom look
 // - was a hand-drawn wheel identical on both OSes. Swapped for
 // @react-native-community/datetimepicker (confirmed bundled in this Expo Go
-// SDK, no native-module risk) rather than DateWheelPicker.tsx, which is now
-// unused everywhere and can be deleted.
+// SDK, no native-module risk) instead of the old custom wheel.
 //
 // The two platforms don't just skin differently, they interact differently
 // - not an oversight to "fix" into one shape:
 //   iOS: `display="spinner"` renders inline, always visible, scrolls live -
 //     matches the old wheel picker's own always-on-screen behavior almost
-//     exactly, so this is the platform 2026-09-18 was actually building for.
+//     exactly.
 //   Android: the native picker is a modal dialog, not an inline widget - it
 //     has to be triggered from a field/button and conditionally rendered,
-//     or it pops up unprompted on mount. Built for completeness (this repo
-//     targets both platforms) but not the one being tested against today.
+//     or it pops up unprompted on mount.
 //
 // minimumDate/maximumDate also give finding #17 (invalid birth date) a
 // first, free layer for free - can't pick a future date or one over 120
 // years back at all. Doesn't replace #17's other half (showing the date
 // back near biorhythms on Home so a plausible-but-wrong date is still
 // self-correctable) - that's separate, not done here.
+//
+// TEMPORARY OVERRIDE, 2026-09-19, her explicit ask: she's testing on
+// Android but wants to look at the iOS wheel specifically right now
+// ("верни колесо как у айфонов, даже если я на андроиде смотрю... пока
+// сконцентрируемся на пользователях айфон") - a real native Android
+// picker forced into "spinner" mode would render Android's OWN native
+// wheel, not an iOS look-alike (UIDatePicker is Apple's own code, it
+// physically can't render on Android hardware) - so getting an
+// iOS-looking wheel on her Android phone means the hand-drawn
+// DateWheelPicker.tsx (restored from before finding #13's fix, its own
+// comment there already describes it as "iOS-style"), not the real
+// native picker. Deliberately reverses finding #13 on purpose, for this
+// phase only - flip back to `false` once real per-platform testing
+// (not just an iOS-focused preview) is back in scope, don't leave this
+// true by accident later.
+const FORCE_IOS_WHEEL_PREVIEW = true;
+
 const today = new Date();
 const MIN_DATE = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
 
@@ -52,7 +68,9 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
       onPressSkip={() => navigation.replace('Main')}
     >
       <View style={styles.pickerWrap}>
-        {Platform.OS === 'ios' ? (
+        {FORCE_IOS_WHEEL_PREVIEW ? (
+          <DateWheelPicker value={date} onChange={setDate} />
+        ) : Platform.OS === 'ios' ? (
           <DateTimePicker
             value={valueToDate(date)}
             mode="date"
