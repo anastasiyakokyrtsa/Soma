@@ -1,6 +1,7 @@
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { colors, fontFamily, radius } from '../theme';
 import { StyleSwatch } from './StyleSwatch';
+import { EyeIcon } from './icons/EyeIcon';
 import type { VisualStyleId } from '../theme/visualStyles';
 
 // Grid cell for the 2x2 style picker (WF 12). Selection here deliberately
@@ -15,12 +16,14 @@ export function StyleGridTile({
   size,
   selected,
   onPress,
+  onPressPreview,
 }: {
   styleId: VisualStyleId;
   name: string;
   size: number;
   selected: boolean;
   onPress: () => void;
+  onPressPreview: () => void;
 }) {
   return (
     <Pressable
@@ -36,6 +39,15 @@ export function StyleGridTile({
       <View style={styles.labelChip}>
         <Text style={styles.label}>{name}</Text>
       </View>
+      {/* Replaces the screen-level "Предпросмотр" button (2026-09-20, "много
+          места все это занимает") — same translucent-dark backdrop recipe as
+          labelChip, for the same reason: stays legible over any swatch
+          color. A nested Pressable inside the tile's own Pressable — RN's
+          responder system gives the tap to whichever one is actually under
+          the finger, so this doesn't also trigger tile selection. */}
+      <Pressable style={styles.previewButton} onPress={onPressPreview} hitSlop={8}>
+        <EyeIcon size={18} color={colors.textPrimary} />
+      </Pressable>
     </Pressable>
   );
 }
@@ -68,5 +80,16 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.semiBold,
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  previewButton: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(5,8,22,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

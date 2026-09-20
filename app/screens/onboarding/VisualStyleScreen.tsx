@@ -19,11 +19,6 @@ export function VisualStyleScreen({ navigation }: any) {
       description="Выбери оформление, которое вдохновляет тебя. Стиль всегда можно изменить в настройках"
       buttonLabel="Применить стиль"
       buttonDisabled={selected === null}
-      secondaryButtonLabel="Предпросмотр"
-      secondaryButtonDisabled={selected === null}
-      onPressSecondary={() =>
-        navigation.navigate('StylePreview', { initialId: VISUAL_STYLES[selected!].id })
-      }
       // TODO: applying a non-Cosmos style doesn't actually re-theme the app
       // yet (see theme/visualStyles.ts).
       onPressNext={() => navigation.replace('Personalization')}
@@ -39,6 +34,7 @@ export function VisualStyleScreen({ navigation }: any) {
             size={tileSize}
             selected={selected === index}
             onPress={() => setSelected(index)}
+            onPressPreview={() => navigation.navigate('StylePreview', { initialId: style.id })}
           />
         ))}
       </View>
