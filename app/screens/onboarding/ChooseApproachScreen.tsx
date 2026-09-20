@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
-import { ExpandableChoiceCard } from '../../components/ExpandableChoiceCard';
+import { RadioChoiceCard } from '../../components/RadioChoiceCard';
 
 const APPROACHES = [
   {
     title: 'Научно-практический',
-    description:
-      'Мы анализируем твои биоритмы, сон, солнечную активность и другие факторы, чтобы находить закономерности между телом, настроением и нагрузкой и предлагать индивидуальные решения',
+    description: 'Факторы тела, сна\nи окружающей среды',
   },
   {
     title: 'Астрологический',
-    description:
-      'Мы опираемся на фазы луны, твою натальную карту и положение планет, чтобы находить тонкие закономерности в твоём состоянии и предлагать персональные ритуалы и прогнозы',
+    description: 'Циклы, символы и астрологические интерпретации',
   },
   {
     title: 'Синтез двух систем',
-    description:
-      'Мы совмещаем биоритмы и данные о теле с лунными и планетарными циклами, чтобы показывать более полную картину твоего состояния и предлагать решения с обеих сторон',
+    description: 'Объединяет оба подхода',
   },
 ];
 
@@ -36,12 +33,12 @@ export function ChooseApproachScreen({ navigation }: any) {
     >
       <View style={styles.list}>
         {APPROACHES.map((approach, index) => (
-          <ExpandableChoiceCard
+          <RadioChoiceCard
             key={approach.title}
             title={approach.title}
             description={approach.description}
-            expanded={selected === index}
-            onPress={() => setSelected((prev) => (prev === index ? null : index))}
+            selected={selected === index}
+            onPress={() => setSelected(index)}
           />
         ))}
       </View>
