@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.screenPadding,
   },
   image: {
     width: '100%',
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.screenPadding,
   },
   textBlock: {
-    gap: 4,
+    gap: 8,
     marginBottom: 40,
   },
   title: {

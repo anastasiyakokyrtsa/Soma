@@ -5,7 +5,7 @@ export function AboutApp3Screen({ navigation }: any) {
     <OnboardingSlide
       image={require('../../assets/onboarding/about-3.png')}
       title="Живи в своём ритме"
-      description="Наблюдай фазы напряжения и восстановления. Настраивай нагрузку в соответствии с твоим ритмом."
+      description="Наблюдай фазы напряжения и восстановления, настраивай нагрузку под свой ритм."
       buttonLabel="Начать исследование"
       activeIndex={2}
       onPressNext={() => navigation.navigate('Name')}
