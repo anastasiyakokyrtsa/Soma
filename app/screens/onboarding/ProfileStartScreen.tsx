@@ -22,14 +22,21 @@ import { InfoIcon } from '../../components/icons/InfoIcon';
 const ASTROLABE = require('../../assets/onboarding/astrolabe.png');
 export function ProfileStartScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
-  const { width, height } = useWindowDimensions();
-  // Bled past the standard text margin on purpose (2026-08-16: "еще
-  // больше") - it's art, not text needing a readable column, and the image
-  // already has its own internal breathing room (the disc doesn't touch its
-  // own canvas edge), so a tight 12px margin reads as full-bleed without
-  // actually clipping anything. Height cap is a safety ceiling so the
-  // square never crowds the title/button on short screens, not a visual choice.
-  const illustrationWidth = Math.min(width - spacing.sp3 * 2, height * 0.58);
+  const { width } = useWindowDimensions();
+  // 16px is the target distance from screen edge to the *visible* drawing,
+  // not to the (transparent, invisible) square canvas edge (her 2026-09-20
+  // clarification - "пускай края картинки выходят, частицы всё равно в
+  // рамках"). The drawing itself sits inside a real empty margin baked into
+  // the source file, bigger than it first looked on-screen - min(width-8,
+  // height*ratio) and later a real-onLayout-height version both landed
+  // short of what she wanted ("ты её меньше сделал"), because both were
+  // still capping the CANVAS at roughly screen width. To get the *drawing*
+  // near the edge, the canvas has to genuinely overflow past the screen -
+  // deliberate, not a bug, per her explicit go-ahead. +64 is a first real
+  // attempt at that overflow amount, not a measured value (screenshots
+  // compress/resize, so exact px math off one isn't reliable) - check on
+  // device and say if it needs to go further.
+  const illustrationWidth = width + 64;
 
   return (
     <Animated.View
@@ -129,7 +136,7 @@ const styles = StyleSheet.create({
   },
   skipTap: {},
   skipText: {
-    fontFamily: fontFamily.medium,
+    fontFamily: fontFamily.regular,
     fontSize: 14,
     color: colors.violet300,
   },
