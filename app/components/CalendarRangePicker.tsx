@@ -12,7 +12,7 @@ import { ChevronIcon } from './icons/ChevronIcon';
 
 export type CalendarDate = { year: number; month: number; day: number }; // month is 0-indexed
 
-const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 // dayCircle's own box - the pill's edges are inset to this width (not the
 // full, wider cell width) so it lines up with the actual start/end square
 // instead of overhanging past it (2026-08-17: "подложка... вылазит немного
@@ -22,6 +22,17 @@ const MONTH_NAMES = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
 ];
+
+// For screen-reader labels ("15 июня 2026"), where the nominative names
+// above would read wrong.
+const MONTH_NAMES_GENITIVE = [
+  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+];
+
+function dayNumber(d: CalendarDate) {
+  return Math.round(Date.UTC(d.year, d.month, d.day) / 86400000);
+}
 
 function daysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -75,6 +86,8 @@ export function CalendarRangePicker({
   rangeStart,
   rangeEnd,
   onRangeChange,
+  maxDate,
+  maxRangeDays,
 }: {
   year: number;
   month: number;
@@ -82,6 +95,12 @@ export function CalendarRangePicker({
   rangeStart: CalendarDate | null;
   rangeEnd: CalendarDate | null;
   onRangeChange: (start: CalendarDate | null, end: CalendarDate | null) => void;
+  // Latest selectable day (days after it are dimmed and can't be tapped, and
+  // the "next month" arrow stops at its month).
+  maxDate?: CalendarDate;
+  // Longest allowed range in days, counting both ends. Enforced while the
+  // end is being picked: days further from the start than this are disabled.
+  maxRangeDays?: number;
 }) {
   const [cellWidth, setCellWidth] = useState(0);
   const rows = buildGrid(year, month);
@@ -90,10 +109,23 @@ export function CalendarRangePicker({
     setCellWidth(e.nativeEvent.layout.width / 7);
   };
 
+  const now = new Date();
+  const todayDate: CalendarDate = { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() };
+  const nextMonthDisabled = !!maxDate && (year > maxDate.year || (year === maxDate.year && month >= maxDate.month));
+
+  const isDisabled = (date: CalendarDate) => {
+    if (maxDate && cmp(date, maxDate) > 0) return true;
+    if (maxRangeDays && rangeStart && !rangeEnd && cmp(date, rangeStart) >= 0) {
+      return dayNumber(date) - dayNumber(rangeStart) >= maxRangeDays;
+    }
+    return false;
+  };
+
   const goPrev = () => onMonthChange(month === 0 ? year - 1 : year, month === 0 ? 11 : month - 1);
   const goNext = () => onMonthChange(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1);
 
   const handlePress = (date: CalendarDate) => {
+    if (isDisabled(date)) return;
     if (!rangeStart || (rangeStart && rangeEnd)) {
       onRangeChange(date, null);
     } else if (cmp(date, rangeStart) < 0) {
@@ -111,14 +143,28 @@ export function CalendarRangePicker({
   return (
     <View>
       <View style={styles.header}>
-        <Pressable style={styles.navButton} onPress={goPrev} hitSlop={8}>
+        <Pressable
+          style={styles.navButton}
+          onPress={goPrev}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Предыдущий месяц"
+        >
           <ChevronIcon direction="left" size={16} color={colors.textSecondary} />
         </Pressable>
-        <Text style={styles.headerLabel}>
+        <Text style={styles.headerLabel} accessibilityRole="header">
           {MONTH_NAMES[month]} {year}
         </Text>
-        <Pressable style={styles.navButton} onPress={goNext} hitSlop={8}>
-          <ChevronIcon direction="right" size={16} color={colors.textSecondary} />
+        <Pressable
+          style={styles.navButton}
+          onPress={goNext}
+          disabled={nextMonthDisabled}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel="Следующий месяц"
+          accessibilityState={{ disabled: nextMonthDisabled }}
+        >
+          <ChevronIcon direction="right" size={16} color={nextMonthDisabled ? colors.textDisabled : colors.textSecondary} />
         </Pressable>
       </View>
 
@@ -167,17 +213,27 @@ export function CalendarRangePicker({
                 const start = isStart(cell);
                 const end = isEnd(cell);
                 const endpoint = start || end;
+                const disabled = isDisabled(cell);
+                const today = sameDate(cell, todayDate);
+                const label =
+                  `${cell.day} ${MONTH_NAMES_GENITIVE[cell.month]} ${cell.year}` +
+                  (today ? ', сегодня' : '') +
+                  (start ? ', начало периода' : end ? ', конец периода' : inRange(cell) ? ', в выбранном периоде' : '');
                 return (
                   <Pressable
                     key={ci}
                     style={[styles.dayCell, { width: cellWidth || undefined, flex: cellWidth ? undefined : 1 }]}
                     onPress={() => handlePress(cell)}
+                    disabled={disabled}
+                    accessibilityRole="button"
+                    accessibilityLabel={label}
+                    accessibilityState={{ selected: endpoint || inRange(cell), disabled }}
                   >
-                    <View style={[styles.dayCircle, endpoint && styles.dayCircleActive]}>
+                    <View style={[styles.dayCircle, today && !endpoint && styles.dayCircleToday, endpoint && styles.dayCircleActive]}>
                       <Text
                         style={[
                           styles.dayText,
-                          !cell.inCurrentMonth && styles.dayTextDim,
+                          (!cell.inCurrentMonth || disabled) && styles.dayTextDim,
                           endpoint && styles.dayTextActive,
                         ]}
                       >
@@ -248,6 +304,12 @@ const styles = StyleSheet.create({
     borderRadius: DAY_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Thin ring marking today - same violet-border language as selected
+  // cards elsewhere, dropped when the day is a range end (already filled).
+  dayCircleToday: {
+    borderWidth: 1,
+    borderColor: colors.borderVioletStrong,
   },
   // Soft-cornered square, not a full circle, for the start/end highlight
   // (2026-08-17: "чтобы у этих квадратов были мягкие углы") - radius.xs (10),

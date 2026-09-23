@@ -3,6 +3,7 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { SleepWheelPicker } from '../../components/SleepWheelPicker';
 import { spacing } from '../../theme';
+import { includesCycleStep, profileStepTotal } from '../../lib/onboardingProfile';
 
 export function ProfileSleepScheduleScreen({ navigation }: any) {
   // The dial is one 12h loop (see SleepWheelPicker.tsx's 2026-08-16 note on
@@ -19,9 +20,10 @@ export function ProfileSleepScheduleScreen({ navigation }: any) {
   return (
     <ProfileStepLayout
       step={2}
+      totalSteps={profileStepTotal()}
       title="Какой у тебя обычно график сна?"
       description="Отметь, во сколько ты уснул и проснулся. Это поможет нам точнее понять твой текущий ритм и состояние"
-      onPressNext={() => navigation.navigate('ProfileMenstrualCycle')}
+      onPressNext={() => navigation.navigate(includesCycleStep() ? 'ProfileMenstrualCycle' : 'ProfileMood')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >

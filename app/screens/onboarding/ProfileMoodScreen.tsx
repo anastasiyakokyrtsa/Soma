@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { MoodScale } from '../../components/MoodScale';
+import { profileStepTotal } from '../../lib/onboardingProfile';
 
 export function ProfileMoodScreen({ navigation }: any) {
   const [moodIndex, setMoodIndex] = useState(3); // "Хорошо" — matches the wireframe's default
 
   return (
     <ProfileStepLayout
-      step={4}
+      step={profileStepTotal()}
+      totalSteps={profileStepTotal()}
       title="Как ты чувствуешь себя сегодня?"
       onPressNext={() => navigation.replace('Main')}
       onPressBack={() => navigation.goBack()}

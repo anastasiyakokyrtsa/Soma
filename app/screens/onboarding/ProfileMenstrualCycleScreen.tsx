@@ -4,6 +4,9 @@ import { ProfileStepLayout } from './ProfileStepLayout';
 import { CalendarRangePicker, type CalendarDate } from '../../components/CalendarRangePicker';
 
 const today = new Date();
+// A period longer than this is almost certainly a mis-tap, not a real one -
+// picking an end further out than this is blocked instead of accepted.
+const MAX_PERIOD_DAYS = 10;
 
 export function ProfileMenstrualCycleScreen({ navigation }: any) {
   const [year, setYear] = useState(today.getFullYear());
@@ -15,7 +18,7 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
     <ProfileStepLayout
       step={3}
       title="Укажи даты последнего менструального цикла"
-      description="Так мы сможем отслеживать твои естественные гормональные фазы и сопоставлять их с изменениями в настроении и энергии"
+      description="Так мы сможем примерно понять, на каком этапе цикла ты сейчас, и сопоставить это с настроением и энергией"
       buttonDisabled={!rangeStart || !rangeEnd}
       onPressNext={() => navigation.navigate('ProfileMood')}
       onPressBack={() => navigation.goBack()}
@@ -29,6 +32,8 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
             setYear(y);
             setMonth(m);
           }}
+          maxDate={{ year: today.getFullYear(), month: today.getMonth(), day: today.getDate() }}
+          maxRangeDays={MAX_PERIOD_DAYS}
           rangeStart={rangeStart}
           rangeEnd={rangeEnd}
           onRangeChange={(start, end) => {

@@ -5,6 +5,7 @@ import { ProfileStepLayout } from './ProfileStepLayout';
 import { colors, fontFamily } from '../../theme';
 import { formatBirthDate, type BirthDate } from '../../lib/biorhythm';
 import { DateWheelPicker } from '../../components/DateWheelPicker';
+import { profileStepTotal } from '../../lib/onboardingProfile';
 
 // Audit finding #13 (platform-conformance): date pickers are one of the
 // component types that must diverge by platform, not share one custom look
@@ -61,6 +62,7 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
   return (
     <ProfileStepLayout
       step={1}
+      totalSteps={profileStepTotal()}
       title="Когда ты родился?"
       description="Дата рождения нужна, чтобы рассчитать индивидуальные биоритмы и ритмы восстановления"
       onPressNext={() => navigation.navigate('BiorhythmInsight', { birth: date })}
