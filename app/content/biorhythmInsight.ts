@@ -17,9 +17,18 @@ export const BIORHYTHM_INSIGHTS: Record<CycleId, Record<'high' | 'low', string>>
     low: 'Эмоциональный ритм сегодня по графику пониже, если что-то заденет сильнее обычного, это вполне может быть просто фаза.',
   },
   intellect: {
-    high: 'Интеллектуальный ритм сегодня по графику на подъёме, неплохое время для сосредоточенных задач.',
+    high: 'Судя по графику, сегодня интеллектуальный ритм на подъёме. Хороший день для задач, где нужна концентрация.',
     low: 'Интеллектуальный ритм сегодня по графику пониже, если сложно собраться с мыслями, дело может быть не только в тебе.',
   },
 };
 
 export const BIORHYTHM_INSIGHT_EYEBROW = 'Твой первый инсайт';
+
+// Demo-phase insight (2026-09-23, her pick of 4 drafts): matches what Home's
+// hand-authored chart shows on its default day (physical at the peak,
+// emotional and intellect near the bottom) so the two screens don't
+// contradict each other. Shown while USE_HOME_DEMO_INSIGHT is true in
+// BiorhythmInsightScreen; the six templates above are the real-formula
+// path, to come back once Home runs off the same formula.
+export const BIORHYTHM_INSIGHT_DEMO =
+  'Сегодня по графику много сил в теле. Хороший день, чтобы выйти на прогулку или размяться, а сложные дела можно оставить на потом.';
