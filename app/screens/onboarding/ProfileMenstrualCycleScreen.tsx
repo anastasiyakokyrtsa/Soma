@@ -18,7 +18,7 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
     <ProfileStepLayout
       step={3}
       title="Укажи даты последнего менструального цикла"
-      description="Так мы сможем примерно понять, на каком этапе цикла ты сейчас, и сопоставить это с настроением и энергией"
+      description="Так мы сможем примерно понять, на каком ты этапе цикла, и лучше отслеживать, как меняются настроение и энергия"
       buttonDisabled={!rangeStart || !rangeEnd}
       onPressNext={() => navigation.navigate('ProfileMood')}
       onPressBack={() => navigation.goBack()}

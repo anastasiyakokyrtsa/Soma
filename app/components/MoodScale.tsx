@@ -139,7 +139,12 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
             except the very ends. This was a known, previously-flagged
             drift ([[project-app-development]] 2026-08-17 entry) - she's
             now confirmed it's actually visible, so fixing it for real. */}
-        {labelsReady ? <Animated.View style={[styles.thumb, thumbAnimStyle]} /> : null}
+        {/* Static left first, animated left on top: the styles.thumb base has no
+            `left`, so for the frame(s) before the animated style lands the
+            thumb sat at the line's far-left end (her 2026-09-23 report: on
+            entering the screen the knob stood at the left tip) instead of
+            at its real stop. */}
+        {labelsReady ? <Animated.View style={[styles.thumb, { left: labelPosForPct(pct) }, thumbAnimStyle]} /> : null}
         <View style={StyleSheet.absoluteFill} {...panResponder.panHandlers} />
       </View>
 
