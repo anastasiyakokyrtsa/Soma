@@ -5,19 +5,30 @@ import { MoodScale } from '../../components/MoodScale';
 import { profileStepTotal } from '../../lib/onboardingProfile';
 
 export function ProfileMoodScreen({ navigation }: any) {
-  const [moodIndex, setMoodIndex] = useState(3); // "Хорошо" — matches the wireframe's default
+  // Knob starts over "Ужасно" (her call, 2026-09-23), and Continue stays disabled
+  // until the scale is actually touched, so nobody records a mood they never
+  // picked (a pre-set "Хорошо" used to be submitted by just tapping Continue).
+  const [moodIndex, setMoodIndex] = useState(0);
+  const [touched, setTouched] = useState(false);
 
   return (
     <ProfileStepLayout
       step={profileStepTotal()}
       totalSteps={profileStepTotal()}
       title="Как ты чувствуешь себя сегодня?"
+      buttonDisabled={!touched}
       onPressNext={() => navigation.replace('Main')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >
       <View style={styles.wrap}>
-        <MoodScale index={moodIndex} onChange={setMoodIndex} />
+        <MoodScale
+          index={moodIndex}
+          onChange={(i) => {
+            setTouched(true);
+            setMoodIndex(i);
+          }}
+        />
       </View>
     </ProfileStepLayout>
   );

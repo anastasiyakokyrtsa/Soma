@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { View, Text, Image, StyleSheet, PanResponder, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, PanResponder, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { colors, glow, fontFamily, gradients, spacing } from '../theme';
@@ -151,7 +151,16 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
       <View style={styles.icons}>
         {labelsReady
           ? MOODS.map((m, i) => (
-              <Image key={i} source={m.img} style={[styles.iconMini, { left: labelPosForPct(i / (MOODS.length - 1)) }]} resizeMode="contain" />
+              <Pressable
+                key={i}
+                style={[styles.iconMini, { left: labelPosForPct(i / (MOODS.length - 1)) }]}
+                onPress={() => onChange(i)}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={m.label}
+              >
+                <Image source={m.img} style={styles.iconMiniImg} resizeMode="contain" />
+              </Pressable>
             ))
           : null}
       </View>
@@ -159,7 +168,11 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
       <View style={styles.labels}>
         {labelsReady
           ? MOODS.map((m, i) => (
-              <Text key={i} style={[styles.labelText, { left: labelPosForPct(i / (MOODS.length - 1)) }, i === index && styles.labelActive]}>
+              <Text
+                key={i}
+                onPress={() => onChange(i)}
+                style={[styles.labelText, { left: labelPosForPct(i / (MOODS.length - 1)) }, i === index && styles.labelActive]}
+              >
                 {m.label}
               </Text>
             ))
@@ -191,11 +204,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  // 44px touch height (was 24 - too thin to hit reliably); marginTop/
+  // marginBottom offset the extra 20px so the line itself and everything
+  // below it stay exactly where they were.
   track: {
     width: '100%',
-    height: 24,
+    height: 44,
     justifyContent: 'center',
-    marginBottom: 32,
+    marginTop: -10,
+    marginBottom: 22,
   },
   trackLine: {
     position: 'absolute',
@@ -237,15 +254,19 @@ const styles = StyleSheet.create({
     height: 30,
     marginLeft: -15,
   },
+  iconMiniImg: {
+    width: 30,
+    height: 30,
+  },
   labels: {
     width: '100%',
-    height: 16,
+    height: 18,
   },
   labelText: {
     position: 'absolute',
     top: 0,
     fontFamily: fontFamily.semiBold,
-    fontSize: 12,
+    fontSize: 13,
     color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
     // Approximates the web version's translateX(-50%): a fixed-width box
@@ -261,6 +282,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     opacity: 0,
     fontFamily: fontFamily.semiBold,
-    fontSize: 12,
+    fontSize: 13,
   },
 });

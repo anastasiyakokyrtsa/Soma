@@ -18,7 +18,10 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
     <ProfileStepLayout
       step={3}
       title="Укажи даты последнего менструального цикла"
-      description="Так мы сможем примерно понять, на каком ты этапе цикла, и лучше отслеживать, как меняются настроение и энергия"
+      // Explicit breaks: last line was left with a couple of words ("некрасиво"),
+      // RN has no balanced text-wrap. Three ~equal lines at the standard screen
+      // width; a much narrower phone may re-wrap them, so recheck if one turns up.
+      description={'Так мы сможем примерно понять, на каком\nты этапе цикла, и лучше отслеживать,\nкак меняются настроение и энергия'}
       buttonDisabled={!rangeStart || !rangeEnd}
       onPressNext={() => navigation.navigate('ProfileMood')}
       onPressBack={() => navigation.goBack()}
