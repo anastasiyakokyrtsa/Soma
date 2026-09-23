@@ -136,10 +136,25 @@ export function SleepWheelPicker({
     const rad = (angleDeg * Math.PI) / 180;
     return { x: center + radius * Math.cos(rad), y: center + radius * Math.sin(rad) };
   };
+  // strokeLinecap="round" pushes each end half a stroke-width *past* the
+  // point the path actually ends at, so an arc drawn exactly from mark to
+  // mark visibly overshoots the digit/tick at both ends (her 2026-09-23
+  // screenshot: "кончики вылазят"). Pull each end in by the angle that
+  // half-stroke subtends at this radius, so the cap's outermost tip - not
+  // the path's own endpoint - lands exactly on the mark.
+  const capInsetDeg = (stroke / 2 / r) * (180 / Math.PI);
   const arcPath = (startMin: number, endMin: number, radius: number) => {
-    const a0 = minutesToAngle(startMin);
+    let a0 = minutesToAngle(startMin);
     let a1 = minutesToAngle(endMin);
     if (a1 <= a0) a1 += 360;
+    if (a1 - a0 > 2 * capInsetDeg + 1) {
+      a0 += capInsetDeg;
+      a1 -= capInsetDeg;
+    } else {
+      const mid = (a0 + a1) / 2;
+      a0 = mid - 0.5;
+      a1 = mid + 0.5;
+    }
     const p0 = polar(a0, radius);
     const p1 = polar(a1, radius);
     const largeArc = a1 - a0 > 180 ? 1 : 0;
