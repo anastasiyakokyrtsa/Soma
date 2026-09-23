@@ -18,10 +18,13 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
     <ProfileStepLayout
       step={3}
       title="Укажи даты последнего менструального цикла"
-      // Explicit breaks: last line was left with a couple of words ("некрасиво"),
-      // RN has no balanced text-wrap. Three ~equal lines at the standard screen
-      // width; a much narrower phone may re-wrap them, so recheck if one turns up.
-      description={'Так мы сможем примерно понять, на каком\nты этапе цикла, и лучше отслеживать,\nкак меняются настроение и энергия'}
+      // Explicit breaks: RN has no balanced text-wrap and the greedy wrap left a
+      // short last line. Lines are measured against a real phone (~38 chars fit
+      // at the standard width, so each line here stays under ~34) - a first
+      // 3-line attempt at 39 chars per line overflowed and made it worse
+      // (2026-09-23). Breaks fall on clause boundaries; a much narrower
+      // phone may still re-wrap, so recheck if a short line turns up.
+      description={'Так мы сможем примерно\nпонять, на каком ты этапе\nцикла, и лучше отслеживать,\nкак меняются настроение и энергия'}
       buttonDisabled={!rangeStart || !rangeEnd}
       onPressNext={() => navigation.navigate('ProfileMood')}
       onPressBack={() => navigation.goBack()}
