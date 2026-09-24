@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Platform, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
@@ -122,6 +122,27 @@ function GreetingHeading({ text }: { text: string }) {
   };
 
   const height = lines ? Math.max(...lines.map((l) => l.y)) + 12 : 80;
+
+  // Web: react-native-web's Text never calls onTextLayout with per-line data,
+  // so `lines` stayed null and the greeting simply didn't render on the web
+  // link (her 2026-09-24 screenshot: "нет заголовка"). A browser can do the
+  // gradient-filled text natively, so no line measuring is needed there.
+  if (Platform.OS === 'web') {
+    const [c0, c1, c2] = gradients.headingText.colors;
+    const [l0, l1, l2] = gradients.headingText.locations;
+    const webGradient = {
+      backgroundImage: `linear-gradient(135deg, ${c0} ${l0 * 100}%, ${c1} ${l1 * 100}%, ${c2} ${l2 * 100}%)`,
+      backgroundClip: 'text',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      color: 'transparent',
+    } as object;
+    return (
+      <View style={styles.greetingTextWrap} accessible accessibilityRole="header" accessibilityLabel={text}>
+        <Text style={[styles.greetingMeasure, { opacity: 1 }, webGradient]}>{text}</Text>
+      </View>
+    );
+  }
 
   return (
     // accessible+accessibilityLabel on the wrapper collapses the whole

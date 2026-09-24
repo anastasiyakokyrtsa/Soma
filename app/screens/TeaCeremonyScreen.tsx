@@ -148,6 +148,9 @@ export function TeaCeremonyScreen({ navigation }: any) {
   const goBack = () => (index > 0 ? setIndex(index - 1) : navigation.goBack());
 
   const [introDescHeight, setIntroDescHeight] = useState<number | null>(null);
+  // Measured position of the last slide's "К другим чаям" link inside `content`
+  // (content starts at the screen's top edge, so layout y is also screen y).
+  const [linkBox, setLinkBox] = useState<{ y: number; h: number } | null>(null);
   const introImageHeight = introDescHeight
     ? screenHeight - INTRO_BOTTOM_GAP - introDescHeight - 20 - (insets.top + TITLE_TOP_OFFSET + INTRO_TITLE_HEIGHT + 20)
     : IMAGE_HEIGHT * 1.6; // reasonable placeholder for the one frame before the real measurement lands
@@ -179,7 +182,14 @@ export function TeaCeremonyScreen({ navigation }: any) {
           BreathingCompleteScreen's own CTA). The intro slide gets none here -
           its own bottom gap is already solved exactly via introImageHeight
           above, adding this on top would overshoot her literal "160" ask. */}
+      {/* pointerEvents="none": `content` sits on top of the tap zones and, as a
+          plain View, was swallowing every tap over the title/picture/text -
+          right-taps never reached the story zones (confirmed on the web link,
+          2026-09-24: "переходить на след сторис кликая справа"). The one real
+          control inside it, the last slide's link, is re-created as a separate
+          Pressable further down, positioned from the measured layout. */}
       <View
+        pointerEvents="none"
         style={[
           styles.content,
           { paddingTop: insets.top + TITLE_TOP_OFFSET, paddingBottom: index === 0 ? 0 : insets.bottom + 40 },
@@ -207,11 +217,20 @@ export function TeaCeremonyScreen({ navigation }: any) {
             "ghost button" convention (feedback_rn_app_ui_defaults.md) - that
             one's for a distinct action, not a see-more link. */}
         {index === SLIDES.length - 1 ? (
-          <Pressable onPress={() => navigation.navigate('TeaCategories')} hitSlop={8}>
+          <View onLayout={(e) => setLinkBox({ y: e.nativeEvent.layout.y, h: e.nativeEvent.layout.height })}>
             <Text style={styles.otherTeasLink}>К другим чаям</Text>
-          </Pressable>
+          </View>
         ) : null}
       </View>
+
+      {index === SLIDES.length - 1 && linkBox ? (
+        <Pressable
+          style={{ position: 'absolute', left: 0, right: 0, top: linkBox.y + 24 - 10, height: linkBox.h - 24 + 20 }}
+          onPress={() => navigation.navigate('TeaCategories')}
+          accessibilityRole="link"
+          accessibilityLabel="К другим чаям"
+        />
+      ) : null}
 
       {/* Invisible twin, real width but off-screen - measures the intro
           description's actual wrapped height so introImageHeight above can
