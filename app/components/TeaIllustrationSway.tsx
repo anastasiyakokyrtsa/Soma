@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Image } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
+import { Image, Platform } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing, type SharedValue } from 'react-native-reanimated';
 
 const IMAGE_W = 193;
 const IMAGE_H = 360;
@@ -51,6 +51,41 @@ const TEA_ILLUSTRATION = require('../assets/illustrations/tea-ritual.png');
 //     the tip's own absolute sideways travel roughly where it was when she
 //     said that part looked fine ("та анимация которая качает веточки слева
 //     направо и наоборот - в целом ок").
+// Native version of take 3's skewX (2026-09-24). On the web link the single
+// skewX sways exactly as she wants ("травка колышется прям как я хотела"),
+// but a skew transform isn't reliably honored by React Native's native views
+// (Android in particular), so the phone didn't match. This reproduces the
+// same shear without any skew: the artwork is cut into thin horizontal strips
+// and each strip is translated sideways by tan(angle) * its own height above
+// the base - the exact horizontal shift skewX (origin at the bottom centre)
+// gives that row, using only translateX, which every native view supports.
+// Strips tile edge to edge (no overlap - the artwork's soft alpha edges would
+// double up in an overlap band); each is 20px wider than the image on both
+// sides so the shifted content is never clipped by its own strip.
+const STRIP_H = 6;
+const STRIP_PAD = 20;
+const STRIP_COUNT = Math.ceil(IMAGE_H / STRIP_H);
+
+function SwayStrip({ index, angle }: { index: number; angle: SharedValue<number> }) {
+  const top = index * STRIP_H;
+  const height = Math.min(STRIP_H, IMAGE_H - top);
+  const distanceFromBase = top + height / 2 - IMAGE_H;
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateX: Math.tan((angle.value * Math.PI) / 180) * distanceFromBase }],
+  }));
+  return (
+    <Animated.View
+      style={[{ position: 'absolute', left: -STRIP_PAD, top, width: IMAGE_W + STRIP_PAD * 2, height, overflow: 'hidden' }, style]}
+    >
+      <Image
+        source={TEA_ILLUSTRATION}
+        resizeMode="contain"
+        style={{ position: 'absolute', left: STRIP_PAD, top: -top, width: IMAGE_W, height: IMAGE_H }}
+      />
+    </Animated.View>
+  );
+}
+
 export function TeaIllustrationSway() {
   const angle = useSharedValue(0);
 
@@ -68,6 +103,16 @@ export function TeaIllustrationSway() {
   }, []);
 
   const style = useAnimatedStyle(() => ({ transform: [{ skewX: `${angle.value}deg` }] }));
+
+  if (Platform.OS !== 'web') {
+    return (
+      <Animated.View style={{ width: IMAGE_W, height: IMAGE_H }}>
+        {Array.from({ length: STRIP_COUNT }, (_, i) => (
+          <SwayStrip key={i} index={i} angle={angle} />
+        ))}
+      </Animated.View>
+    );
+  }
 
   return (
     <Animated.View style={[{ width: IMAGE_W, height: IMAGE_H, transformOrigin: '50% 100%' }, style]}>
