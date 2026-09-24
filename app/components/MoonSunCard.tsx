@@ -52,7 +52,7 @@ export function MoonSunCard({
           layer is sized purely by absoluteFillObject + percentage-based
           gradient/rect coordinates, matching whatever the real height
           resolves to after layout. */}
-      <Svg style={StyleSheet.absoluteFillObject}>
+      <Svg width="100%" height="100%" style={StyleSheet.absoluteFillObject}>
         <Defs>
           <RadialGradient id="moonsunFill" cx="50%" cy="50%" r="70.7%">
             <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />

@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, PanResponder, type GestureResponderEvent } from 'react-native';
+import { View, Text, StyleSheet, PanResponder, Platform, type GestureResponderEvent } from 'react-native';
 import Svg, {
   Circle as SvgCircle,
   Path,
@@ -115,7 +115,14 @@ export function SleepWheelPicker({
   const center = size / 2;
   const outerRadius = (size * OUTER_RATIO) / 2;
   const stroke = outerRadius * STROKE_OF_OUTER;
-  const blur = outerRadius * BLUR_OF_OUTER;
+  // A real browser applies the SVG Gaussian blur at full strength, so on the web
+  // link the glow looked much stronger than on the phone (react-native-svg's
+  // native blur renders softer) and its edge showed as a square where the SVG
+  // viewport clips it (her 2026-09-24 screenshot). Web-only damping to match
+  // the phone; numbers are a visual match, not derived.
+  const onWeb = Platform.OS === 'web';
+  const blur = outerRadius * BLUR_OF_OUTER * (onWeb ? 0.6 : 1);
+  const glowOpacity = onWeb ? 0.4 : 1;
   const r = outerRadius - stroke / 2;
   const ringInner = r - stroke / 2;
   const tickLen = size * 0.024;
@@ -221,7 +228,7 @@ export function SleepWheelPicker({
 
         <SvgCircle cx={center} cy={center} r={r} stroke="rgba(139,124,246,0.27)" strokeWidth={stroke} fill="none" />
 
-        <Path d={d} stroke="url(#sleepArcGrad)" strokeWidth={stroke} strokeLinecap="round" fill="none" filter="url(#sleepGlow)" />
+        <Path d={d} stroke="url(#sleepArcGrad)" strokeWidth={stroke} strokeLinecap="round" fill="none" filter="url(#sleepGlow)" opacity={glowOpacity} />
         <Path d={d} stroke="url(#sleepArcGrad)" strokeWidth={stroke} strokeLinecap="round" fill="none" />
 
         {HOUR_MARKS.filter((m) => m.label === null).map(({ angle }, i) => {
