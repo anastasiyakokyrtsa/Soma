@@ -162,8 +162,10 @@ export function StarField({
     () => makeStars(width, height, count, twinkleChance, dipRange),
     [width, height, count, twinkleChance, dipRange]
   );
+  // style is flattened: Skia's web Canvas hands it straight to a DOM element,
+  // which throws on an array (native is unaffected).
   return (
-    <Canvas style={[StyleSheet.absoluteFillObject, { width, height }]}>
+    <Canvas style={StyleSheet.flatten([StyleSheet.absoluteFillObject, { width, height }])}>
       {stars.map((s, i) => (
         <Star key={i} star={s} />
       ))}
