@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
+import { View, TextInput, StyleSheet, TextInputProps, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -129,5 +129,9 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.medium,
     fontSize: 18,
     paddingTop: 0,
+    // Web only: browsers draw their own blue focus ring around a focused
+    // <input>, on top of this field's own violet border (seen on the web
+    // link, 2026-09-24). The container already shows the focus state.
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null),
   },
 });
