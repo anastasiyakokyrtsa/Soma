@@ -29,7 +29,7 @@ export function NavChip({ icon, label, onPress }: { icon: GradientIconName; labe
   return (
     <Pressable style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]} onPress={onPress} onLayout={onLayout}>
       {size ? (
-        <Svg width={size.width} height={size.height} style={StyleSheet.absoluteFillObject}>
+        <Svg width={size.width} height={size.height} style={StyleSheet.absoluteFill}>
           <Defs>
             <RadialGradient id={`navChipFill-${icon}`} cx="50%" cy="50%" r="70.7%">
               <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   whiteWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
   label: {

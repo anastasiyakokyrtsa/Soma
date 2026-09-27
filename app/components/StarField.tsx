@@ -165,7 +165,7 @@ export function StarField({
   // style is flattened: Skia's web Canvas hands it straight to a DOM element,
   // which throws on an array (native is unaffected).
   return (
-    <Canvas style={StyleSheet.flatten([StyleSheet.absoluteFillObject, { width, height }])}>
+    <Canvas style={StyleSheet.flatten([StyleSheet.absoluteFill, { width, height }])}>
       {stars.map((s, i) => (
         <Star key={i} star={s} />
       ))}

@@ -56,7 +56,7 @@ export function MoodCheckIn() {
           2026-09-14, ui-designer confirmed it's the same known issue and
           recommended porting the identical gradient rather than inventing
           a second treatment. */}
-      <Svg width="100%" height="100%" style={StyleSheet.absoluteFillObject}>
+      <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <RadialGradient id="moodFill" cx="50%" cy="50%" r="70.7%">
             <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   // gradient) - same as MoonSunCard's own whiteWash, too subtle to need
   // its own gradient.
   whiteWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
   inner: {

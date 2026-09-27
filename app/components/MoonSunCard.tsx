@@ -52,7 +52,7 @@ export function MoonSunCard({
           layer is sized purely by absoluteFillObject + percentage-based
           gradient/rect coordinates, matching whatever the real height
           resolves to after layout. */}
-      <Svg width="100%" height="100%" style={StyleSheet.absoluteFillObject}>
+      <Svg width="100%" height="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <RadialGradient id="moonsunFill" cx="50%" cy="50%" r="70.7%">
             <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   // flat wash sitting on top of the radial gradient) - too subtle for its own
   // gradient, just a uniform tint.
   whiteWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255,255,255,0.02)',
   },
   // fontSize/lineHeight/margin/gap/minWidth below are all set inline

@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   tapZones: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   tapZoneLeft: {
     position: 'absolute',

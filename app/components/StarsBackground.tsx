@@ -19,7 +19,7 @@ export function StarsBackground({ width, height }: { width: number; height: numb
       height={height}
       viewBox="0 0 412 1955"
       preserveAspectRatio="none"
-      style={StyleSheet.absoluteFillObject}
+      style={StyleSheet.absoluteFill}
     />
   );
 }

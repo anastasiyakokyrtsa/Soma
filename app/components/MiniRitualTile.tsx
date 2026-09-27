@@ -51,7 +51,7 @@ export function MiniRitualTile({
           farthest-corner (see MoonSunCard.tsx's own comment for the math);
           the 30% CSS stop becomes 0.3*70.7%=21.2% here.
           Explicit numeric width/height on the Svg (not just
-          style={StyleSheet.absoluteFillObject} + "100%" on the Rect, which
+          style={StyleSheet.absoluteFill} + "100%" on the Rect, which
           worked fine on MoonSunCard's own hug-height, closer-to-square
           shape) - on this tile's much more elongated 1:1.8 aspect ratio,
           the percentage-only version rendered a hard flat cutoff partway
@@ -59,7 +59,7 @@ export function MiniRitualTile({
           какая-то странная темная"), so give it real known pixel
           dimensions since both `width` and the fixed `TILE_H` are already
           known here. */}
-      <Svg width={width} height={TILE_H} style={StyleSheet.absoluteFillObject}>
+      <Svg width={width} height={TILE_H} style={StyleSheet.absoluteFill}>
         <Defs>
           <RadialGradient id="miniTileFill" cx="50%" cy="50%" r="70.7%">
             <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   whiteWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255,255,255,0.03)',
   },
   tilePressed: {

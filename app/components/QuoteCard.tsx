@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bg: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   insetVignette: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     boxShadow: 'inset 0px 0px 10px rgba(5,8,22,0.8)',
   },
   content: {

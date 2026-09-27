@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   tapZones: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flexDirection: 'row',
   },
   tapZoneLeft: {

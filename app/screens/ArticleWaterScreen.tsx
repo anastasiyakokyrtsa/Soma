@@ -73,7 +73,7 @@ export function ArticleWaterScreen({ navigation }: any) {
       <LinearGradient
         colors={['transparent', colors.bg0]}
         locations={[0.32, 0.82]}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
 
@@ -109,7 +109,7 @@ export function ArticleWaterScreen({ navigation }: any) {
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={32}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       >
         <View style={{ width: screenWidth, height: screenHeight }}>
           <View style={[styles.coverContent, { paddingBottom: insets.bottom + 96 }]}>
