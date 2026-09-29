@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: type.h3.fontFamily,
     fontSize: type.h3.fontSize,
-    lineHeight: type.h3.fontSize * 1.0,
+    lineHeight: type.h3.fontSize * 1.15, // was 1.0 - iOS top-clipping fix, 2026-09-29
     color: colors.textPrimary,
   },
   description: {

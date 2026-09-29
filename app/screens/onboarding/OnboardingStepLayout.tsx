@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: type.h2.fontFamily,
     fontSize: type.h2.fontSize,
-    lineHeight: type.h2.fontSize * 1.0,
+    lineHeight: type.h2.fontSize * 1.15, // was 1.0 - iOS top-clipping fix, 2026-09-29
     color: colors.textPrimary,
   },
   description: {

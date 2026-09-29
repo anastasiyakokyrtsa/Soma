@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   stepCounter: {
     fontFamily: fontFamily.semiBold,
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 16 * 1.15,
     color: colors.textSecondary,
   },
   // 20px, matching the arrow-row -> title gap in OnboardingStepLayout.tsx
@@ -125,10 +125,12 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 20,
   },
+  // Same iOS top-clipping fix as ProfileStartScreen's identical title
+  // recipe (2026-09-29) - was an exact 1.0 lineHeight ratio.
   title: {
     fontFamily: fontFamily.extraBold,
     fontSize: 26,
-    lineHeight: 26,
+    lineHeight: 26 * 1.15,
     color: colors.textPrimary,
   },
   description: {

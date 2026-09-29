@@ -344,16 +344,19 @@ const styles = StyleSheet.create({
   // 18 -> 16, fixed (not auto-fit) - see the comment above where this is
   // used. 16 comfortably fits "Настраиваем пространство" on one line at
   // this row's available width without needing to shrink further.
+  // lineHeight bumped from an exact 1.0 ratio - same iOS top-clipping fix
+  // as ProfileStartScreen's title, same date (2026-09-29, her screenshot
+  // showed it on this screen's own step subtitles specifically).
   stepTitle: {
     fontFamily: fontFamily.semiBold,
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 16 * 1.15,
     color: colors.textPrimary,
   },
   stepSubtitle: {
     fontFamily: fontFamily.medium,
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 16 * 1.15,
     color: colors.textPrimary,
   },
   stepTextPending: {
@@ -366,7 +369,7 @@ const styles = StyleSheet.create({
   caption: {
     fontFamily: fontFamily.semiBold,
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 16 * 1.15,
     color: colors.textPrimary,
     textAlign: 'center',
   },

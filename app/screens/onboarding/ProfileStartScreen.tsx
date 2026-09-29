@@ -87,10 +87,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.screenPadding,
   },
+  // lineHeight was an exact 1.0 ratio (no leading at all) - iOS started
+  // clipping the top of ascenders/cap-height here after the SDK 54->57
+  // upgrade (2026-09-29, her screenshot: "верх текста режется"), likely a
+  // small shift in how this RN version measures a bold multi-line Text's
+  // own box. A modest 1.15 gives real headroom without visibly loosening
+  // the tight punchy-title look.
   title: {
     fontFamily: fontFamily.extraBold,
     fontSize: 26,
-    lineHeight: 26,
+    lineHeight: 26 * 1.15,
     color: colors.textPrimary,
   },
   description: {
