@@ -91,10 +91,19 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
   // Station-to-station motion is a spring, not an instant jump to the new
   // stop (2026-09-05: "слишком резко скачет" - she wants the same 5-station
   // snapping, just eased between stops rather than teleporting).
+  //
+  // The spring must not run on the very first mount - even animating "from"
+  // and "to" the same value (2026-09-29, Android: the knob sat at the line's
+  // far end for a second, then jumped to its real stop over "Ужасно") turned
+  // out to visibly glitch on this SDK's Reanimated on Android. `isMounted`
+  // makes the first render's value an instant, animation-free assignment;
+  // only real, later selection changes spring.
   const animatedPct = useSharedValue(pct);
+  const isMounted = useSharedValue(false);
   useEffect(() => {
-    animatedPct.value = withSpring(pct, { damping: 16, stiffness: 180, mass: 0.6 });
-  }, [pct, animatedPct]);
+    animatedPct.value = isMounted.value ? withSpring(pct, { damping: 16, stiffness: 180, mass: 0.6 }) : pct;
+    isMounted.value = true;
+  }, [pct, animatedPct, isMounted]);
 
   const thumbAnimStyle = useAnimatedStyle(() => ({
     left: labelInsetLeft + animatedPct.value * labelUsableWidth,
