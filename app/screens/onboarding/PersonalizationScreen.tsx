@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { FadeIn, FadeInDown, Easing } from 'react-native-reanimated';
@@ -28,11 +28,21 @@ const STEP_DURATION_MS = 5000;
 // The final checkmark draws in over this long rather than popping in
 // instantly (2026-08-09 review: "галочка... пусть помедленнее и поплавнее").
 const CHECK_DURATION_MS = 900;
-// Unthrottled (every rAF frame, ~60fps) - 2026-08-09 review: the earlier
-// 20fps throttle ("plenty smooth" in theory) actually read as faint
+// Unthrottled (every rAF frame, ~60fps) on iOS - 2026-08-09 review: the
+// earlier 20fps throttle ("plenty smooth" in theory) actually read as faint
 // stutter on a slow, deliberate glide, where every dropped frame is more
 // noticeable than it would be on something fast.
-const TICK_MS = 0;
+//
+// Android-only regression, 2026-09-29 (after the SDK 54->57 upgrade): every
+// tick recomputes ~40 star positions and re-renders the whole Skia Canvas via
+// a plain React re-render (see the comment below on why it's not shared-value
+// driven) - a real per-frame cost that iOS has headroom for but Android
+// apparently no longer does at 60fps on the newer RN/Skia/Hermes versions
+// this SDK bundles (it did before the upgrade, same code, same devices - she
+// confirmed iPhone stayed smooth, only Android got worse). A locked, lower
+// rate reads as smoother than an attempted-60fps that keeps dropping frames
+// unevenly, so Android throttles to ~30fps instead of chasing 60.
+const TICK_MS = Platform.OS === 'android' ? 33 : 0;
 
 type Phase = 'step1' | 'step2' | 'done';
 type StepState = 'pending' | 'active' | 'done';
