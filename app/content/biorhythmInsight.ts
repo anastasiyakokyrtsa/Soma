@@ -31,4 +31,4 @@ export const BIORHYTHM_INSIGHT_EYEBROW = 'Твой первый инсайт';
 // BiorhythmInsightScreen; the six templates above are the real-formula
 // path, to come back once Home runs off the same formula.
 export const BIORHYTHM_INSIGHT_DEMO =
-  'Сегодня по графику много сил в теле. Хороший день, чтобы выйти на прогулку или размяться, а сложные дела можно оставить на потом.';
+  'Сегодня по графику много сил в теле. Хороший день, чтобы выйти на прогулку или размяться, а сложные дела лучше отложить.';
