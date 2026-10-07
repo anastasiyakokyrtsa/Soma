@@ -130,18 +130,26 @@ const styles = StyleSheet.create({
   },
   // weight bumped twice the same day: regular->medium (size/weight
   // rebalance vs `time`), then medium->semiBold ("можешь в заголовках еще
-  // на ступень жирность увеличить?") - size stays 13, same as `time`.
+  // на ступень жирность увеличить?") - size stays paired with `time`.
+  // 13 -> 12 (2026-10-01): "Медитация" (the longest single-word title, no
+  // natural break point) was still just wide enough at 13px to wrap on her
+  // real device, splitting off its last letter onto its own line and
+  // pushing that tile's `time` text down out of alignment with the other
+  // tiles ("на уровне таком же как слово Дыхание") - same root cause/fix as
+  // the earlier 15->13 drop, one shared size for every title rather than a
+  // per-instance auto-fit (would let sibling titles render at visibly
+  // different sizes).
   title: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 13,
-    lineHeight: 13 * 1.1,
+    fontSize: 12,
+    lineHeight: 12 * 1.1,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   time: {
     fontFamily: fontFamily.regular,
-    fontSize: 13,
-    lineHeight: 13 * 1.1,
+    fontSize: 12,
+    lineHeight: 12 * 1.1,
     color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
   },

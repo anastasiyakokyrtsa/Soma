@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { colors, fontFamily, radius } from '../theme';
 import { GradientIcon, type GradientIconName } from './icons/GradientIcon';
 
@@ -36,7 +36,22 @@ export function FocusCard({
             the title dropped to 16px (2026-08-26) 26 read as too small next
             to it the other way - her follow-up ask same day: "иконки прям
             совсем маленькие, можешь увеличить на пару пикселей". */}
-        <GradientIcon name={icon} size={29 * scale} />
+        {/* The lineHeight bump above (1.1->1.15) didn't actually recenter
+            anything - her follow-up catch, 2026-10-01: "иконки так и
+            располагаются чуть ниже чем надо". Row-centering math (alignItems:
+            'center') centers boxes by their geometric height, but iOS's text
+            glyphs apparently sit nearer the top of their own line-box (more
+            slack below the baseline than above) rather than dead-center in
+            it - so the box centers correctly while the visible glyph ink
+            reads higher than the icon, i.e. the icon reads low next to it.
+            A lineHeight ratio change can't fix that (it adds slack, doesn't
+            redistribute where iOS already puts it), so this nudges the icon
+            itself up a couple of px on iOS only - a direct, estimated
+            correction, not derived from a measured value, so flag the exact
+            remaining offset (if any) rather than assuming this is pixel-exact. */}
+        <View style={Platform.OS === 'ios' ? styles.iconIOSNudge : undefined}>
+          <GradientIcon name={icon} size={29 * scale} />
+        </View>
         {/* numberOfLines+adjustsFontSizeToFit kept as a safety net even
             though "Мягкий старт и обновление" (the one title that actually
             needed it) got shortened to just "Мягкий старт" the same round -
@@ -77,17 +92,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  iconIOSNudge: {
+    marginTop: -2,
+  },
   // Literal (not scaled by this card's own `scale`) 16px/semiBold, matching
   // ArticleLinkRow's title exactly - her consistency ask, 2026-08-26: "взять
   // такой же кегль и такую же жирность шрифта у заголовка как... в блоке О
   // теле и ритмах". Deliberately NOT multiplied by `scale` here (unlike this
   // card's icon/gap) - the whole point is matching Care screen's literal
   // size everywhere, not a proportionally-scaled version of it.
+  // lineHeight 1.1 -> 1.15 - same iOS text-metrics fix as everywhere else
+  // tonight (ProfileStartScreen/PersonalizationScreen/etc, all post-SDK-57):
+  // `header`'s `alignItems:'center'` centers the icon against this Text's
+  // own measured line-box height, and iOS's text layout changed under RN
+  // 0.86 in a way that reads as off-center next to the icon specifically on
+  // iOS, not Android (2026-09-30/10-01, her catch on Фокус дня's cards).
   title: {
     flexShrink: 1,
     fontFamily: fontFamily.semiBold,
     fontSize: 16,
-    lineHeight: 16 * 1.1,
+    lineHeight: 16 * 1.15,
     color: colors.textPrimary,
   },
   // Literal 14px/medium, matching ArticleLinkRow's subtitle - same
