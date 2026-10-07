@@ -1,10 +1,11 @@
-import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily, gradients, radius } from '../theme';
 import { StarsBackground } from '../components/StarsBackground';
 import { GradientIcon, type GradientIconName } from '../components/icons/GradientIcon';
+import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 
 type Stat = {
   title: string;
@@ -32,11 +33,22 @@ export function AnalyticsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const cardWidth = (screenWidth - 20 * 2 - 16) / 2;
+  // Same fix as Home/Care (2026-10-01): a fixed, non-scrolling layout here
+  // left whatever empty space the device's actual height happened to leave
+  // below the grid, growing or shrinking with the screen instead of landing
+  // at a consistent, intentional distance from the bar - wrapping in a
+  // ScrollView with the same bar-height-aware bottom padding those two
+  // screens use keeps that gap the same everywhere, this screen included.
+  const bottomBarHeight = BAR_VIEWBOX_H * (Math.min(screenWidth, BAR_VIEWBOX_W) / BAR_VIEWBOX_W);
+  const scrollBottomPadding = bottomBarHeight + insets.bottom + 60;
 
   return (
     <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
       <StarsBackground width={screenWidth} height={screenHeight} />
-      <View style={{ paddingTop: insets.top + 40, paddingHorizontal: 20 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingHorizontal: 20, paddingBottom: scrollBottomPadding }}
+        showsVerticalScrollIndicator={false}
+      >
         <Svg width="100%" height={40}>
           <Defs>
             <SvgLinearGradient id="analyticsTitleGrad" x1="0" y1="0" x2="1" y2="0">
@@ -58,7 +70,12 @@ export function AnalyticsScreen({ navigation }: any) {
               onPress={() => navigation.navigate('Biorhythms')}
               style={({ pressed }) => [
                 styles.card,
-                { width: cardWidth },
+                // Square, not a fixed 184 height - her catch, 2026-10-01:
+                // "карточки вообще-то квадратные" (matching her own
+                // reference mockup). Height now follows the same
+                // screen-width-derived `cardWidth` the grid already uses,
+                // instead of an independent literal number.
+                { width: cardWidth, height: cardWidth },
                 !s.available && styles.cardUnavailable,
                 s.available && pressed && styles.cardPressed,
               ]}
@@ -71,7 +88,7 @@ export function AnalyticsScreen({ navigation }: any) {
             </Pressable>
           ))}
         </View>
-      </View>
+      </ScrollView>
     </Animated.View>
   );
 }
@@ -87,12 +104,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 16,
   },
+  // Top-anchored with an explicit 24px lead-in, not centered - her literal
+  // spec, 2026-10-01: "от круга до верха 24 пикселя". The icon-to-title (20)
+  // and title-to-value (6) gaps below were already exactly this (iconRing's
+  // own marginBottom, cardValue's own marginTop) - centering just hid that
+  // they matched, since centering repositions the whole block regardless of
+  // its own internal gaps.
   card: {
-    height: 184,
     borderRadius: radius.card,
     backgroundColor: colors.cardFillSmFallback,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 24,
     paddingHorizontal: 16,
   },
   cardPressed: {

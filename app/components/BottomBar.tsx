@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -80,10 +80,41 @@ const GLOW_LAYERS = Array.from({ length: GLOW_LAYER_COUNT }, (_, i) => {
 
 export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const width = Math.min(screenWidth, BAR_VIEWBOX_W);
   const scale = width / BAR_VIEWBOX_W;
   const height = BAR_VIEWBOX_H * scale;
+  const totalHeight = height + insets.bottom;
+
+  // Two guesses at the real cause of "the bar floats above the true screen
+  // edge" (2026-10-01, her repeated catch on both iOS and Android) already
+  // failed: an explicit `top` computed from window height (wrong coordinate
+  // space, made it worse everywhere), and a solid filler for the strip
+  // DOME_PATH's own fill doesn't reach (reduced nothing - she reloaded and
+  // still saw the same gap, so whatever's actually happening isn't a missing
+  // fill either). Rather than theorize a *third* cause of a gap whose real
+  // mechanism clearly isn't any of the above, this measures where the bar
+  // actually lands in true screen coordinates (`measureInWindow` - real
+  // device coordinates, not relative to whatever ancestor `position:
+  // 'absolute'`/`bottom: 0` are silently resolving against, which is
+  // apparently not the physical screen on this device/navigator
+  // combination) and corrects any leftover gap directly, however large it
+  // turns out to be, instead of computing a guessed number.
+  const wrapRef = useRef<View>(null);
+  const [floatingGap, setFloatingGap] = useState(0);
+
+  // Re-measures on every real layout pass (onLayout), not once on a timer -
+  // the previous rAF-based version may simply have fired before `wrapRef`
+  // had a committed native view to measure, silently doing nothing and
+  // reproducing the exact old behavior (which is exactly what she reported:
+  // no change at all, not even a partial one).
+  const measureGap = () => {
+    wrapRef.current?.measureInWindow((_x, y, _w, measuredHeight) => {
+      const gap = screenHeight - (y + measuredHeight);
+      if (gap > 0.5) setFloatingGap(gap);
+      else if (gap < -0.5) setFloatingGap(0);
+    });
+  };
 
   return (
     // Real root cause of the persistent "black area above the bar" - not a
@@ -101,13 +132,27 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
     // unstyled root background, not the screen's stars/content (2026-08-20:
     // "мне нужно чтобы фон задний, тексты и тд, было видно выше светящейся
     // линии" - confirmed nothing was showing through, because nothing was
-    // there to show). Fixed by making `wrap` itself `position:'absolute'`,
-    // anchored to the bottom of whatever contains both the screens and this
-    // bar (any RN View is a valid positioning context for its descendants,
-    // no explicit `position:'relative'` needed the way CSS requires) - now
-    // the screen genuinely fills the full height behind it, matching the
-    // "floats over content" behavior this always should have had.
-    <View style={[styles.wrap, { width, left: (screenWidth - width) / 2, height: height + insets.bottom, paddingBottom: insets.bottom }]}>
+    // there to show). Fixed by making `wrap` itself `position:'absolute'`.
+    //
+    // 2026-10-01: tried replacing `bottom: 0` below with an explicit `top`
+    // computed from `useWindowDimensions`' own height, on the theory that
+    // iOS's positioning ancestor might not span the full physical screen -
+    // that theory was never actually confirmed, and the swap made the bar
+    // float above the real edge on *both* platforms instead of just iOS (the
+    // window's height isn't the same coordinate space as this View's actual
+    // positioned ancestor, so computing `top` from it was simply wrong, not
+    // just unverified). Reverted to the plain, Android-confirmed `bottom: 0`.
+    // `bottom: -floatingGap` - 0 until the measurement effect above finds a
+    // real gap, then pushes the bar down by exactly that much. See that
+    // effect's own comment for why this measures instead of computing.
+    <View
+      ref={wrapRef}
+      onLayout={measureGap}
+      style={[
+        styles.wrap,
+        { width, left: (screenWidth - width) / 2, bottom: -floatingGap, height: totalHeight, paddingBottom: insets.bottom },
+      ]}
+    >
       {/* Kit's glow is filter:drop-shadow(), tracing the dome's alpha
           silhouette. No SVG <Filter> here (FeDropShadow, then
           FeGaussianBlur, both rasterized their filter *region* as an
@@ -140,6 +185,20 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         ))}
         <Path d={DOME_PATH} fill="#0C0D1B" />
       </Svg>
+
+      {/* DOME_PATH's own solid fill is drawn in an <Svg> sized to roughly
+          `height` (BAR_VIEWBOX_H*scale) plus a small glow-headroom pad
+          (~20px) - nowhere near enough to also cover the *extra* height this
+          View itself gets from `insets.bottom` (home indicator on iOS, ~34px
+          there - bigger than that glow pad, so real device content showed
+          through underneath). The fill only reached as far as its own Svg's
+          bottom edge, leaving the true bottom inset strip fully transparent
+          - read as "the bar is floating above the screen edge" (2026-10-01,
+          her catch - visible on iOS where insets.bottom is biggest, barely
+          visible on Android where it's often smaller than the glow pad).
+          Plain opaque filler, not another Svg shape - just needs to match
+          the dome's own fill color and cover the inset exactly. */}
+      <View style={[styles.insetFiller, { height: insets.bottom }]} pointerEvents="none" />
 
       <View style={[styles.content, { top: 50 * scale, height: 75 * scale, paddingHorizontal: 12 * scale }]}>
         {state.routes.map((route, index) => {
@@ -197,7 +256,15 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
+  },
+  // Covers the bottom-inset strip DOME_PATH's own Svg doesn't reach - see
+  // the comment where this is used.
+  insetFiller: {
+    position: 'absolute',
     bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#0C0D1B',
   },
   // NOT overflow:'visible' - the kit's own .bottombar-svg has it (so its
   // glow isn't clipped at the dome's edges), but on this Svg it briefly

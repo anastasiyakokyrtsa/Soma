@@ -9,6 +9,7 @@ import { NavChip } from '../components/NavChip';
 import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
 import { TeaIllustrationSway } from '../components/TeaIllustrationSway';
+import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -57,6 +58,12 @@ export function CareScreen({ navigation }: any) {
   // "они у тебя не помещаются на экране... надо чтобы между ними было по
   // 12 пикселей, и как обычно паддинг слева и справа по 16").
   const tileWidth = (screenWidth - SIDE_MARGIN * 2 - TILE_GAP * 2) / 3;
+  // Same fix as HomeScreen (2026-10-01) - a flat 160 can't track BottomBar's
+  // own height, which grows with insets.bottom rather than just shifting
+  // position, so it left almost no visible gap above the bar on an iPhone's
+  // bigger bottom inset. See HomeScreen.tsx's own comment for the full story.
+  const bottomBarHeight = BAR_VIEWBOX_H * (Math.min(screenWidth, BAR_VIEWBOX_W) / BAR_VIEWBOX_W);
+  const scrollBottomPadding = bottomBarHeight + insets.bottom + 60;
 
   return (
     // Единый fade-in вход по всему приложению (2026-09-06: "на всех
@@ -67,13 +74,7 @@ export function CareScreen({ navigation }: any) {
           scrollable column, so it stays put while content scrolls over it. */}
       <StarsBackground width={screenWidth} height={screenHeight} />
       <ScrollView
-        // 160, not insets.bottom + N - her explicit ask, 2026-08-26: "от
-        // Все статьи до самого низа экрана 160 пикселей", the literal
-        // physical screen edge, not a safe-area-relative gap. A flat 160
-        // already clears any realistic insets.bottom (home indicator/nav
-        // bar), so it doesn't need insets.bottom added on top - doing so
-        // would overshoot her stated number on devices with a real inset.
-        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 160 }}
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: scrollBottomPadding }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
@@ -130,14 +131,14 @@ export function CareScreen({ navigation }: any) {
               onPress={() => navigation.navigate('BreathingInfo')}
             />
             {/* explicit break, not left to auto-wrap. iconMarginBottom
-                restored (30, not the default 44) to compensate for this
+                restored (31, not the default 44) to compensate for this
                 title's real 2nd line - the fixed-title-height trick that
                 made this override unnecessary was tried and reverted the
                 same day (left a dead gap under 1-line titles - see
-                MiniRitualTile.tsx). 30 = 44 - 13*1.1 (one line's worth of
-                the new 13px title size, recomputed after the font-size
-                drop below). */}
-            <MiniRitualTile width={tileWidth} icon="seaWaves" title={'Звуки\nприроды'} time="10 мин" iconMarginBottom={30} />
+                MiniRitualTile.tsx). 31 = 44 - 12*1.1 (one line's worth of
+                the 12px title size, after 2026-10-01's 13->12 drop for
+                "Медитация"). */}
+            <MiniRitualTile width={tileWidth} icon="seaWaves" title={'Звуки\nприроды'} time="10 мин" iconMarginBottom={31} />
             <MiniRitualTile width={tileWidth} icon="lotus" title="Медитация" time="10 мин" />
           </View>
         </View>

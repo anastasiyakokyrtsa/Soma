@@ -13,6 +13,7 @@ import { InfoIcon } from '../components/icons/InfoIcon';
 import { StarsBackground } from '../components/StarsBackground';
 import { InfoSheet } from '../components/InfoSheet';
 import { MoodCheckIn } from '../components/MoodCheckIn';
+import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
@@ -194,6 +195,19 @@ export function HomeScreen({ navigation }: any) {
   const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
   const [selectedDay, setSelectedDay] = useState(14);
   const paragraph = DAY_PARAGRAPHS[selectedDay] ?? DAY_PARAGRAPHS[14];
+  // Real bar height + insets.bottom + a 60px clearance above it - was a flat
+  // 160 (2026-08-26, matching Care's own flat number), but a flat value
+  // can't track BottomBar's own height, which *grows* by insets.bottom
+  // (home indicator / gesture-nav inset), not just shifts position. On an
+  // iPhone with a ~34px bottom inset the bar's real total height already
+  // eats nearly all of 160, leaving almost no visible gap above it (her
+  // 2026-10-01 catch) - Android's smaller/zero inset left real room by
+  // comparison, so this never showed up there. Restores the pre-160
+  // inset-aware formula this screen used before (see its own prior history
+  // in this comment block), which was replaced by the flat number for
+  // being "good enough" without having been checked on a big-inset iPhone.
+  const bottomBarHeight = BAR_VIEWBOX_H * (Math.min(screenWidth, BAR_VIEWBOX_W) / BAR_VIEWBOX_W);
+  const scrollBottomPadding = bottomBarHeight + insets.bottom + 60;
 
   return (
     // Единый fade-in вход по всему приложению вместо native-stack transition
@@ -206,13 +220,7 @@ export function HomeScreen({ navigation }: any) {
           its first child. */}
       <StarsBackground width={screenWidth} height={screenHeight} />
       <ScrollView
-        // 160, matching Care screen's own flat bottom spacing - her
-        // explicit ask, 2026-08-26 ("от карточки с цитатой до самого низа
-        // экрана... сделай так же, как на Care - жёстко 160"), replacing
-        // the previous device-width-dependent formula (insets.bottom +
-        // real bar height + 60px above it, ~165-185px depending on screen
-        // width) with a flat distance-to-screen-edge number instead.
-        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: 160 }}
+        contentContainerStyle={{ paddingTop: insets.top + 40, paddingBottom: scrollBottomPadding }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
