@@ -1,66 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 
-// Ports UI Kit's "Resource Meter" (.resource-ring/.rr-*, style.css ~L843) -
-// a single always-the-same violet/pink ring (no progress-arc logic, purely
-// decorative), for WF's Home screen "42% Низкий ресурс" card. The kit's own
-// ring color is a spinning conic-gradient (no RN equivalent) - approximated
-// here as a static diagonal linear gradient across the ring's own stroke,
-// the same technique already used for SleepWheelPicker's arc.
+// Ports UI Kit's "Resource Meter" (.resource-ring/.rr-*, style.css ~L843) for
+// WF's Home screen "42% Низкий ресурс" card.
 //
-// Spin animation (2026-08-20, "нужно анимировать... прогресс бар") - kit's
-// own `.rr-ring` spec (`rrSpin`, style.css ~L887): one full rotation every
-// 5s, `linear infinite` - "5s" is the loop *duration*, "infinite" means it
-// never stops (her explicit ask: "анимация не 5 секунд, она должна
-// бесконечно идти" - confirming this reads as a single 5s play then stop,
-// not a forever loop). Driven by a plain requestAnimationFrame clock (not
-// Reanimated-into-a-Skia-prop, the confirmed-broken bridge on this Expo Go
-// SDK - see [[project-skia-reanimated-bridge]] - though this is
-// react-native-svg not Skia; kept on the app's one proven rAF-clock pattern
-// anyway for architectural consistency, same shape as PersonalizationScreen's
-// own `useAnimationClock`). The angle is `elapsed % SPIN_DURATION_MS`, not
-// raw elapsed time, so it wraps cleanly forever instead of the number
-// (harmlessly, since only its value-mod-360 ever matters, but still worth
-// keeping bounded) growing without limit for as long as the screen stays
-// mounted. No throttle on the tick rate - a slow/calm rotation shows
-// dropped frames more, not less, than fast motion (see PersonalizationScreen's
-// own TICK_MS=0 lesson), so every rAF frame updates the clock.
-//
-// 2026-08-20, later same day: a color-matched rotating *glow* layer was
-// added on top of this, then explicitly reverted along with the animation
-// itself, then the animation alone was asked back ("сам прогресс бар
-// анимируй как в ките договаривались" - just the ring, per the original
-// kit-matching agreement). Don't re-add the glow-rotation layer without her
-// asking again - only the ring's own gradient rotates, matching the kit
-// exactly (`.rr-ring` animates, `.rr-halo` doesn't).
-const SPIN_DURATION_MS = 5000;
-
-function useAnimationClock() {
-  const [time, setTime] = useState(0);
-  const startRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    let raf: number;
-    const tick = () => {
-      const now = Date.now();
-      if (startRef.current === null) startRef.current = now;
-      setTime(now - startRef.current);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return time;
-}
+// 2026-10-01, real progress arc: the ring used to always draw as a full
+// circle regardless of `value` - a spinning gradient outline, purely
+// decorative, with no actual connection between the number in the middle and
+// how much of the ring was "filled" (her catch: "несмотря на то что ресурс
+// низкий, прогресс бар этого не отражает"). Demoed two directions in a
+// standalone web artifact first (per her ask, before touching app code) - a
+// real dasharray/dashoffset arc sized to `value` (same technique as
+// BiorhythmChart's own rings) vs. a procedural "energy orb" - she picked the
+// arc. The continuous spin animation this used to have doesn't survive the
+// change: a gradient spinning around a *partial* arc would constantly move
+// the arc's own start/end points, undermining the one thing this is now for
+// (reading the arc's length as the actual value) - dropped rather than kept
+// alongside, not an oversight.
+const RING_STROKE = 2;
+// Same round-cap-bulge floor as BiorhythmChart's rings (MIN_VISIBLE_GAP) -
+// a strokeLinecap="round" cap bulges roughly half the stroke width past the
+// path's own end, which can fully close a very-near-100% gap or fully hide a
+// very-near-0% sliver. Floors the visible arc so it's never literally
+// invisible at low real values, without faking a value that isn't 0 at
+// genuine 0 (floor only kicks in strictly above it).
+const MIN_VISIBLE_ARC_PCT = 1.5;
 
 export function ResourceRing({ value, caption, size = 244 }: { value: number; caption: string; size?: number }) {
-  const stroke = 2;
-  const r = size / 2 - stroke;
-  const time = useAnimationClock();
-  const angle = ((time % SPIN_DURATION_MS) / SPIN_DURATION_MS) * 360;
+  const r = size / 2 - RING_STROKE;
+  const circumference = 2 * Math.PI * r;
+  const pct = value <= 0 ? 0 : Math.max(value, MIN_VISIBLE_ARC_PCT);
+  const dashoffset = circumference * (1 - pct / 100);
 
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>
@@ -74,10 +45,13 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
           2026-08-20, "свечение похоже вокруг квадрата сделал, а не по
           кругу"). Full 4-layer recipe ported now too (previously only the
           2 outward layers were here, the 2 inset ones were missing
-          entirely). Not rotated - kit's own animation is scoped to
-          `.rr-ring` only, the halo stays a static ambient glow. */}
+          entirely). */}
       <View style={[styles.halo, { width: size, height: size, borderRadius: size / 2 }]} />
-      <Svg width={size} height={size} style={[styles.ringSvg, { transform: [{ rotate: `${angle}deg` }] }]}>
+      {/* Rotated -90deg so the arc starts at 12 o'clock and sweeps clockwise
+          as `value` grows - the same convention BiorhythmChart's rings and
+          MoodScale's thumb-coordinate system already use everywhere else in
+          this app, not a new one invented here. */}
+      <Svg width={size} height={size} style={[styles.ringSvg, { transform: [{ rotate: '-90deg' }] }]}>
         <Defs>
           <LinearGradient id="rrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset={0} stopColor={colors.violet400} />
@@ -87,7 +61,21 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
             <Stop offset={1} stopColor={colors.violet400} />
           </LinearGradient>
         </Defs>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke="url(#rrGrad)" strokeWidth={stroke} fill="none" />
+        {/* Faint full-circle track behind the arc, same recipe/opacity as
+            BiorhythmChart's own ring track - without it, a low value's short
+            arc would read as floating on nothing. */}
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(139,124,246,0.14)" strokeWidth={RING_STROKE} fill="none" />
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="url(#rrGrad)"
+          strokeWidth={RING_STROKE + 0.5}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={dashoffset}
+        />
       </Svg>
 
       <View style={[StyleSheet.absoluteFill, styles.content]}>
