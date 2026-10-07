@@ -67,6 +67,20 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
   const labelUsableWidth = Math.max(0, trackWidth - labelInsetLeft - labelInsetRight);
   const labelsReady = trackWidth > 0 && firstLabelWidth > 0 && lastLabelWidth > 0;
   const labelPosForPct = (p: number) => labelInsetLeft + p * labelUsableWidth;
+  // Before the two invisible measuring twins report their real widths,
+  // firstLabelWidth/lastLabelWidth read as 0, which zeroes labelInsetLeft out
+  // entirely - so for that window the thumb sits at the track's literal left
+  // wall (x=0) rather than "Ужасно"'s real, slightly-inset position. On
+  // Android that window has been visible for close to a second (her repeated
+  // 2026-09-29 reports), long enough to read as "стоит не на месте, потом
+  // прыгает" instead of an imperceptible one-frame correction. The line's own
+  // coordinate system (leftOffset/scaleWidth) only needs a single plain
+  // View's layout, not two Text measurements, so it settles first - using it
+  // as the interim position keeps the thumb close to its real spot the whole
+  // time instead of parked at the wall.
+  const effectiveInsetLeft = labelsReady ? labelInsetLeft : leftOffset;
+  const effectiveUsableWidth = labelsReady ? labelUsableWidth : scaleWidth;
+  const thumbPosForPct = (p: number) => effectiveInsetLeft + p * effectiveUsableWidth;
 
   const indexFromX = (x: number) => {
     if (scaleWidth <= 0) return index;
@@ -106,7 +120,7 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
   }, [pct, animatedPct, isMounted]);
 
   const thumbAnimStyle = useAnimatedStyle(() => ({
-    left: labelInsetLeft + animatedPct.value * labelUsableWidth,
+    left: effectiveInsetLeft + animatedPct.value * effectiveUsableWidth,
   }));
   const fillAnimStyle = useAnimatedStyle(() => ({
     width: Math.max(animatedPct.value * scaleWidth, MIN_FILL_WIDTH),
@@ -152,8 +166,15 @@ export function MoodScale({ index, onChange }: { index: number; onChange: (index
             `left`, so for the frame(s) before the animated style lands the
             thumb sat at the line's far-left end (her 2026-09-23 report: on
             entering the screen the knob stood at the left tip) instead of
-            at its real stop. */}
-        {labelsReady ? <Animated.View style={[styles.thumb, { left: labelPosForPct(pct) }, thumbAnimStyle]} /> : null}
+            at its real stop.
+            Gated on `ready` (just the track's own layout), not `labelsReady`
+            (which also needs both hidden label twins measured) - the thumb
+            now shows the moment the track itself is known, using the
+            line-based fallback position (effectiveInsetLeft/Width above)
+            until the precise label-based one lands, instead of sitting
+            unrendered/at-the-wall for however long the label measurements
+            take on that device. */}
+        {ready ? <Animated.View style={[styles.thumb, { left: thumbPosForPct(pct) }, thumbAnimStyle]} /> : null}
         <View style={StyleSheet.absoluteFill} {...panResponder.panHandlers} />
       </View>
 
