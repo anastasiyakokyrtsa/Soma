@@ -2,19 +2,21 @@ import { useRef, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
+  Dimensions,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
-import { colors, fontFamily, gradients } from '../theme';
+import { colors, fontFamily, radius } from '../theme';
 import { ChevronIcon } from '../components/icons/ChevronIcon';
+import { HourglassIcon } from '../components/icons/HourglassIcon';
+import { SwipeHandIcon } from '../components/icons/SwipeHandIcon';
 import {
   ARTICLE_WATER_SERIES,
   ARTICLE_WATER_TITLE,
@@ -26,6 +28,15 @@ import {
 
 const WATER_IMAGE = require('../assets/articles/water.jpg');
 const TOTAL_PAGES = 1 + ARTICLE_WATER_PAGES.length;
+const SIDE_MARGIN = 16;
+// Literal row height for the "Все статьи / Закрыть" row, used only to
+// compute the card's own top offset below - not a measured value, close
+// enough to that row's real text+hitSlop height that the 16px gap below it
+// (her spec) doesn't visibly drift.
+const NAV_ROW_HEIGHT = 24;
+// Icon (28*28/36≈21.8) + 6px gap + one text line (~16px) - used only to
+// position the swipe hint's `top` from the card's bottom edge, see below.
+const SWIPE_HINT_HEIGHT = 44;
 
 // Swipe-through article reader (her explicit format choice, 2026-09-16,
 // over ux-architect/ui-designer's continuous-scroll recommendation for
@@ -45,6 +56,18 @@ const TOTAL_PAGES = 1 + ARTICLE_WATER_PAGES.length;
 // so "Свет и внутренние часы"/"Паузы и восстановление" (already drafted in
 // docs/content/статьи.md) can reuse this same screen shape later without
 // rebuilding it, even though only Water is wired up for now.
+//
+// 2026-10-07, take 2 against her reference screenshots - the structural
+// change that actually mattered: the water photo + tag pill + page counter
+// used to be ONE shared overlay positioned outside the horizontal
+// ScrollView, with only its opacity/text driven by `index` state after a
+// swipe settled. That's why dragging only moved the *text* - the "card"
+// behind it was a fixed backdrop, never part of the paged content at all.
+// Each page now renders its own full ArticleCard (image, fade, pill,
+// counter) *inside* the ScrollView, so the whole card genuinely pans with
+// the gesture and the next page's card is visible mid-drag, the same way
+// native paging always behaves for content that's actually inside it - not
+// a new effect bolted on, just no longer faking it from outside.
 export function ArticleWaterScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -56,28 +79,27 @@ export function ArticleWaterScreen({ navigation }: any) {
     if (i !== index) setIndex(i);
   };
 
-  // The water photo is vivid on the cover, then fades out over the next
-  // couple of pages and stays fully dark for the rest - matches her own
-  // reference screens (page 3 already mostly black) and resolves
-  // ui-designer's readability concern (a busy photo behind 1500 words)
-  // without dropping the image outright, which she wanted to keep.
-  const imageOpacity = Math.max(0, 1 - index * 0.45);
+  // Her literal spec, 2026-10-07: nav row 40px from the top, the card 16px
+  // below *that* row (not below the status bar), 16px margins on both
+  // sides instead of edge-to-edge.
+  const navTop = insets.top + 40;
+  const cardTop = navTop + NAV_ROW_HEIGHT + 16;
+  // Literal 16px from the true bottom edge of the *physical display*, not
+  // `useWindowDimensions()`'s own `height` - her side-by-side screenshots,
+  // 2026-10-07, showed a visibly bigger gap on Android than iOS despite
+  // identical code, the same root cause already chased down for BottomBar:
+  // RN's "window" dimensions (what useWindowDimensions reports) can be
+  // smaller than the real display on Android when system bars reserve
+  // space, while iOS's "window" and "screen" sizes are always identical.
+  // `Dimensions.get('screen')` reports the true physical display height on
+  // both platforms, so the card's own math uses that instead.
+  const screenPhysicalHeight = Dimensions.get('screen').height;
+  const cardBottom = screenPhysicalHeight - 16;
+  const cardHeight = cardBottom - cardTop;
 
   return (
     <View style={styles.container}>
-      <Image
-        source={WATER_IMAGE}
-        style={[styles.bgImage, { width: screenWidth, height: screenHeight, opacity: imageOpacity }]}
-        resizeMode="cover"
-      />
-      <LinearGradient
-        colors={['transparent', colors.bg0]}
-        locations={[0.32, 0.82]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-
-      <View style={[styles.topRow, { paddingTop: insets.top + 16 }]} pointerEvents="box-none">
+      <View style={[styles.topRow, { top: navTop }]} pointerEvents="box-none">
         <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backBtn}>
           <ChevronIcon direction="left" size={14} color={colors.textPrimary} />
           <Text style={styles.topLabel}>Все статьи</Text>
@@ -87,21 +109,6 @@ export function ArticleWaterScreen({ navigation }: any) {
         </Pressable>
       </View>
 
-      <View style={[styles.metaRow, { top: insets.top + 68 }]} pointerEvents="none">
-        {index === 0 ? (
-          <View style={styles.tagPill}>
-            <Text style={styles.tagText}>• {ARTICLE_WATER_SERIES.toUpperCase()} •</Text>
-          </View>
-        ) : (
-          <View />
-        )}
-        <View style={styles.counter}>
-          <Text style={styles.counterNum}>{String(index + 1).padStart(2, '0')}</Text>
-          <View style={styles.counterLine} />
-          <Text style={styles.counterNum}>{String(TOTAL_PAGES).padStart(2, '0')}</Text>
-        </View>
-      </View>
-
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -109,30 +116,53 @@ export function ArticleWaterScreen({ navigation }: any) {
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={32}
-        style={StyleSheet.absoluteFill}
+        style={[styles.scroll, { top: cardTop, height: cardHeight }]}
       >
-        <View style={{ width: screenWidth, height: screenHeight }}>
-          <View style={[styles.coverContent, { paddingBottom: insets.bottom + 96 }]}>
-            <CoverTitle text={ARTICLE_WATER_TITLE} />
-            <Text style={styles.coverSubtitle}>{ARTICLE_WATER_SUBTITLE}</Text>
-            <Text style={styles.readTime}>⏳  {ARTICLE_WATER_READ_TIME}</Text>
-          </View>
+        <View style={{ width: screenWidth, height: cardHeight, paddingHorizontal: SIDE_MARGIN }}>
+          <ArticleCard pageIndex={0}>
+            <View style={styles.contentSpacerTop} />
+            <View style={styles.coverContent}>
+              <CoverTitle text={ARTICLE_WATER_TITLE} />
+              <Text style={styles.coverSubtitle}>{ARTICLE_WATER_SUBTITLE}</Text>
+              <View style={styles.readTimeRow}>
+                {/* size=8 (was 7) - readTime went 14->16px right after the
+                    original consult, scaled to keep the same ~77%
+                    cap-height ratio (ui-designer, 2026-10-07): ~12.3px tall
+                    next to 16px text. */}
+                <HourglassIcon size={8} />
+                <Text style={styles.readTime}>{ARTICLE_WATER_READ_TIME}</Text>
+              </View>
+            </View>
+            <View style={styles.contentSpacerBottom} />
+          </ArticleCard>
         </View>
 
         {ARTICLE_WATER_PAGES.map((page, i) => (
-          <View key={i} style={{ width: screenWidth, height: screenHeight }}>
-            <View style={[styles.pageContent, { paddingBottom: insets.bottom + 96 }]}>
-              {page.blocks.map((block, bi) => (
-                <ArticleBlockView key={bi} block={block} onLinkPress={() => navigation.goBack()} />
-              ))}
-            </View>
+          <View key={i} style={{ width: screenWidth, height: cardHeight, paddingHorizontal: SIDE_MARGIN }}>
+            <ArticleCard pageIndex={i + 1}>
+              <View style={styles.contentSpacerTop} />
+              <View style={styles.pageContent}>
+                {page.blocks.map((block, bi) => (
+                  <ArticleBlockView key={bi} block={block} onLinkPress={() => navigation.goBack()} />
+                ))}
+              </View>
+              <View style={styles.contentSpacerBottom} />
+            </ArticleCard>
           </View>
         ))}
       </ScrollView>
 
       {index < TOTAL_PAGES - 1 ? (
-        <View style={[styles.swipeHint, { bottom: insets.bottom + 32 }]} pointerEvents="none">
-          <ChevronIcon direction="left" size={14} color={colors.violet300} />
+        // `top`, not `bottom` - `bottom` on an absolutely positioned child
+        // measures from its container's own layout box, which RN sizes
+        // using `window` dimensions, not the `screen` dimensions `cardBottom`
+        // is now computed from above; mixing the two would reintroduce the
+        // exact Android/iOS mismatch this is fixing. Computing an explicit
+        // `top` from `cardBottom` keeps both the card and this hint on the
+        // same coordinate basis. SWIPE_HINT_HEIGHT is an estimate (icon +
+        // gap + one text line), not measured.
+        <View style={[styles.swipeHint, { top: cardBottom - 32 - SWIPE_HINT_HEIGHT }]} pointerEvents="none">
+          <SwipeHandIcon size={28} />
           <Text style={styles.swipeHintText}>Свайпни влево</Text>
         </View>
       ) : null}
@@ -140,29 +170,86 @@ export function ArticleWaterScreen({ navigation }: any) {
   );
 }
 
-// Gradient title reserved for this one "screen identity" moment (the
-// cover), same reasoning ui-designer gave for why in-page section
-// headings stay plain white - matches how HomeScreen's own greeting is
-// the one gradient heading on that screen, not every heading on it.
-function CoverTitle({ text }: { text: string }) {
-  const lines = text.split('\n');
-  const lineHeight = 40;
+// One page's full card - photo, bottom-fade, tag pill (cover only) + page
+// counter, and whatever content the caller passes as children. `pageIndex`
+// alone determines the photo's opacity and the counter's number, both
+// computed directly from it rather than from the screen's `index` state -
+// that's what lets this card live *inside* the paged ScrollView and still
+// show the right fade/number for whichever page it is, mid-drag, before any
+// scroll-settle state update ever fires.
+function ArticleCard({ pageIndex, children }: { pageIndex: number; children: React.ReactNode }) {
+  // Flat, not a progressive fade to nothing - her ask, 2026-10-07: every
+  // content page should carry the same slightly-darkened photo page 2 had
+  // (0.55), not fade further page over page until there's no image left by
+  // page 4 (the old `1 - pageIndex*0.45` formula hit 0 there) - page 3 in
+  // particular read as "сильно затемнено" at the old formula's 0.1.
+  const imageOpacity = pageIndex === 0 ? 1 : 0.55;
+
   return (
-    <Svg width="100%" height={lineHeight * lines.length + 8} style={styles.coverTitleSvg}>
-      <Defs>
-        <SvgLinearGradient id="articleTitleGrad" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset={gradients.headingText.locations[0]} stopColor={gradients.headingText.colors[0]} />
-          <Stop offset={gradients.headingText.locations[1]} stopColor={gradients.headingText.colors[1]} />
-          <Stop offset={gradients.headingText.locations[2]} stopColor={gradients.headingText.colors[2]} />
-        </SvgLinearGradient>
-      </Defs>
-      {lines.map((line, i) => (
-        <SvgText key={i} x={0} y={lineHeight * (i + 1) - 8} fontSize={34} fontFamily={fontFamily.extraBold} fill="url(#articleTitleGrad)">
-          {line}
-        </SvgText>
-      ))}
-    </Svg>
+    <View style={[styles.card, pageIndex > 0 && styles.cardBordered]}>
+      {/* expo-image, not core RN Image (her 2026-10-07 catch, "до этого
+          картинка нормальная была") - today's rewrite moved the photo from
+          one shared Image to 9 (one per page, all mounted at once since
+          ScrollView doesn't virtualize), and RN's own Image decodes its
+          source fresh per instance - 9 simultaneous full decodes of the
+          same photo is real memory pressure, and the OS answering with a
+          visibly lower-quality decode to cope is a known failure mode, not
+          a cache/asset issue (confirmed: the file itself and the bundled
+          copy are both sharp). expo-image caches the *decoded* bitmap by
+          source, so all 9 instances share one real decode instead of each
+          paying for their own. */}
+      <Image
+        source={WATER_IMAGE}
+        style={[StyleSheet.absoluteFill, { opacity: imageOpacity }]}
+        contentFit="cover"
+        cachePolicy="memory-disk"
+      />
+      {/* locations pushed later (was 0.32/0.82) - that fade was tuned for
+          the old full-screen-height image; applied to this card's now much
+          shorter height, the same *fractions* darkened the photo far
+          sooner, both proportionally and in absolute px, reading as a
+          washed-out haze instead of the crisp photo in her reference
+          (2026-10-07: "куда ты дел нормальную картинку воды?"). Starting
+          the fade later keeps the photo clear through the pill/counter
+          zone and only darkens toward where the text actually sits now
+          that content isn't bottom-anchored any more. */}
+      <LinearGradient
+        colors={['transparent', colors.bg0]}
+        locations={[0.5, 0.92]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+
+      <View style={styles.cardMeta} pointerEvents="none">
+        {pageIndex === 0 ? (
+          <View style={styles.tagPill}>
+            <View style={styles.tagDot} />
+            <Text style={styles.tagText}>{ARTICLE_WATER_SERIES.toUpperCase()}</Text>
+            <View style={styles.tagDot} />
+          </View>
+        ) : (
+          <View />
+        )}
+        <View style={styles.counter}>
+          <Text style={styles.counterNum}>{String(pageIndex + 1).padStart(2, '0')}</Text>
+          <View style={styles.counterLine} />
+          <Text style={styles.counterNum}>{String(TOTAL_PAGES).padStart(2, '0')}</Text>
+        </View>
+      </View>
+
+      {children}
+    </View>
   );
+}
+
+// Plain white Text, not the gradient SVG this used before - her reference
+// screenshots (2026-10-07, "вот прям точно так же"): the cover title reads
+// as plain white and notably lighter than a bold/extraBold weight, not the
+// pink-violet gradient treatment this had. Dropped the gradient outright
+// rather than keeping it alongside a lighter weight - the reference has no
+// visible color shift across the title at all.
+function CoverTitle({ text }: { text: string }) {
+  return <Text style={styles.coverTitle}>{text}</Text>;
 }
 
 function ArticleBlockView({ block, onLinkPress }: { block: ArticleBlock; onLinkPress: () => void }) {
@@ -198,16 +285,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg0,
   },
-  bgImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
   topRow: {
     position: 'absolute',
     left: 20,
     right: 20,
-    top: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -223,27 +304,65 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
   },
-  metaRow: {
+  scroll: {
     position: 'absolute',
-    left: 20,
-    right: 20,
+    left: 0,
+    right: 0,
+  },
+  // Rounded on all four corners now the card has a real 16px gap on every
+  // side (was top-only, flush to the bottom edge - her 2026-10-07 catch:
+  // "у карточки внизу не видно краев").
+  card: {
+    flex: 1,
+    borderRadius: radius.card,
+    overflow: 'hidden',
+  },
+  // Border only on page 2+ (her explicit call, 2026-10-07: "на первой
+  // странице обводить карточку не надо") - the cover's own photo is bright
+  // enough to read as a distinct card against the screen background on its
+  // own; only the darker pages need the edge drawn in.
+  cardBordered: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  cardMeta: {
+    position: 'absolute',
+    top: 32,
+    left: 16,
+    right: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     zIndex: 2,
   },
+  // Real dot Views either side of the label, not inline "•" glyphs - more
+  // reliably centered/sized across fonts than relying on a bullet
+  // character's own glyph metrics. Border violet (was a white-ish
+  // rgba(255,255,255,0.4)) and text/dots white (was textSecondary gray) -
+  // her close-up reference (2026-10-07) shows a lavender border and plain
+  // white label, not a gray/white-bordered pill - color was the actual
+  // remaining mismatch after the dot fix.
   tagPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     borderWidth: 1,
-    borderColor: colors.borderDefault,
+    borderColor: colors.violet300,
     borderRadius: 999,
-    paddingVertical: 6,
+    paddingVertical: 7,
     paddingHorizontal: 14,
+  },
+  tagDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: colors.textPrimary,
   },
   tagText: {
     fontFamily: fontFamily.semiBold,
     fontSize: 11,
-    letterSpacing: 0.6,
-    color: colors.textSecondary,
+    letterSpacing: 0.8,
+    color: colors.textPrimary,
   },
   counter: {
     alignItems: 'center',
@@ -259,36 +378,64 @@ const styles = StyleSheet.create({
     backgroundColor: colors.violet400,
     marginVertical: 3,
   },
+  // Content no longer bottom-anchored (was `flex:1, justifyContent:
+  // 'flex-end'`) - her reference has it sitting a bit above the card's own
+  // middle, on both the cover and the content pages (page 2's screenshot
+  // shows the same thing, even though she only wrote this up for the
+  // cover). contentSpacerTop/Bottom below do the positioning; these two
+  // just hold the content's own internal layout.
+  contentSpacerTop: {
+    flex: 0.85,
+  },
+  contentSpacerBottom: {
+    flex: 1.3,
+  },
   coverContent: {
-    flex: 1,
-    justifyContent: 'flex-end',
     paddingHorizontal: 20,
     gap: 16,
   },
-  coverTitleSvg: {
+  // 34 -> 40 - her ask, 2026-10-07: "заголовок можно крупнее".
+  // lineHeight ratio 1.15 -> 1.05 (46px -> 42px at this fontSize) - her
+  // catch, 2026-10-07: the gap between lines read as too loose for a 3-line
+  // display headline at this size.
+  coverTitle: {
     marginBottom: 4,
-  },
-  coverSubtitle: {
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 16 * 1.4,
+    fontSize: 40,
+    lineHeight: 40 * 1.05,
     color: colors.textPrimary,
   },
+  // 16 -> 18 - her ask, 2026-10-07 ("не сильно ли маленького шрифта
+  // текст?").
+  coverSubtitle: {
+    fontFamily: fontFamily.regular,
+    fontSize: 18,
+    lineHeight: 18 * 1.4,
+    color: colors.textPrimary,
+  },
+  readTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  // 14 -> 16 - her ask, 2026-10-07: "сколько она пикселей? нельзя так мало
+  // делать?".
   readTime: {
     fontFamily: fontFamily.medium,
-    fontSize: 14,
+    fontSize: 16,
     color: colors.violet300,
   },
   pageContent: {
-    flex: 1,
-    justifyContent: 'flex-end',
     paddingHorizontal: 20,
     gap: 16,
   },
+  // 24 -> 28 - her reference screenshot's big statement heading ("Мы часто
+  // ищем сложные решения...") reads noticeably larger than this was,
+  // closer to the cover title's own size than to a section sub-header.
   heading: {
     fontFamily: fontFamily.bold,
-    fontSize: 24,
-    lineHeight: 24 * 1.3,
+    fontSize: 28,
+    lineHeight: 28 * 1.3,
     color: colors.textPrimary,
   },
   subheading: {
@@ -333,13 +480,12 @@ const styles = StyleSheet.create({
     color: colors.violet300,
     textDecorationLine: 'underline',
   },
+  // Column now (icon above label), not a row - her reference, 2026-10-07.
   swipeHint: {
     position: 'absolute',
     left: 0,
     right: 0,
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
     gap: 6,
   },
   swipeHintText: {
