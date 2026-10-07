@@ -103,18 +103,20 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
   },
+  // True italic font file (fontFamily.mediumItalic), not `fontStyle:
+  // 'italic'` on the upright family - the latter rendered upright on iOS
+  // (Android fakes/slants a custom font automatically, iOS doesn't) - her
+  // 2026-10-01 catch.
   text: {
-    fontFamily: fontFamily.medium,
-    fontStyle: 'italic',
+    fontFamily: fontFamily.mediumItalic,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   // color corrected .65 -> .75 (kit's literal --text-secondary-equivalent
   // alpha, 2026-08-20 audit) - was a real fidelity miss, not a deliberate
-  // deviation.
+  // deviation. fontFamily: same true-italic fix as `text` above.
   author: {
-    fontFamily: fontFamily.regular,
-    fontStyle: 'italic',
+    fontFamily: fontFamily.regularItalic,
     color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
   },

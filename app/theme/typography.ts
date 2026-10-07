@@ -13,6 +13,15 @@ export const fontFamily = {
   semiBold: 'NunitoSans_600SemiBold',
   bold: 'NunitoSans_700Bold',
   extraBold: 'NunitoSans_800ExtraBold',
+  // True italic font files, not `fontStyle: 'italic'` on an upright family -
+  // iOS doesn't synthesize/slant a custom font the way Android does, so
+  // `fontStyle: 'italic'` on e.g. `regular` renders upright on iOS and only
+  // actually looks italic on Android (QuoteCard's catch, 2026-10-01). Same
+  // "load the real italic file" fix already used for CormorantGaramond on
+  // the visual-style preview screen (see App.tsx) - just applied here too,
+  // for the two weights QuoteCard actually needs.
+  regularItalic: 'NunitoSans_400Regular_Italic',
+  mediumItalic: 'NunitoSans_500Medium_Italic',
 } as const;
 
 export const type = {
