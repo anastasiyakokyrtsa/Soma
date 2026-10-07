@@ -1,4 +1,5 @@
 import { Canvas, Circle, Group, Blur, Path } from '@shopify/react-native-skia';
+import { useDerivedValue, type SharedValue } from 'react-native-reanimated';
 
 // Fixed-position vector port of Figma's "Personalization" illustration (node
 // 402:3007..4000) — replaces an earlier attempt that rasterized the kit's
@@ -7,21 +8,36 @@ import { Canvas, Circle, Group, Blur, Path } from '@shopify/react-native-skia';
 // smear. Drawing it live with Skia (same approach as StarField.tsx) keeps the
 // glow crisp at any size and matches Figma's actual coordinates exactly.
 //
-// 2026-08-09 review, take 2: originally drove all motion off Reanimated
-// shared values passed straight into Skia props (the documented, "should
-// just work" pattern) — but on-device it never actually animated: Skia only
-// painted the latest value at the moment React itself re-rendered (e.g. on
-// the phase state change), not on every UI-thread tick. Root cause: this
-// exact Expo Go SDK 54 bundle pins @shopify/react-native-skia@2.2.12 +
-// react-native-worklets@0.5.1, and Skia's newer official worklets support
-// needs >=0.7.0 - so the shared-value-to-canvas bridge silently doesn't
-// fire. Can't just bump the npm version either: Expo Go's native side is
-// fixed per-SDK, a JS-level upgrade wouldn't reach the actual app on the
-// phone. Fix: don't depend on that bridge at all. Every position here is now
-// a plain number computed fresh each render from `time`/`ring1Progress`/
-// `ring2Progress` (plain numbers, driven by one rAF loop in
-// PersonalizationScreen.tsx) - ordinary React re-rendering, which works
-// regardless of any native module version mismatch.
+// 2026-08-09, take 2: originally drove all motion off Reanimated shared
+// values passed straight into Skia props - but on-device it never actually
+// animated, because this app's Expo Go build at the time pinned
+// @shopify/react-native-skia@2.2.12 + react-native-worklets@0.5.1, and
+// Skia's shared-value-to-canvas bridge needs newer versions than that (Skia's
+// own docs: the direct-shared-value integration needs Reanimated v4+, which
+// implies newer worklets than 0.5). Rebuilt at the time on a plain rAF-driven
+// React state number instead (see PersonalizationScreen.tsx's own history),
+// which sidesteps the bridge entirely at the cost of a full React
+// re-render + Skia repaint every single frame.
+//
+// 2026-09-29, take 3: after the SDK 54->57 upgrade (Skia 2.6.2, worklets
+// 0.10.1, reanimated 4.5.1) she reported this screen's animation had gone
+// jerky - but *only on Android*, iOS stayed smooth. Since a still-broken
+// bridge would fail identically on both platforms, this was instead the
+// take-2 workaround's real per-frame cost (recomputing ~40 star positions +
+// a full Skia repaint via React re-render, every frame) finally exceeding
+// Android's budget on the newer, apparently heavier render pipeline - a
+// throttle to ~30fps on Android alone didn't fully fix it either, meaning
+// the bottleneck is the *cost* of each frame's JS work, not just how often
+// it runs. Confirmed the bridge itself is actually wired in this Skia
+// version (node_modules/@shopify/react-native-skia's own
+// sksg/Recorder/ReanimatedRecorder.js does the same `isSharedValue(prop)`
+// detection the docs describe) - so this take moves every position back to
+// genuine Reanimated shared/derived values passed directly as Skia props.
+// The whole animation now runs on the UI thread with zero React re-renders
+// per frame (PersonalizationScreen.tsx's clock is a plain useFrameCallback
+// mutating a shared value, not React state) - not just cheaper than take 2,
+// structurally a different, much lighter mechanism. Not yet confirmed smooth
+// on her Android device.
 //
 // Two motion layers:
 //  1. Ambient wander — every star drifts slowly and organically the whole
@@ -123,12 +139,15 @@ const RING2_R = 127.14;
 function ringPath(cx: number, cy: number, r: number) {
   return `M ${cx} ${cy - r} A ${r} ${r} 0 1 1 ${cx} ${cy + r} A ${r} ${r} 0 1 1 ${cx} ${cy - r}`;
 }
+const RING1_PATH = ringPath(CENTER[0], CENTER[1], RING1_R);
+const RING2_PATH = ringPath(CENTER[0], CENTER[1], RING2_R);
 
 // Checkmark path from Figma's exported asset (Group 69, 78x61.18 box),
 // centered on the illustration and translated from its own top-left origin.
 const CHECK_PATH = 'M66.5314 9.00104C65.9085 9.0196 65.3173 9.27994 64.883 9.72689L28.2159 46.394L13.1276 31.3057C12.9067 31.0756 12.642 30.8919 12.3492 30.7653C12.0564 30.6388 11.7413 30.5719 11.4223 30.5687C11.1033 30.5654 10.7869 30.6258 10.4915 30.7464C10.1962 30.867 9.92789 31.0453 9.70232 31.2709C9.47676 31.4964 9.29846 31.7647 9.17789 32.0601C9.05731 32.3554 8.99688 32.6718 9.00012 32.9908C9.00337 33.3098 9.07023 33.6249 9.19679 33.9177C9.32335 34.2106 9.50706 34.4752 9.73717 34.6961L26.5207 51.4796C26.9704 51.9291 27.5801 52.1816 28.2159 52.1816C28.8517 52.1816 29.4615 51.9291 29.9111 51.4796L68.2735 13.1173C68.6199 12.7805 68.8566 12.3469 68.9524 11.8734C69.0482 11.3998 68.9987 10.9083 68.8104 10.4633C68.6221 10.0184 68.3037 9.64066 67.8971 9.37973C67.4904 9.11879 67.0144 8.9868 66.5314 9.00104Z';
 const CHECK_W = 78;
 const CHECK_H = 61.1816;
+const CHECK_TRANSFORM = [{ translate: [CENTER[0] - CHECK_W / 2, CENTER[1] - CHECK_H / 2] as [number, number] }];
 
 function mulberry32(seed: number) {
   let a = seed;
@@ -157,7 +176,10 @@ function makeWander(seed: number): WanderParams {
   };
 }
 
+// 'worklet' - runs on the UI thread inside useDerivedValue below, must not
+// close over anything but plain data/other worklets.
 function wanderAt(p: WanderParams, timeMs: number): Pt {
+  'worklet';
   return [
     p.ampX * Math.sin((timeMs / p.periodX) * Math.PI * 2 + p.phaseX),
     p.ampY * Math.sin((timeMs / p.periodY) * Math.PI * 2 + p.phaseY),
@@ -179,17 +201,33 @@ function arrivalWindow(threshold: number): [number, number] {
   return [0, threshold];
 }
 
+// 'worklet'
 function clamp01(v: number) {
+  'worklet';
   return Math.min(1, Math.max(0, v));
 }
 
 // Slow start, slow finish - reads as a natural, unhurried drift rather than
 // a fast dash that decelerates (ease-out alone) or a mechanical straight line.
+// 'worklet'
 function smoothstep(t: number) {
+  'worklet';
   return t * t * (3 - 2 * t);
 }
 
-function Star({ cx, cy, r, coreR, glowOpacity = 1 }: { cx: number; cy: number; r: number; coreR: number; glowOpacity?: number }) {
+function Star({
+  cx,
+  cy,
+  r,
+  coreR,
+  glowOpacity = 1,
+}: {
+  cx: SharedValue<number>;
+  cy: SharedValue<number>;
+  r: number;
+  coreR: number;
+  glowOpacity?: number;
+}) {
   return (
     <>
       <Group opacity={glowOpacity}>
@@ -201,84 +239,108 @@ function Star({ cx, cy, r, coreR, glowOpacity = 1 }: { cx: number; cy: number; r
   );
 }
 
+// One ambient-only wandering star - position is a pure function of `time`,
+// no ring choreography.
+function WanderStar({ base, wander, r, coreR, time }: { base: Pt; wander: WanderParams; r: number; coreR: number; time: SharedValue<number> }) {
+  const cx = useDerivedValue(() => base[0] + wanderAt(wander, time.value)[0], [time]);
+  const cy = useDerivedValue(() => base[1] + wanderAt(wander, time.value)[1], [time]);
+  return <Star cx={cx} cy={cy} r={r} coreR={coreR} />;
+}
+
+// One ring star - wanders freely until its arrival window, then glides onto
+// its ring destination as `ringProgress` sweeps past its threshold.
+function RingStar({
+  from,
+  to,
+  threshold,
+  wander,
+  time,
+  ringProgress,
+}: {
+  from: Pt;
+  to: Pt;
+  threshold: number;
+  wander: WanderParams;
+  time: SharedValue<number>;
+  ringProgress: SharedValue<number>;
+}) {
+  const [arrivalStart, arrivalEnd] = arrivalWindow(threshold);
+  const cx = useDerivedValue(() => {
+    const t = clamp01((ringProgress.value - arrivalStart) / (arrivalEnd - arrivalStart));
+    const eased = smoothstep(t);
+    const dx = wanderAt(wander, time.value)[0];
+    return from[0] + (to[0] - from[0]) * eased + dx * (1 - eased);
+  }, [time, ringProgress]);
+  const cy = useDerivedValue(() => {
+    const t = clamp01((ringProgress.value - arrivalStart) / (arrivalEnd - arrivalStart));
+    const eased = smoothstep(t);
+    const dy = wanderAt(wander, time.value)[1];
+    return from[1] + (to[1] - from[1]) * eased + dy * (1 - eased);
+  }, [time, ringProgress]);
+  return <Star cx={cx} cy={cy} r={17.5} coreR={3.5} glowOpacity={0.14} />;
+}
+
 export function PersonalizationIllustration({
   width,
   height,
   time,
   ring1Progress,
   ring2Progress,
-  checkProgress = 0,
+  checkProgress,
 }: {
   width: number;
   height: number;
-  time: number;
-  ring1Progress: number;
-  ring2Progress: number;
-  checkProgress?: number;
+  time: SharedValue<number>;
+  ring1Progress: SharedValue<number>;
+  ring2Progress: SharedValue<number>;
+  checkProgress: SharedValue<number>;
 }) {
   const scale = width / CANVAS_W;
+  const checkVisible = useDerivedValue(() => (checkProgress.value > 0 ? 1 : 0), [checkProgress]);
 
   return (
     <Canvas style={{ width, height }}>
       <Group transform={[{ scale }]}>
-        {STARS_8.map((base, i) => {
-          const [dx, dy] = wanderAt(STARS_8_WANDER[i], time);
-          return <Star key={`s8-${i}`} cx={base[0] + dx} cy={base[1] + dy} r={4} coreR={1} />;
-        })}
-        {STARS_5.map((base, i) => {
-          const [dx, dy] = wanderAt(STARS_5_WANDER[i], time);
-          return <Star key={`s5-${i}`} cx={base[0] + dx} cy={base[1] + dy} r={2.5} coreR={0.625} />;
-        })}
+        {STARS_8.map((base, i) => (
+          <WanderStar key={`s8-${i}`} base={base} wander={STARS_8_WANDER[i]} r={4} coreR={1} time={time} />
+        ))}
+        {STARS_5.map((base, i) => (
+          <WanderStar key={`s5-${i}`} base={base} wander={STARS_5_WANDER[i]} r={2.5} coreR={0.625} time={time} />
+        ))}
 
-        {RING1_ORIGIN.map((from, i) => {
-          const [arrivalStart, arrivalEnd] = arrivalWindow(RING1_THRESHOLDS[i]);
-          const t = clamp01((ring1Progress - arrivalStart) / (arrivalEnd - arrivalStart));
-          const eased = smoothstep(t);
-          const [dx, dy] = wanderAt(RING1_WANDER[i], time);
-          const to = RING1_DEST[i];
-          const cx = from[0] + (to[0] - from[0]) * eased + dx * (1 - eased);
-          const cy = from[1] + (to[1] - from[1]) * eased + dy * (1 - eased);
-          return <Star key={`r1-${i}`} cx={cx} cy={cy} r={17.5} coreR={3.5} glowOpacity={0.14} />;
-        })}
-        {RING2_ORIGIN.map((from, i) => {
-          const [arrivalStart, arrivalEnd] = arrivalWindow(RING2_THRESHOLDS[i]);
-          const t = clamp01((ring2Progress - arrivalStart) / (arrivalEnd - arrivalStart));
-          const eased = smoothstep(t);
-          const [dx, dy] = wanderAt(RING2_WANDER[i], time);
-          const to = RING2_DEST[i];
-          const cx = from[0] + (to[0] - from[0]) * eased + dx * (1 - eased);
-          const cy = from[1] + (to[1] - from[1]) * eased + dy * (1 - eased);
-          return <Star key={`r2-${i}`} cx={cx} cy={cy} r={17.5} coreR={3.5} glowOpacity={0.14} />;
-        })}
+        {RING1_ORIGIN.map((from, i) => (
+          <RingStar
+            key={`r1-${i}`}
+            from={from}
+            to={RING1_DEST[i]}
+            threshold={RING1_THRESHOLDS[i]}
+            wander={RING1_WANDER[i]}
+            time={time}
+            ringProgress={ring1Progress}
+          />
+        ))}
+        {RING2_ORIGIN.map((from, i) => (
+          <RingStar
+            key={`r2-${i}`}
+            from={from}
+            to={RING2_DEST[i]}
+            threshold={RING2_THRESHOLDS[i]}
+            wander={RING2_WANDER[i]}
+            time={time}
+            ringProgress={ring2Progress}
+          />
+        ))}
 
-        <Path
-          path={ringPath(CENTER[0], CENTER[1], RING1_R)}
-          start={0}
-          end={ring1Progress}
-          style="stroke"
-          strokeWidth={0.6}
-          color={CORE}
-          opacity={0.6}
-        />
-        <Path
-          path={ringPath(CENTER[0], CENTER[1], RING2_R)}
-          start={0}
-          end={ring2Progress}
-          style="stroke"
-          strokeWidth={0.6}
-          color={CORE}
-          opacity={0.6}
-        />
+        <Path path={RING1_PATH} start={0} end={ring1Progress} style="stroke" strokeWidth={0.6} color={CORE} opacity={0.6} />
+        <Path path={RING2_PATH} start={0} end={ring2Progress} style="stroke" strokeWidth={0.6} color={CORE} opacity={0.6} />
 
-        {checkProgress > 0 ? (
-          <Group transform={[{ translate: [CENTER[0] - CHECK_W / 2, CENTER[1] - CHECK_H / 2] }]}>
-            <Group>
-              <Blur blur={4.5} />
-              <Path path={CHECK_PATH} start={0} end={checkProgress} color={GLOW} />
-            </Group>
+        <Group transform={CHECK_TRANSFORM} opacity={checkVisible}>
+          <Group>
+            <Blur blur={4.5} />
             <Path path={CHECK_PATH} start={0} end={checkProgress} color={GLOW} />
           </Group>
-        ) : null}
+          <Path path={CHECK_PATH} start={0} end={checkProgress} color={GLOW} />
+        </Group>
       </Group>
     </Canvas>
   );

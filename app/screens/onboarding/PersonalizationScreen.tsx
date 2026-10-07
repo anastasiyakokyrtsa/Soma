@@ -1,8 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { useCallback, useState } from 'react';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
-import Animated, { FadeIn, FadeInDown, Easing } from 'react-native-reanimated';
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  Easing,
+  useSharedValue,
+  useDerivedValue,
+  useFrameCallback,
+  useAnimatedReaction,
+  runOnJS,
+  type SharedValue,
+  type FrameInfo,
+} from 'react-native-reanimated';
 import { colors, glow, gradients, fontFamily, spacing } from '../../theme';
 import { StepProgressRing } from '../../components/icons/StepProgressRing';
 import { ProgressRingCheckIcon } from '../../components/icons/ProgressRingCheckIcon';
@@ -14,100 +25,97 @@ import { PersonalizationIllustration } from '../../components/PersonalizationIll
 // phases (step 1's circular loading ring, then step 2's), then the screen
 // completes.
 //
-// Everything here is driven by one plain rAF loop (`time`, ms since mount) -
-// not Reanimated shared values. See PersonalizationIllustration.tsx for why:
-// this exact Expo Go SDK's react-native-skia/reanimated/worklets versions
-// don't bridge shared-value mutations into the Skia canvas, only React
-// re-renders do, so a shared-value-driven animation just sat frozen until
-// the next real re-render. A plain state number that changes every frame
-// via requestAnimationFrame sidesteps that entirely - ordinary React
-// re-rendering always works. The step badge (StepProgressRing) reads off
-// the exact same `time`-derived progress numbers so it can't drift out of
-// sync with the illustration's rings.
+// Take 3, 2026-09-29 (see PersonalizationIllustration.tsx for the full
+// history): the clock is now a Reanimated shared value advanced by
+// useFrameCallback, and every progress value below is a useDerivedValue
+// worklet - a pure function of that one shared value, computed on the UI
+// thread. Nothing here causes a React re-render on a per-frame basis
+// anymore; the JS thread only hears about it twice, at the two real phase
+// transitions (via useAnimatedReaction + runOnJS below), to switch the
+// title/step-badge UI. This replaces the previous "React state ticks every
+// frame" approach, whose real per-frame cost (recomputing ~40 Skia star
+// positions + a full Canvas repaint via ordinary re-render) is what
+// regressed on Android after the SDK 54->57 upgrade - throttling that
+// approach to ~30fps didn't fully fix it, so this removes the JS-thread
+// bottleneck itself instead of just reducing how often it's paid.
 const STEP_DURATION_MS = 5000;
 // The final checkmark draws in over this long rather than popping in
 // instantly (2026-08-09 review: "галочка... пусть помедленнее и поплавнее").
 const CHECK_DURATION_MS = 900;
-// Unthrottled (every rAF frame, ~60fps) on iOS - 2026-08-09 review: the
-// earlier 20fps throttle ("plenty smooth" in theory) actually read as faint
-// stutter on a slow, deliberate glide, where every dropped frame is more
-// noticeable than it would be on something fast.
-//
-// Android-only regression, 2026-09-29 (after the SDK 54->57 upgrade): every
-// tick recomputes ~40 star positions and re-renders the whole Skia Canvas via
-// a plain React re-render (see the comment below on why it's not shared-value
-// driven) - a real per-frame cost that iOS has headroom for but Android
-// apparently no longer does at 60fps on the newer RN/Skia/Hermes versions
-// this SDK bundles (it did before the upgrade, same code, same devices - she
-// confirmed iPhone stayed smooth, only Android got worse). A locked, lower
-// rate reads as smoother than an attempted-60fps that keeps dropping frames
-// unevenly, so Android throttles to ~30fps instead of chasing 60.
-const TICK_MS = Platform.OS === 'android' ? 33 : 0;
 
 type Phase = 'step1' | 'step2' | 'done';
 type StepState = 'pending' | 'active' | 'done';
 
-function useAnimationClock() {
-  const [time, setTime] = useState(0);
-  const startRef = useRef<number | null>(null);
-  const lastRef = useRef(0);
-
-  useEffect(() => {
-    let raf: number;
-    const tick = () => {
-      const now = Date.now();
-      if (startRef.current === null) startRef.current = now;
-      const elapsed = now - startRef.current;
-      if (elapsed - lastRef.current >= TICK_MS) {
-        lastRef.current = elapsed;
-        setTime(elapsed);
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return time;
-}
-
 function clamp01(v: number) {
+  'worklet';
   return Math.min(1, Math.max(0, v));
 }
 
 function smoothstep(t: number) {
+  'worklet';
   return t * t * (3 - 2 * t);
 }
 
 export function PersonalizationScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const time = useAnimationClock();
   const [phase, setPhase] = useState<Phase>('step1');
-  const [step2StartTime, setStep2StartTime] = useState<number | null>(null);
-  const [doneStartTime, setDoneStartTime] = useState<number | null>(null);
 
-  const progress1 = phase === 'step1' ? clamp01(time / STEP_DURATION_MS) : 1;
-  const progress2 =
-    phase === 'done' ? 1 : phase === 'step2' && step2StartTime !== null ? clamp01((time - step2StartTime) / STEP_DURATION_MS) : 0;
-  const checkProgress =
-    phase === 'done' && doneStartTime !== null ? smoothstep(clamp01((time - doneStartTime) / CHECK_DURATION_MS)) : 0;
+  const time = useSharedValue(0);
+  // A stable callback identity is load-bearing here, not a style nicety: an
+  // inline arrow re-created on every render made useFrameCallback's own
+  // effect (deps [callback, autostart]) tear down and re-register a brand
+  // new callback at each of this screen's two React re-renders (the phase
+  // flips at 5s/10s, driven by setPhase below) - and a freshly-registered
+  // callback's *own* startTime is null, so Reanimated reports its next tick
+  // as frame 0 all over again (see FrameCallbackRegistryUI's "First frame"
+  // branch). `time` silently snapped back to 0 right as step 2 was supposed
+  // to begin, undrawing ring 1 and stalling ring 2 forever - her 2026-09-29
+  // catch ("ты всю последовательность испортил"). `time` itself (the
+  // useSharedValue return) is a stable ref across renders, so memoizing on
+  // it is enough to keep this one callback registered for the screen's
+  // entire lifetime.
+  // 'worklet' explicit and mandatory here, not optional style - Reanimated's
+  // babel plugin only auto-marks a function as a worklet when it sees it
+  // written directly inline as the argument of a known hook call
+  // (useFrameCallback(fn), useDerivedValue(fn), ...). Once it's wrapped in
+  // useCallback like this, the plugin can no longer trace it back to
+  // useFrameCallback's argument position, so without the explicit directive
+  // it stays a plain JS closure - which crashed for real on-device (2026-09-29,
+  // her report): Android threw "[Worklets] Tried to synchronously call a
+  // Remote Function" (the UI thread tried to run a non-worklet JS function
+  // synchronously), iOS just hard-crashed out of the app on the same call.
+  const onFrame = useCallback(
+    (frame: FrameInfo) => {
+      'worklet';
+      time.value = frame.timeSinceFirstFrame;
+    },
+    [time]
+  );
+  useFrameCallback(onFrame);
 
-  useEffect(() => {
-    if (phase === 'step1' && progress1 >= 1) {
-      setPhase('step2');
-      setStep2StartTime(time);
+  // Continuous, deterministic functions of `time` alone - each phase has a
+  // fixed duration, so there's no need to capture "when did the previous
+  // phase actually end" the way the old React-state version had to; the
+  // fixed boundaries (STEP_DURATION_MS, its double) are exact instead of
+  // whichever rAF tick happened to observe the crossing.
+  const progress1 = useDerivedValue(() => clamp01(time.value / STEP_DURATION_MS));
+  const progress2 = useDerivedValue(() => clamp01((time.value - STEP_DURATION_MS) / STEP_DURATION_MS));
+  const checkProgress = useDerivedValue(() =>
+    smoothstep(clamp01((time.value - STEP_DURATION_MS * 2) / CHECK_DURATION_MS))
+  );
+
+  // The only bridge back to JS: runs on the UI thread every frame (cheap -
+  // just three comparisons), but only actually calls into JS at the two
+  // instants the phase label changes, not every frame.
+  useAnimatedReaction(
+    () => (checkProgress.value > 0 ? 'done' : progress2.value > 0 ? 'step2' : 'step1'),
+    (current, previous) => {
+      if (current !== previous) {
+        runOnJS(setPhase)(current as Phase);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress1, phase]);
-
-  useEffect(() => {
-    if (phase === 'step2' && progress2 >= 1) {
-      setPhase('done');
-      setDoneStartTime(time);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress2, phase]);
+  );
 
   const step1State: StepState = phase === 'step1' ? 'active' : 'done';
   const step2State: StepState = phase === 'step1' ? 'pending' : phase === 'step2' ? 'active' : 'done';
@@ -211,7 +219,7 @@ function StepRow({
   title: string;
   subtitle: string;
   state: StepState;
-  progress: number;
+  progress: SharedValue<number>;
 }) {
   const pending = state === 'pending';
   return (
