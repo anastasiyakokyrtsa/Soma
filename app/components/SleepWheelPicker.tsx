@@ -125,6 +125,23 @@ export function SleepWheelPicker({
   const glowOpacity = onWeb ? 0.4 : 1;
   const r = outerRadius - stroke / 2;
   const ringInner = r - stroke / 2;
+  // OUTER_RATIO already leaves ~5% of `size` as margin outside the ring's own
+  // outer edge, but the glow's blur (~13% of outerRadius, i.e. roughly that
+  // same ~13% of `size`) needs more room than that to fade out before
+  // hitting the <Svg>'s own canvas edge - same root cause/fix as
+  // BiorhythmChart's ring glow (fixed the same night): react-native-svg
+  // clips to the declared canvas regardless of the filter region's -50%/200%
+  // (that's for the shape's own bounding box, not the SVG viewport). The
+  // web-only blur/opacity damping below was band-aiding the visible symptom
+  // (a weaker blur clips less noticeably) without fixing the real shortage -
+  // she's now caught the same hard edge on iOS too (2026-09-29, sleep-setup
+  // screen), so this gives the canvas real headroom instead. viewBox shifts
+  // by -RING_GLOW_PAD while width/height grow by 2x that, keeping 1 unit =
+  // 1px (no rescale) - all the existing center/polar math below still uses
+  // plain 0..size coordinates unchanged, just with real room around them
+  // now; the negative margin folds the extra canvas back so this <Svg>'s
+  // still occupies exactly `size`x`size` in `wrap`'s own layout.
+  const RING_GLOW_PAD = size * 0.12;
   const tickLen = size * 0.024;
   // 8px everywhere - the same literal gap for both the tick dashes and the
   // numbers, not two different formulas landing at two different visual
@@ -209,7 +226,12 @@ export function SleepWheelPicker({
 
   return (
     <View style={[styles.wrap, { width: size, height: size }]}>
-      <Svg width={size} height={size}>
+      <Svg
+        width={size + RING_GLOW_PAD * 2}
+        height={size + RING_GLOW_PAD * 2}
+        viewBox={`${-RING_GLOW_PAD} ${-RING_GLOW_PAD} ${size + RING_GLOW_PAD * 2} ${size + RING_GLOW_PAD * 2}`}
+        style={{ margin: -RING_GLOW_PAD }}
+      >
         <Defs>
           <SvgLinearGradient id="sleepArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset={0} stopColor={gradients.headingText.colors[0]} />

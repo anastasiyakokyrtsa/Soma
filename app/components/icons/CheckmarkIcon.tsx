@@ -16,9 +16,30 @@ const CHECK_D =
 // bridge). No wrapping box of any kind - her explicit ask 2026-09-06, after
 // a boxShadow-on-a-View attempt rendered a visible dark rectangle behind the
 // icon: "сам значок только остался без тёмного фона под ним".
+// "9 9 60 43.18" is the glyph's own exact bounding box (no spare room) -
+// fine unglowed, but with `glow` the blur has nowhere to fade into before
+// the SVG's own canvas clips it, same bug fixed tonight everywhere else this
+// app draws a glow through an SVG filter. Only relevant when `glow` is true
+// (BreathingComplete's own use), same "grow the canvas + fold it back with a
+// negative margin" technique so the crisp glyph's own size never changes.
+const CHECK_VB = { x: 9, y: 9, w: 60, h: 43.18 };
+const CHECK_GLOW_PAD_RATIO = 0.25;
+
 export function CheckmarkIcon({ size = 60, color = '#FFFFFF', glow = false }: { size?: number; color?: string; glow?: boolean }) {
+  const scale = size / CHECK_VB.w;
+  const baseH = CHECK_VB.h * scale;
+  const padUnits = glow ? Math.max(CHECK_VB.w, CHECK_VB.h) * CHECK_GLOW_PAD_RATIO : 0;
+  const padPx = padUnits * scale;
+  const viewBox = `${CHECK_VB.x - padUnits} ${CHECK_VB.y - padUnits} ${CHECK_VB.w + padUnits * 2} ${CHECK_VB.h + padUnits * 2}`;
+
   return (
-    <Svg width={size} height={size * (43.18 / 60)} viewBox="9 9 60 43.18" fill="none">
+    <Svg
+      width={size + padPx * 2}
+      height={baseH + padPx * 2}
+      viewBox={viewBox}
+      fill="none"
+      style={{ margin: -padPx }}
+    >
       {glow ? (
         <>
           <Defs>

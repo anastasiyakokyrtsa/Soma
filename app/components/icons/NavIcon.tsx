@@ -23,10 +23,41 @@ export type { NavIconName };
 // the active icon's own fill color already *is* the glow color (unlike
 // BottomBar's dark-filled dome, which needed a separately-colored stroke
 // instead - see that file's own comment).
+// Each icon's viewBox in navIconPaths.ts is a tight bounding box around its
+// own path (ported straight from Figma's export), with no spare room - fine
+// for the plain outline, but the active glow's blur (stdDeviation 4.5) needs
+// somewhere to fade into before hitting that boundary, same clipping bug
+// fixed tonight in BiorhythmChart/SleepWheelPicker/BottomBar. This is the
+// bottom tab bar - on screen on every tab, in its highlighted state - so
+// it's a real, visible instance, not a hypothetical one (her 2026-09-29 ask
+// to check every glow spot for this exact iOS symptom).
+// Padding is proportional (not a flat px number) since each icon's own
+// viewBox is a different, sometimes non-square, size - and computed
+// per-axis in pixel space (canvasW/H, marginX/Y) rather than baked into the
+// viewBox unconditionally, so the icon's own crisp size in `size`x`size`
+// never shrinks to make room; only the (inactive-by-default, invisible)
+// canvas around it grows, same "grow the canvas + fold it back with a
+// negative margin" technique as BottomBar's own dome glow.
+const NAV_GLOW_PAD_RATIO = 0.22;
+
 export function NavIcon({ name, active, size = 27 }: { name: NavIconName; active?: boolean; size?: number }) {
   const def = navIconPaths[name];
+  const [vx, vy, vw, vh] = def.viewBox.split(' ').map(Number);
+  const padUnits = Math.max(vw, vh) * NAV_GLOW_PAD_RATIO;
+  const scaleX = size / vw;
+  const scaleY = size / vh;
+  const padPxX = padUnits * scaleX;
+  const padPxY = padUnits * scaleY;
+  const paddedViewBox = `${vx - padUnits} ${vy - padUnits} ${vw + padUnits * 2} ${vh + padUnits * 2}`;
+
   return (
-    <Svg width={size} height={size} viewBox={def.viewBox} preserveAspectRatio="none">
+    <Svg
+      width={size + padPxX * 2}
+      height={size + padPxY * 2}
+      viewBox={paddedViewBox}
+      preserveAspectRatio="none"
+      style={{ marginHorizontal: -padPxX, marginVertical: -padPxY }}
+    >
       {active ? (
         <>
           <Defs>

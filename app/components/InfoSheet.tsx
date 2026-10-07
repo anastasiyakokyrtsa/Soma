@@ -45,10 +45,20 @@ export function InfoSheet({
   const insets = useSafeAreaInsets();
   const translateY = useSharedValue(0);
 
-  // Reset position each time the sheet opens - otherwise a swipe-dismissed
-  // close would leave it parked off-screen for the next open.
+  // Sheet slides up on its own (Reanimated), separate from the scrim below -
+  // 2026-09-29, her catch: Modal's own `animationType="slide"` animates the
+  // WHOLE native modal surface, scrim included, so the dimming visibly slid
+  // up from the bottom together with the panel instead of snapping on
+  // instantly ("затемнение экрана тоже выезжает снизу... так не надо, надо
+  // чтобы экран просто мгновенно затемнялся"). Modal is now `animationType=
+  // "none"` (no native animation at all, so the scrim just appears at full
+  // opacity the instant `visible` flips) and this effect drives the panel's
+  // own slide-in instead, decoupled from the scrim.
   useEffect(() => {
-    if (visible) translateY.value = 0;
+    if (visible) {
+      translateY.value = 400;
+      translateY.value = withTiming(0, { duration: 220 });
+    }
   }, [visible, translateY]);
 
   const close = () => onClose();
@@ -70,7 +80,7 @@ export function InfoSheet({
   }));
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       {/* Modal renders its content on its own native surface, separate from
           the app's root - the <GestureHandlerRootView> in App.tsx doesn't
           reach in here, so this Modal needs its own, or the gesture below

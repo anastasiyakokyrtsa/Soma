@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import Svg, { Line, Path, Circle, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 
@@ -103,6 +103,25 @@ const RING_META = [
 // 100, not the kit's literal 84 - her explicit ask to size these up past
 // the kit's own reference (2026-08-19, "прогресс бары... сделать побольше").
 const RING_BOX = 100;
+// The ring's own <Svg> canvas is 84x84 (viewBox), but the ring's outer stroke
+// edge (RING_R 34 + half the 8px strokeWidth = 38) sits only 4 units from
+// that canvas's own edge - not enough room for the glow filter's blur to
+// fully fade before hitting the SVG's own canvas boundary, so at the ring's
+// top (where a low-value ring's whole visible arc is just a short bright dot)
+// the glow's soft falloff gets hard-clipped into a flat edge on iOS (her
+// 2026-09-29 screenshot). Exact same root cause/fix as the curves' own
+// viewBox padding above - RN-SVG clips to the declared canvas regardless of
+// `overflow: visible` on the wrapping style, so the real fix is giving the
+// canvas itself more room, not the View around it. Padding both dimensions
+// symmetrically keeps the ring centered without touching its cx/cy.
+const RING_GLOW_PAD = 10;
+const RING_VIEWBOX = 84;
+const RING_CANVAS = RING_VIEWBOX + RING_GLOW_PAD * 2;
+// Android's own glow read weaker than the reference even after the last
+// bump - iOS didn't get this complaint, only Android, so this stays a
+// platform split rather than a shared bump (2026-09-29: "только для версии
+// на андроид: прибавь чуть чуть свечение").
+const RING_GLOW_STD = Platform.OS === 'android' ? 6 : 4;
 
 export function BiorhythmChart({
   width = 380,
@@ -190,11 +209,16 @@ export function BiorhythmChart({
           return (
             <View key={r.id} style={styles.ringItem}>
               <View style={[styles.ringBox, { width: ringBoxSize, height: ringBoxSize }]}>
-                <Svg width={ringBoxSize} height={ringBoxSize} viewBox="0 0 84 84" style={styles.ringSvg}>
+                <Svg
+                  width={ringBoxSize * (RING_CANVAS / RING_VIEWBOX)}
+                  height={ringBoxSize * (RING_CANVAS / RING_VIEWBOX)}
+                  viewBox={`${-RING_GLOW_PAD} ${-RING_GLOW_PAD} ${RING_CANVAS} ${RING_CANVAS}`}
+                  style={styles.ringSvg}
+                >
                   <Defs>
                     <Filter id={`ringGlow-${r.id}`} x="-50%" y="-50%" width="200%" height="200%">
                       {/* stdDeviation bumped 2.5 -> 4 (2026-08-19: same glow ask, applied to the rings too) */}
-                      <FeGaussianBlur stdDeviation={4} />
+                      <FeGaussianBlur stdDeviation={RING_GLOW_STD} />
                     </Filter>
                   </Defs>
                   {/* faint full-circle track behind the arc, so the ring
@@ -289,6 +313,7 @@ const styles = StyleSheet.create({
   },
   ringSvg: {
     position: 'absolute',
+    overflow: 'visible',
     transform: [{ rotate: '-90deg' }],
   },
   ringPct: {
