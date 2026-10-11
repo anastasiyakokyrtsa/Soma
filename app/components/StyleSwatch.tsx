@@ -56,10 +56,20 @@ const GRADIENTS: Record<VisualStyleId, string[]> = {
   dawn: ['#050816', '#050816'],
 };
 
-function FocusRings({ width, height }: { width: number; height: number }) {
+function FocusRings({ width, height, centerY }: { width: number; height: number; centerY?: number }) {
   const cx = width / 2;
-  const cy = height / 2;
-  const rings = [0.16, 0.28, 0.4, 0.52];
+  // Centered between the header and the bottom text block, not the full
+  // screen height (her ask, 2026-10-11) - falls back to height/2 (the old
+  // behavior) until the caller has measured both.
+  const cy = centerY ?? height / 2;
+  // Ring radii as fractions of the outermost one, not of `width` directly -
+  // the outermost ring is sized to leave exactly 16px to the screen edges
+  // (her catch, 2026-10-11: at the old fixed 0.52*width fraction its
+  // diameter was 1.04x the screen width, running off both sides), with the
+  // other 3 scaled proportionally so the ring spacing itself is unchanged.
+  const maxRadius = width / 2 - 16;
+  const ringFractions = [0.16, 0.28, 0.4, 0.52];
+  const rings = ringFractions.map((f) => (f / 0.52) * maxRadius);
   const dotScale = useSharedValue(1);
 
   useEffect(() => {
@@ -79,8 +89,8 @@ function FocusRings({ width, height }: { width: number; height: number }) {
 
   return (
     <>
-      {rings.map((f, i) => (
-        <ShimmerRing key={i} size={width * f * 2} left={cx - width * f} top={cy - width * f} baseAlpha={0.55 - i * 0.11} delay={i * 350} />
+      {rings.map((r, i) => (
+        <ShimmerRing key={i} size={r * 2} left={cx - r} top={cy - r} baseAlpha={0.55 - i * 0.11} delay={i * 350} />
       ))}
       {/* small solid center point — an aperture/lens iris reads more like
           "focus" than empty rings alone, now breathing (scale pulse) */}
@@ -266,11 +276,14 @@ export function StyleSwatch({
   width,
   height,
   radius = 0,
+  focusCenterY,
 }: {
   styleId: VisualStyleId;
   width: number;
   height: number;
   radius?: number;
+  // Only used by the 'focus' swatch - see FocusRings.
+  focusCenterY?: number;
 }) {
   const imageSource = IMAGE_SOURCES[styleId];
 
@@ -300,7 +313,7 @@ export function StyleSwatch({
         />
       )}
 
-      {styleId === 'focus' && <FocusRings width={width} height={height} />}
+      {styleId === 'focus' && <FocusRings width={width} height={height} centerY={focusCenterY} />}
 
       {styleId === 'nature' && (
         <>
