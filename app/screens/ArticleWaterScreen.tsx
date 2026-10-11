@@ -1,15 +1,15 @@
-import { useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  useWindowDimensions,
-  Dimensions,
-  type NativeSyntheticEvent,
-  type NativeScrollEvent,
-} from 'react-native';
+import { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions, Dimensions } from 'react-native';
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  useAnimatedReaction,
+  runOnJS,
+  interpolate,
+  Extrapolation,
+  type SharedValue,
+} from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -34,9 +34,71 @@ const SIDE_MARGIN = 16;
 // enough to that row's real text+hitSlop height that the 16px gap below it
 // (her spec) doesn't visibly drift.
 const NAV_ROW_HEIGHT = 24;
-// Icon (28*28/36≈21.8) + 6px gap + one text line (~16px) - used only to
-// position the swipe hint's `top` from the card's bottom edge, see below.
-const SWIPE_HINT_HEIGHT = 44;
+// ScrollView clips to its own declared height/viewport (standard behavior,
+// not configurable away) - the card's glow (cardGlowActive below) had zero
+// vertical room to bleed into since the card's own height fills the
+// ScrollView's exactly, so it only ever showed on the left/right (where the
+// page's own 16px side padding gave it somewhere to go). The ScrollView's
+// canvas is padded by this much on top/bottom, shifted to compensate, and
+// each page adds the same amount back as its own vertical padding - same
+// "grow the canvas + fold it back" fix as every other glow-clipping bug
+// tonight, just applied to a ScrollView instead of an SVG.
+const CARD_GLOW_PAD = 16;
+// Depth page transition (her ask, 2026-10-09: the page you're swiping away
+// from should recede/shrink while the incoming one reads as "closer") -
+// same shape as Android's own well-known DepthPageTransformer sample.
+// MIN_SCALE/MIN_ALPHA tuned close to the Android reference sample.
+// Reverted here from a 0.92/0.03 attempt (2026-10-09) that closed the
+// "hole" between cards but flattened the depth effect enough that it
+// barely read at all - back to the values that still looked like real
+// depth, just with the smaller pullback from the two rounds before that.
+const DEPTH_MIN_SCALE = 0.75;
+const DEPTH_MIN_ALPHA = 0.5;
+const DEPTH_PULLBACK_RATIO = 0.06;
+
+// One page's outer slot, with the depth transform applied to the *whole*
+// slot (card + its padding) rather than just the card - driven by `scrollX`,
+// a Reanimated shared value updated on the UI thread every frame of the
+// gesture (useAnimatedScrollHandler below), not JS-thread state. Tonight's
+// Personalization-screen lesson applies here too: anything that has to
+// track a continuous gesture smoothly belongs on a shared value, not
+// per-frame React state.
+function DepthPage({
+  pageIndex,
+  scrollX,
+  width,
+  style,
+  children,
+}: {
+  pageIndex: number;
+  scrollX: SharedValue<number>;
+  width: number;
+  style: object;
+  children: React.ReactNode;
+}) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const position = scrollX.value / width - pageIndex;
+    // Symmetric now (was outgoing-only) - her follow-up, 2026-10-09: the
+    // *incoming* page should also arrive from depth (small/dim/held back)
+    // and only reach full size exactly as it settles into place, not slide
+    // in already at 1x. `distance` is 0 at the centered/settled position
+    // and 1 a full page away on either side.
+    const distance = Math.min(Math.abs(position), 1);
+    const scale = interpolate(distance, [0, 1], [1, DEPTH_MIN_SCALE], Extrapolation.CLAMP);
+    const opacity = interpolate(distance, [0, 1], [1, DEPTH_MIN_ALPHA], Extrapolation.CLAMP);
+    // Without this, each page would just slide at the scroll's own 1:1 rate
+    // like normal paging. Pulling the outgoing page back (and holding the
+    // incoming one further away, catching up as it nears position 0) makes
+    // both read as moving through depth rather than sliding flat.
+    const translateX = interpolate(position, [-1, 0, 1], [width * DEPTH_PULLBACK_RATIO, 0, -width * DEPTH_PULLBACK_RATIO], Extrapolation.CLAMP);
+    return {
+      opacity,
+      transform: [{ translateX }, { scale }],
+    };
+  });
+
+  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+}
 
 // Swipe-through article reader (her explicit format choice, 2026-09-16,
 // over ux-architect/ui-designer's continuous-scroll recommendation for
@@ -71,13 +133,12 @@ const SWIPE_HINT_HEIGHT = 44;
 export function ArticleWaterScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const [index, setIndex] = useState(0);
-  const scrollRef = useRef<ScrollView>(null);
-
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const i = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
-    if (i !== index) setIndex(i);
-  };
+  // Real-time scroll position on the UI thread, feeding each page's own
+  // depth transform (DepthPage above) every frame of the gesture.
+  const scrollX = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((e) => {
+    scrollX.value = e.contentOffset.x;
+  });
 
   // Her literal spec, 2026-10-07: nav row 40px from the top, the card 16px
   // below *that* row (not below the status bar), 16px margins on both
@@ -109,16 +170,25 @@ export function ArticleWaterScreen({ navigation }: any) {
         </Pressable>
       </View>
 
-      <ScrollView
-        ref={scrollRef}
+      <Animated.ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        scrollEventThrottle={32}
-        style={[styles.scroll, { top: cardTop, height: cardHeight }]}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        style={[styles.scroll, { top: cardTop - CARD_GLOW_PAD, height: cardHeight + CARD_GLOW_PAD * 2 }]}
       >
-        <View style={{ width: screenWidth, height: cardHeight, paddingHorizontal: SIDE_MARGIN }}>
+        <DepthPage
+          pageIndex={0}
+          scrollX={scrollX}
+          width={screenWidth}
+          style={{
+            width: screenWidth,
+            height: cardHeight + CARD_GLOW_PAD * 2,
+            paddingHorizontal: SIDE_MARGIN,
+            paddingVertical: CARD_GLOW_PAD,
+          }}
+        >
           <ArticleCard pageIndex={0}>
             <View style={styles.contentSpacerTop} />
             <View style={styles.coverContent}>
@@ -134,11 +204,32 @@ export function ArticleWaterScreen({ navigation }: any) {
               </View>
             </View>
             <View style={styles.contentSpacerBottom} />
+            {/* Attached to the cover's own card now (was a separate
+                screen-level overlay, positioned off `cardBottom`) - her ask,
+                2026-10-09: it should move/scale/fade *with* the card during
+                the swipe, not float independently over it. Only ever
+                rendered here, on the cover - no `index` check needed, this
+                JSX simply doesn't exist on the other pages. */}
+            <View style={styles.swipeHint} pointerEvents="none">
+              <SwipeHandIcon size={28} />
+              <Text style={styles.swipeHintText}>Свайпни влево</Text>
+            </View>
           </ArticleCard>
-        </View>
+        </DepthPage>
 
         {ARTICLE_WATER_PAGES.map((page, i) => (
-          <View key={i} style={{ width: screenWidth, height: cardHeight, paddingHorizontal: SIDE_MARGIN }}>
+          <DepthPage
+            key={i}
+            pageIndex={i + 1}
+            scrollX={scrollX}
+            width={screenWidth}
+            style={{
+              width: screenWidth,
+              height: cardHeight + CARD_GLOW_PAD * 2,
+              paddingHorizontal: SIDE_MARGIN,
+              paddingVertical: CARD_GLOW_PAD,
+            }}
+          >
             <ArticleCard pageIndex={i + 1}>
               <View style={styles.contentSpacerTop} />
               <View style={styles.pageContent}>
@@ -148,24 +239,9 @@ export function ArticleWaterScreen({ navigation }: any) {
               </View>
               <View style={styles.contentSpacerBottom} />
             </ArticleCard>
-          </View>
+          </DepthPage>
         ))}
-      </ScrollView>
-
-      {index < TOTAL_PAGES - 1 ? (
-        // `top`, not `bottom` - `bottom` on an absolutely positioned child
-        // measures from its container's own layout box, which RN sizes
-        // using `window` dimensions, not the `screen` dimensions `cardBottom`
-        // is now computed from above; mixing the two would reintroduce the
-        // exact Android/iOS mismatch this is fixing. Computing an explicit
-        // `top` from `cardBottom` keeps both the card and this hint on the
-        // same coordinate basis. SWIPE_HINT_HEIGHT is an estimate (icon +
-        // gap + one text line), not measured.
-        <View style={[styles.swipeHint, { top: cardBottom - 32 - SWIPE_HINT_HEIGHT }]} pointerEvents="none">
-          <SwipeHandIcon size={28} />
-          <Text style={styles.swipeHintText}>Свайпни влево</Text>
-        </View>
-      ) : null}
+      </Animated.ScrollView>
     </View>
   );
 }
@@ -186,58 +262,65 @@ function ArticleCard({ pageIndex, children }: { pageIndex: number; children: Rea
   const imageOpacity = pageIndex === 0 ? 1 : 0.55;
 
   return (
-    <View style={[styles.card, pageIndex > 0 && styles.cardBordered]}>
-      {/* expo-image, not core RN Image (her 2026-10-07 catch, "до этого
-          картинка нормальная была") - today's rewrite moved the photo from
-          one shared Image to 9 (one per page, all mounted at once since
-          ScrollView doesn't virtualize), and RN's own Image decodes its
-          source fresh per instance - 9 simultaneous full decodes of the
-          same photo is real memory pressure, and the OS answering with a
-          visibly lower-quality decode to cope is a known failure mode, not
-          a cache/asset issue (confirmed: the file itself and the bundled
-          copy are both sharp). expo-image caches the *decoded* bitmap by
-          source, so all 9 instances share one real decode instead of each
-          paying for their own. */}
-      <Image
-        source={WATER_IMAGE}
-        style={[StyleSheet.absoluteFill, { opacity: imageOpacity }]}
-        contentFit="cover"
-        cachePolicy="memory-disk"
-      />
-      {/* locations pushed later (was 0.32/0.82) - that fade was tuned for
-          the old full-screen-height image; applied to this card's now much
-          shorter height, the same *fractions* darkened the photo far
-          sooner, both proportionally and in absolute px, reading as a
-          washed-out haze instead of the crisp photo in her reference
-          (2026-10-07: "куда ты дел нормальную картинку воды?"). Starting
-          the fade later keeps the photo clear through the pill/counter
-          zone and only darkens toward where the text actually sits now
-          that content isn't bottom-anchored any more. */}
-      <LinearGradient
-        colors={['transparent', colors.bg0]}
-        locations={[0.5, 0.92]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
+    // Outer wrap carries the glow (needs no overflow clipping, same split
+    // QuoteCard already uses for its own outward glow) - `card` itself
+    // keeps `overflow: 'hidden'` to clip the photo to the rounded corners,
+    // and a boxShadow on that same element would get clipped by its own
+    // overflow instead of bleeding outward.
+    <View style={[styles.cardGlowWrap, pageIndex > 0 && styles.cardGlowActive]}>
+      <View style={styles.card}>
+        {/* expo-image, not core RN Image (her 2026-10-07 catch, "до этого
+            картинка нормальная была") - today's rewrite moved the photo from
+            one shared Image to 9 (one per page, all mounted at once since
+            ScrollView doesn't virtualize), and RN's own Image decodes its
+            source fresh per instance - 9 simultaneous full decodes of the
+            same photo is real memory pressure, and the OS answering with a
+            visibly lower-quality decode to cope is a known failure mode, not
+            a cache/asset issue (confirmed: the file itself and the bundled
+            copy are both sharp). expo-image caches the *decoded* bitmap by
+            source, so all 9 instances share one real decode instead of each
+            paying for their own. */}
+        <Image
+          source={WATER_IMAGE}
+          style={[StyleSheet.absoluteFill, { opacity: imageOpacity }]}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+        />
+        {/* locations pushed later (was 0.32/0.82) - that fade was tuned for
+            the old full-screen-height image; applied to this card's now much
+            shorter height, the same *fractions* darkened the photo far
+            sooner, both proportionally and in absolute px, reading as a
+            washed-out haze instead of the crisp photo in her reference
+            (2026-10-07: "куда ты дел нормальную картинку воды?"). Starting
+            the fade later keeps the photo clear through the pill/counter
+            zone and only darkens toward where the text actually sits now
+            that content isn't bottom-anchored any more. */}
+        <LinearGradient
+          colors={['transparent', colors.bg0]}
+          locations={[0.5, 0.92]}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
 
-      <View style={styles.cardMeta} pointerEvents="none">
-        {pageIndex === 0 ? (
-          <View style={styles.tagPill}>
-            <View style={styles.tagDot} />
-            <Text style={styles.tagText}>{ARTICLE_WATER_SERIES.toUpperCase()}</Text>
-            <View style={styles.tagDot} />
+        <View style={styles.cardMeta} pointerEvents="none">
+          {pageIndex === 0 ? (
+            <View style={styles.tagPill}>
+              <View style={styles.tagDot} />
+              <Text style={styles.tagText}>{ARTICLE_WATER_SERIES.toUpperCase()}</Text>
+              <View style={styles.tagDot} />
+            </View>
+          ) : (
+            <View />
+          )}
+          <View style={styles.counter}>
+            <Text style={styles.counterNum}>{String(pageIndex + 1).padStart(2, '0')}</Text>
+            <View style={styles.counterLine} />
+            <Text style={styles.counterNum}>{String(TOTAL_PAGES).padStart(2, '0')}</Text>
           </View>
-        ) : (
-          <View />
-        )}
-        <View style={styles.counter}>
-          <Text style={styles.counterNum}>{String(pageIndex + 1).padStart(2, '0')}</Text>
-          <View style={styles.counterLine} />
-          <Text style={styles.counterNum}>{String(TOTAL_PAGES).padStart(2, '0')}</Text>
         </View>
-      </View>
 
-      {children}
+        {children}
+      </View>
     </View>
   );
 }
@@ -317,13 +400,31 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     overflow: 'hidden',
   },
-  // Border only on page 2+ (her explicit call, 2026-10-07: "на первой
-  // странице обводить карточку не надо") - the cover's own photo is bright
-  // enough to read as a distinct card against the screen background on its
-  // own; only the darker pages need the edge drawn in.
-  cardBordered: {
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
+  // Carries the glow (see cardGlowActive) - needs its own `flex: 1` always
+  // (the cover has no glow, so its style array drops the second entry, but
+  // this one must stay so `card`'s own `flex: 1` below still has something
+  // to fill) and the same borderRadius as `card` so a boxShadow follows the
+  // rounded shape instead of the wrapper's own rectangular bounds.
+  cardGlowWrap: {
+    flex: 1,
+    borderRadius: radius.card,
+  },
+  // Soft violet glow, not a flat border - ui-designer consult, 2026-10-07:
+  // on page 2+ the photo fades to `colors.bg0` at its own bottom edge, so a
+  // hairline border was the only thing keeping the card's edge from
+  // visually dissolving into the screen background - needed, but a plain
+  // white 1px line reads as a generic "card in a list" pattern, not this
+  // app's own "glowing object in the dark" language (every other
+  // card-like surface in Soma signals "distinct object" with glow, not a
+  // stroke). Cover (page 1) still gets neither - its own photo is bright
+  // enough to read as a separate object without help.
+  // Thinner, more concentrated, white instead of violet - her catch,
+  // 2026-10-07: the wider 28px violet blur also only had horizontal room to
+  // bleed into (the page's own 16px side padding), not vertical (the card's
+  // height fills its parent exactly), so it only read on the left/right
+  // edges. A smaller blur needs less room to begin with, on every side.
+  cardGlowActive: {
+    boxShadow: `0px 0px 10px 1px rgba(255,255,255,0.4)`,
   },
   cardMeta: {
     position: 'absolute',
@@ -481,10 +582,16 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   // Column now (icon above label), not a row - her reference, 2026-10-07.
+  // Positioned relative to the cover card itself now (was a screen-level
+  // overlay with its own computed `top`) - 32px up from the card's own
+  // bottom edge, her original spec, now trivial since it's a normal
+  // absolutely-positioned child of the card instead of a sibling needing
+  // its own coordinate math.
   swipeHint: {
     position: 'absolute',
     left: 0,
     right: 0,
+    bottom: 32,
     alignItems: 'center',
     gap: 6,
   },
