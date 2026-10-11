@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
   },
   description: {
     fontFamily: fontFamily.medium,
-    fontSize: 16,
-    lineHeight: 16 * 1.1,
+    fontSize: 18,
+    lineHeight: 18 * 1.1,
     color: colors.textPrimary,
   },
   // 16px, matching OnboardingStepLayout.tsx's header->content gap (already

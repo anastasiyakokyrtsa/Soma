@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 14,
+    fontSize: 15,
     color: colors.textPrimary,
   },
   previewButton: {

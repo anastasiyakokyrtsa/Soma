@@ -20,8 +20,8 @@ import { colors, fontFamily, radius, type } from '../theme';
 const RADIO_SIZE = 24;
 const CARD_PADDING = 16;
 const TEXT_GAP = 4;
-const TITLE_LINE_HEIGHT = 16 * 1.1;
-const DESCRIPTION_LINE_HEIGHT = 15 * 1.3;
+const TITLE_LINE_HEIGHT = 18 * 1.1;
+const DESCRIPTION_LINE_HEIGHT = 16 * 1.3;
 // Reserves room for the tallest (2-line) description so all three cards land
 // on the same height regardless of how short their own text is - the block
 // itself (title+gap+text, gap untouched) is then centered in that extra room
@@ -96,14 +96,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.violet400,
   },
   title: {
-    fontFamily: fontFamily.semiBold,
-    fontSize: 16,
+    // One step heavier than semiBold, but still Nunito Sans, not the
+    // `fontFamily.bold` token (that's Onest, reserved for screen headlines -
+    // this is a card title, not one) - literal 'NunitoSans_700Bold', loaded
+    // for just this in App.tsx (her call, 2026-10-11).
+    fontFamily: 'NunitoSans_700Bold',
+    fontSize: 18,
     lineHeight: TITLE_LINE_HEIGHT,
     color: colors.textPrimary,
   },
   description: {
     fontFamily: type.bodyM.fontFamily,
-    fontSize: 15,
+    fontSize: 16,
     lineHeight: DESCRIPTION_LINE_HEIGHT,
     color: colors.textSecondary,
   },

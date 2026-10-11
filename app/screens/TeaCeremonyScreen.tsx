@@ -292,8 +292,8 @@ const styles = StyleSheet.create({
   description: {
     marginTop: 20,
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 16 * 1.4,
+    fontSize: 18,
+    lineHeight: 18 * 1.4,
     color: colors.textPrimary,
     textAlign: 'center',
   },

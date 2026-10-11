@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
   },
   description: {
     fontFamily: fontFamily.medium,
-    fontSize: 16,
-    lineHeight: 16 * 1.1,
+    fontSize: 18,
+    lineHeight: 18 * 1.1,
     color: colors.textPrimary,
     marginTop: 8,
   },
