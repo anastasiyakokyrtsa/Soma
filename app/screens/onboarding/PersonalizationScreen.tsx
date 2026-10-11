@@ -329,8 +329,20 @@ const styles = StyleSheet.create({
   stepBadgeLabel: {
     fontFamily: fontFamily.semiBold,
     fontSize: 18,
-    lineHeight: 18,
+    // Not 18 - her iPhone screenshot (2026-10-11) showed the number still
+    // off-center after an includeFontPadding fix, which is Android-only and
+    // so couldn't have done anything on that device. The real iOS cause:
+    // with lineHeight pinned tight to fontSize, a Text positions its glyph
+    // by the font's own ascent/descent metrics inside that box, not
+    // necessarily centered in it. Matching lineHeight to the badge's own
+    // height (38) instead makes the single line fill the whole circle, so
+    // centering comes from the font's line-box math over that full height
+    // rather than a tight box - the standard RN way to center single-line
+    // text that's more reliable than fighting lineHeight==fontSize. Kept
+    // includeFontPadding:false too - harmless here, still helps Android.
+    lineHeight: 38,
     color: colors.bg0,
+    includeFontPadding: false,
   },
   stepText: {
     flexShrink: 1,
@@ -356,7 +368,11 @@ const styles = StyleSheet.create({
   // as ProfileStartScreen's title, same date (2026-09-29, her screenshot
   // showed it on this screen's own step subtitles specifically).
   stepTitle: {
-    fontFamily: fontFamily.semiBold,
+    // One step heavier than semiBold, but still Nunito Sans, not the
+    // `fontFamily.bold` token (that's Onest, reserved for screen headlines -
+    // this is a step-row title, not one) - literal 'NunitoSans_700Bold',
+    // same reasoning as RadioChoiceCard's title (her call, 2026-10-11).
+    fontFamily: 'NunitoSans_700Bold',
     fontSize: 16,
     lineHeight: 16 * 1.15,
     color: colors.textPrimary,
