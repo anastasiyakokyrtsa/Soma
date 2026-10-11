@@ -12,8 +12,8 @@ import {
   NunitoSans_500Medium_Italic,
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
-  NunitoSans_800ExtraBold,
 } from '@expo-google-fonts/nunito-sans';
+import { Onest_700Bold, Onest_800ExtraBold } from '@expo-google-fonts/onest';
 import { IBMPlexMono_500Medium, IBMPlexMono_600SemiBold } from '@expo-google-fonts/ibm-plex-mono';
 import { Fredoka_500Medium, Fredoka_600SemiBold } from '@expo-google-fonts/fredoka';
 import {
@@ -23,8 +23,11 @@ import {
 import { RootNavigator } from './navigation/RootNavigator';
 import { colors } from './theme';
 
-// The app itself is Nunito Sans everywhere, no exceptions (kit rule). These
-// extra families are scoped to exactly one place: the visual-style preview
+// The app itself is Nunito Sans everywhere, except genuine screen/section
+// headlines (bold/extraBold), which are Onest - her call after trying a
+// few full-swap pairs (Golos Text mono, then Onest+Manrope) on 2026-10-09,
+// see theme/typography.ts for the exact role split. These Focus/Nature/Dawn
+// families below are scoped to exactly one place: the visual-style preview
 // screen's real chrome (header/tagline/button), where each style's mood
 // gets its own typeface on purpose — see
 // screens/onboarding/StylePreviewScreen.tsx. Focus/Nature's fonts went
@@ -67,8 +70,13 @@ export default function App() {
     NunitoSans_500Medium,
     NunitoSans_500Medium_Italic,
     NunitoSans_600SemiBold,
+    // Not the `fontFamily.bold` token - that's Onest now (headline-only, see
+    // theme/typography.ts). This is a real Nunito Sans weight loaded for one
+    // spot that wants "one step heavier than semiBold" without switching
+    // fonts: RadioChoiceCard's title (her call, 2026-10-11).
     NunitoSans_700Bold,
-    NunitoSans_800ExtraBold,
+    Onest_700Bold,
+    Onest_800ExtraBold,
     IBMPlexMono_500Medium,
     IBMPlexMono_600SemiBold,
     Fredoka_500Medium,

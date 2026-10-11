@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700;800&family=Onest:wght@700;800&display=swap');
 
 /* ============ TOKENS ============ */
 :root{
@@ -79,6 +79,11 @@
   --glow-chart-violet:0 0 6px #B6ABFF;
 
   --font-nunito:'Nunito Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  /* Headline-only face, added 2026-10-09 - genuine screen/section titles
+     (bold/extraBold weights: H2/H3 below, .moonsun-title, .mood-title), not
+     buttons/chips/numbers/card titles/body - everything else stayed Nunito
+     Sans (see theme/typography.ts in the app for the exact role split). */
+  --font-headline:'Onest',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
 *{box-sizing:border-box;}
@@ -192,9 +197,14 @@ button{font-family:inherit;}
 /* ============ FOUNDATIONS: TYPE ============ */
 /* Sizes/weights below are sourced from the components actually built in this kit (not an aspirational
    scale) — Display = .article-title, H1 = .article-pullquote, H2 = .mood-title (largest 800-weight
-   headline in use), H3 = .moonsun-title, Body L = .list-row-sub/.pstep-sub, Body M = .article-desc/
-   .tcc-desc, Caption = .tag-pill/.mood-labels. Font is Nunito Sans everywhere in the kit — no second
-   font (Manrope was removed 2026-07-30). */
+   headline in use), H3 = .moonsun-title, Body L = .pstep-sub (18px, her memory of the title+description
+   screen-header subtitle size everywhere, restored 2026-10-10 - .list-row-sub stays its own 14px, a
+   different role, not touched), Body M = .article-desc/.tcc-desc, Caption = .tag-pill/.mood-labels.
+   Nunito Sans everywhere, except genuine screen/section
+   headlines (H2/H3 above, .moonsun-title, .mood-title - bold/extraBold weight, 22px+), which are
+   Onest (--font-headline) - her call after trying a few full-swap pairs, 2026-10-09 (see
+   theme/typography.ts in the app for the exact role split this mirrors). (Manrope, used briefly as
+   the body face during that round, was removed again the same day.) */
 .type-row{
   display:grid; grid-template-columns:120px 90px 1fr; align-items:center; gap:var(--sp-5);
   padding:var(--sp-5) 0; border-bottom:1px solid var(--border-soft);
@@ -202,9 +212,9 @@ button{font-family:inherit;}
 .type-sample{line-height:1; text-align:left; font-family:var(--font-nunito);}
 .type-sample.t-display{font-size:48px; font-weight:300;}
 .type-sample.t-h1{font-size:32px; font-weight:400;}
-.type-sample.t-h2{font-size:26px; font-weight:800;}
-.type-sample.t-h3{font-size:22px; font-weight:700;}
-.type-sample.t-body-l{font-size:16px; font-weight:500;}
+.type-sample.t-h2{font-family:var(--font-headline); font-size:26px; font-weight:800;}
+.type-sample.t-h3{font-family:var(--font-headline); font-size:22px; font-weight:700;}
+.type-sample.t-body-l{font-size:18px; font-weight:500;}
 .type-sample.t-body-m{font-size:14px; font-weight:400;}
 .type-sample.t-body-s{font-size:13px; font-weight:400; color:var(--text-secondary);}
 .type-sample.t-caption{font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-tertiary);}
@@ -280,7 +290,7 @@ button{font-family:inherit;}
 }
 .moonsun-card:active{transform:scale(.98);}
 .moonsun-card:active::before, .moonsun-card.force-pressed::before{opacity:1;}
-.moonsun-title{align-self:flex-start; font-family:var(--font-nunito); font-size:22px; font-weight:700; line-height:1.2; color:var(--text-primary); margin:0 0 var(--sp-4);}
+.moonsun-title{align-self:flex-start; font-family:var(--font-headline); font-size:22px; font-weight:700; line-height:1.2; color:var(--text-primary); margin:0 0 var(--sp-4);}
 .moonsun-img{width:110px; height:110px; margin-bottom:var(--sp-4); border-radius:var(--r-sm); overflow:hidden;}
 .moonsun-img img{width:100%; height:100%; object-fit:cover;}
 .moonsun-date{font-family:var(--font-nunito); font-size:14px; font-weight:300; line-height:1.5; color:var(--text-primary); margin:0 0 4px; text-align:center;}
@@ -409,11 +419,17 @@ button{font-family:inherit;}
    selected at once on screen. Sized down from an earlier 48px/20px-padding/14px-font pass (app
    feedback 2026-08-04): with a dozen chips of very different lengths, the bigger size only fit ~2 per
    row and left ragged empty space — smaller chips pack more per line, reading as a denser, more
-   balanced set instead of a sparse list. */
+   balanced set instead of a sparse list. Height brought back to 44px (2026-10-10, mobile-ux +
+   accessibility review): 38px was below both platforms' minimum touch target for a screen where you
+   tap several of these in a row. Font 13 -> 16px was her own call, overriding the review's 14px
+   suggestion. Padding/gap are off-limits for fixing row-packing ("нельзя менять паддинги и зазоры",
+   2026-10-11) - text size is the only lever for that, hence 16 -> 15px the same day (her catch on the
+   real app: "Уровень стресса" ended up alone on its row before "Общее самочувствие"). Padding stayed
+   at its original 14px throughout. */
 .select-chip{
-  display:inline-flex; align-items:center; height:38px; padding:0 14px;
+  display:inline-flex; align-items:center; height:44px; padding:0 14px;
   border-radius:var(--r-pill); background:var(--bg-0); border:1px solid var(--border-default);
-  color:var(--text-primary); font-size:13px; font-weight:600; cursor:pointer;
+  color:var(--text-primary); font-size:15px; font-weight:600; cursor:pointer;
   transition:all .15s ease; user-select:none;
 }
 .select-chip.is-selected, .select-chip.force-selected{
@@ -830,7 +846,7 @@ button{font-family:inherit;}
 .pstep-text{flex:1; min-width:0; height:38px; display:flex; flex-direction:column; justify-content:center; gap:4px;}
 .pstep-row.is-active .pstep-text, .pstep-row.is-done .pstep-text{width:236px; flex:none;}
 .pstep-title{font-family:var(--font-nunito); font-size:18px; font-weight:600; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
-.pstep-sub{font-family:var(--font-nunito); font-size:16px; font-weight:500; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
+.pstep-sub{font-family:var(--font-nunito); font-size:18px; font-weight:500; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
 .pstep-row.is-inactive .pstep-title, .pstep-row.is-inactive .pstep-sub{color:var(--text-tertiary);}
 /* progress-circle.svg/-alt.svg used to ship as a shared sprite-sheet crop with ~25% empty padding
    baked in around the visible ring, so sizing the <img> at 38px like the number circle rendered the
@@ -946,7 +962,7 @@ button{font-family:inherit;}
 /* ============ PATTERNS ============ */
 .mood-card{padding:var(--sp-7); text-align:center; max-width:460px;}
 .mood-title{
-  font-size:26px; font-weight:800; margin:0 0 var(--sp-5); background:var(--grad-heading);
+  font-family:var(--font-headline); font-size:26px; font-weight:800; margin:0 0 var(--sp-5); background:var(--grad-heading);
   -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
 }
 /* the mood pictures (assets/mood/*.png) are hollow glow-outline shapes re-extracted from your own

@@ -292,7 +292,11 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   itemLabel: {
-    fontFamily: fontFamily.bold,
+    // Not fontFamily.bold - at this 10px nav-chrome scale that would pull in
+    // Onest (the app's headline-only face, see theme/typography.ts), which is
+    // meant for 24px+ screen titles, not a tab label. semiBold (Nunito Sans)
+    // keeps the same emphasis without that mismatch.
+    fontFamily: fontFamily.semiBold,
     color: colors.violet300,
   },
   fab: {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions, LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
@@ -24,7 +24,8 @@ function withAlpha(hex: string, alpha: number) {
 // Per-style theming for the screen's *real* chrome (button, nav icons,
 // fonts) — see memory/project_app_development.md for the round this landed
 // in. Cosmos's values are the app's actual current design (violet/Nunito
-// Sans, standard button radius/glow, plain un-backdropped back icon just
+// Sans + Onest for the header, standard button radius/glow, plain
+// un-backdropped back icon just
 // like every other screen) — it isn't "themed," it's just what the app
 // already looks like everywhere else. Review 2026-08-08 caught two places
 // this had drifted from that: header/tagline text going near-black (using
@@ -48,9 +49,9 @@ const MOOD: Record<
   cosmos: {
     accent: colors.violet400,
     onAccent: colors.bg0,
-    headerFont: 'NunitoSans_700Bold',
+    headerFont: 'Onest_700Bold',
     taglineFont: 'NunitoSans_500Medium',
-    taglineSize: 15,
+    taglineSize: 16,
     buttonFont: 'NunitoSans_600SemiBold',
     buttonRadius: 16,
     glow: true,
@@ -61,7 +62,7 @@ const MOOD: Record<
     onAccent: '#000000',
     headerFont: 'IBMPlexMono_600SemiBold',
     taglineFont: 'IBMPlexMono_500Medium',
-    taglineSize: 15,
+    taglineSize: 16,
     buttonFont: 'IBMPlexMono_600SemiBold',
     // More angular, per her ask ("предлагаю сделать более угловатую
     // кнопку") — fits the geometric/precise mood better than the app's
@@ -75,7 +76,7 @@ const MOOD: Record<
     onAccent: '#FFFFFF',
     headerFont: 'Fredoka_600SemiBold',
     taglineFont: 'Fredoka_500Medium',
-    taglineSize: 15,
+    taglineSize: 16,
     buttonFont: 'Fredoka_600SemiBold',
     // Fully round/pill — "сделай кнопку в Природа прям более круглой мягкой"
     // — half the button's own height so the ends are true semicircles.
@@ -88,10 +89,13 @@ const MOOD: Record<
     onAccent: '#FFFFFF',
     headerFont: 'CormorantGaramond_600SemiBold',
     taglineFont: 'CormorantGaramond_500Medium_Italic',
-    // 15 -> 18: "кегль описания уж слишком мелкий, чуть прибавь" — the
-    // italic serif also just optically reads smaller than the sans-serif
-    // taglines at the same size.
-    taglineSize: 18,
+    // 15 -> 18 (2026-08-08: "кегль описания уж слишком мелкий, чуть
+    // прибавь") - the italic serif also just optically reads smaller than
+    // the sans-serif taglines at the same size, so it's kept +3 over them
+    // rather than matched 1:1. 18 -> 19 when the other three moods' own
+    // taglineSize went 15 -> 16 (2026-10-11, same complaint), to preserve
+    // that same +3 offset.
+    taglineSize: 19,
     buttonFont: 'CormorantGaramond_600SemiBold',
     buttonRadius: 16,
     glow: false,
@@ -109,12 +113,28 @@ export function StylePreviewScreen({ navigation, route }: any) {
   const style = VISUAL_STYLES[index];
   const mood = MOOD[style.id];
 
+  // Focus's rings want to sit centered in the real open space between the
+  // header row and the bottom text block, not the full screen height (her
+  // ask, 2026-10-11) - both are measured via onLayout since the bottom
+  // block's height varies with each mood's own tagline length/line count,
+  // not a fixed number. Falls back to height/2 (the old behavior) until
+  // both have landed, on the first render.
+  const [headerBottom, setHeaderBottom] = useState<number | null>(null);
+  const [bottomTop, setBottomTop] = useState<number | null>(null);
+  const onHeaderLayout = (e: LayoutChangeEvent) => {
+    setHeaderBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height);
+  };
+  const onBottomLayout = (e: LayoutChangeEvent) => {
+    setBottomTop(e.nativeEvent.layout.y);
+  };
+  const focusCenterY = headerBottom !== null && bottomTop !== null ? (headerBottom + bottomTop) / 2 : height / 2;
+
   return (
     <Animated.View
       style={styles.container}
       entering={FadeIn.duration(400).easing(Easing.inOut(Easing.cubic))}
     >
-      <StyleSwatch styleId={style.id} width={width} height={height} radius={0} />
+      <StyleSwatch styleId={style.id} width={width} height={height} radius={0} focusCenterY={focusCenterY} />
 
       <LinearGradient
         colors={['rgba(5,8,22,0.6)', 'transparent']}
@@ -127,7 +147,7 @@ export function StylePreviewScreen({ navigation, route }: any) {
         pointerEvents="none"
       />
 
-      <View style={[styles.header, { paddingTop: insets.top + 40 }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 40 }]} onLayout={onHeaderLayout}>
         <Pressable
           style={[
             styles.iconRing,
@@ -165,7 +185,7 @@ export function StylePreviewScreen({ navigation, route }: any) {
         <NextPageIcon size={ICON_BACKDROP} color={mood.accent} />
       </Pressable>
 
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + 60 }]}>
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + 60 }]} onLayout={onBottomLayout}>
         <Text
           style={[
             styles.tagline,
