@@ -13,7 +13,18 @@ import { colors, fontFamily, radius } from '../theme';
 // feedback): with 12 chips of very different lengths, that size only fit ~2
 // per row, leaving a lot of ragged empty space. Smaller/tighter chips let
 // more sit per line, reading as a denser, more balanced cloud instead of a
-// sparse list — not yet ported back to the kit doc.
+// sparse list.
+//
+// Height brought back up to 44px (2026-10-10, mobile-ux + accessibility
+// review): 38px was below both platforms' minimum touch target (44pt iOS /
+// 48dp Android) for a screen where you tap several of these chips in a row.
+// Text 13 -> 16 was her own call, overriding the review's 14px suggestion.
+// Padding/gap are off-limits for fixing row-packing ("нельзя менять
+// паддинги и зазоры", 2026-10-11) - text size is the only lever for that,
+// hence 16 -> 15 the same day (her catch: "Уровень стресса" ended up alone
+// on its row before "Общее самочувствие"). Check on a real device; drop to
+// 14 (the review's own original suggestion) if a row still looks too
+// sparse.
 export function SelectChip({
   label,
   selected,
@@ -32,7 +43,7 @@ export function SelectChip({
 
 const styles = StyleSheet.create({
   chip: {
-    height: 38,
+    height: 44,
     paddingHorizontal: 14,
     borderRadius: radius.pill,
     borderWidth: 1,
@@ -46,7 +57,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fontFamily.semiBold,
-    fontSize: 13,
+    fontSize: 15,
     color: colors.textPrimary,
   },
 });
