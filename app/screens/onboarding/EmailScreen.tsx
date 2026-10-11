@@ -11,7 +11,7 @@ export function EmailScreen({ navigation }: any) {
     <OnboardingStepLayout
       activeStep={2}
       title="Твоя электронная почта"
-      description="Мы используем почту только для важных уведомлений и сохранения твоего прогресса"
+      description="Мы используем её только для важных уведомлений и сохранения прогресса"
       buttonDisabled={!EMAIL_RE.test(email.trim())}
       onPressNext={() => navigation.navigate('Gender')}
       onPressBack={() => navigation.goBack()}

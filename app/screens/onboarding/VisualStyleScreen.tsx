@@ -15,7 +15,7 @@ export function VisualStyleScreen({ navigation }: any) {
   return (
     <OnboardingStepLayout
       activeStep={6}
-      title="Настрой свой визуальный стиль"
+      title="Выбери свой стиль"
       description="Выбери оформление, которое вдохновляет тебя. Стиль всегда можно изменить в настройках"
       buttonLabel="Применить стиль"
       buttonDisabled={selected === null}
