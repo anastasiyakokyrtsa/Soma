@@ -13,7 +13,7 @@ import {
   NunitoSans_600SemiBold,
   NunitoSans_700Bold,
 } from '@expo-google-fonts/nunito-sans';
-import { Onest_700Bold, Onest_800ExtraBold } from '@expo-google-fonts/onest';
+import { Onest_600SemiBold, Onest_700Bold } from '@expo-google-fonts/onest';
 import { IBMPlexMono_500Medium, IBMPlexMono_600SemiBold } from '@expo-google-fonts/ibm-plex-mono';
 import { Fredoka_500Medium, Fredoka_600SemiBold } from '@expo-google-fonts/fredoka';
 import {
@@ -26,7 +26,11 @@ import { colors } from './theme';
 // The app itself is Nunito Sans everywhere, except genuine screen/section
 // headlines (bold/extraBold), which are Onest - her call after trying a
 // few full-swap pairs (Golos Text mono, then Onest+Manrope) on 2026-10-09,
-// see theme/typography.ts for the exact role split. These Focus/Nature/Dawn
+// see theme/typography.ts for the exact role split. Both headline weights
+// moved one Onest step lighter on 2026-10-12 (ExtraBold->Bold, Bold->
+// SemiBold) - tried on NameScreen's title alone first, then rolled out
+// everywhere once she saw it ("грубовато" at the original weight). These
+// Focus/Nature/Dawn
 // families below are scoped to exactly one place: the visual-style preview
 // screen's real chrome (header/tagline/button), where each style's mood
 // gets its own typeface on purpose — see
@@ -75,8 +79,8 @@ export default function App() {
     // spot that wants "one step heavier than semiBold" without switching
     // fonts: RadioChoiceCard's title (her call, 2026-10-11).
     NunitoSans_700Bold,
+    Onest_600SemiBold,
     Onest_700Bold,
-    Onest_800ExtraBold,
     IBMPlexMono_500Medium,
     IBMPlexMono_600SemiBold,
     Fredoka_500Medium,

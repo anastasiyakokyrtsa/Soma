@@ -49,7 +49,7 @@ const MOOD: Record<
   cosmos: {
     accent: colors.violet400,
     onAccent: colors.bg0,
-    headerFont: 'Onest_700Bold',
+    headerFont: 'Onest_600SemiBold',
     taglineFont: 'NunitoSans_500Medium',
     taglineSize: 16,
     buttonFont: 'NunitoSans_600SemiBold',

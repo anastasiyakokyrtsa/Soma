@@ -20,8 +20,14 @@ export const fontFamily = {
   // 10px active-tab label was bold only for emphasis at nav-chrome scale, so
   // it was moved to `semiBold` instead of pulling Onest in for one tiny
   // label (see BottomBar.tsx).
-  bold: 'Onest_700Bold',
-  extraBold: 'Onest_800ExtraBold',
+  //
+  // Both one Onest step lighter than their name suggests (2026-10-12: tried
+  // ExtraBold->Bold on NameScreen's title alone first - "так полегче
+  // смотрится, а то как-то грубовато" - then rolled out everywhere,
+  // shifting Bold down to SemiBold too to keep the same relative gap
+  // between the two headline weights).
+  bold: 'Onest_600SemiBold',
+  extraBold: 'Onest_700Bold',
   // True italic font files, not `fontStyle: 'italic'` on an upright family -
   // iOS doesn't synthesize/slant a custom font the way Android does, so
   // `fontStyle: 'italic'` on e.g. `regular` renders upright on iOS and only
