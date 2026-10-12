@@ -490,7 +490,8 @@
               <stop offset="100%" stop-color="#8B7CF6"/>
             </linearGradient>
             <filter id="sleepGlowKit" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="20"/>
+              <!-- Was 20 (the literal Figma blur) - tightened over 3 rounds on a real device, 2026-10-12: 20->14->7->10 -->
+              <feGaussianBlur stdDeviation="10"/>
             </filter>
           </defs>
           <circle cx="150" cy="150" r="134" stroke="rgba(139,124,246,0.27)" stroke-width="32" fill="none"/>

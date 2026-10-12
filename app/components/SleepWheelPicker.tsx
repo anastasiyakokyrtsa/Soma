@@ -47,8 +47,9 @@ import { colors, fontFamily, gradients } from '../theme';
 // but not as much as Figma's own layer canvas gets implicitly (that 300-box
 // export came out at 329x340, i.e. ~9-13% margin, which is what 0.9 here
 // approximates). Stroke/blur are then both real ratios *of the outer
-// radius* (32/150 and 20/150 - her exact Figma numbers), not of `size`
-// directly, so they scale correctly as the ring itself scales.
+// radius* (32/150 - her exact Figma number for stroke - and 7/150 for
+// blur, not `size` directly, so they scale correctly as the ring itself
+// scales.
 //
 // `size` is a prop, not a fixed constant (bumped to look bigger, which meant
 // it could overflow a narrow phone's width if left fixed) - the screen
@@ -56,7 +57,12 @@ import { colors, fontFamily, gradients } from '../theme';
 // this component just derives all its internal geometry off whatever it's given.
 const OUTER_RATIO = 0.9;
 const STROKE_OF_OUTER = 32 / 150;
-const BLUR_OF_OUTER = 20 / 150;
+// Was the literal Figma blur (20/150), even though the numbers matched
+// Figma exactly - tightened on a real device over 3 rounds, all her asks
+// 2026-10-12: 20->14->7->10 (landed back up slightly from 7 once she saw
+// it that tight). The web-only damping below still applies on top of this
+// smaller base.
+const BLUR_OF_OUTER = 10 / 150;
 // One full turn = 12 hours (720min), matching a normal clock face where
 // consecutive number marks are consecutive hours - this was 1440 (24h)
 // before, which meant each 30deg step between marks silently represented 2
