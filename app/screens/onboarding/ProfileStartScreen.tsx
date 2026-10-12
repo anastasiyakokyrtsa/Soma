@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.medium,
     fontSize: 18,
     lineHeight: 18 * 1.1,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.75)',
     marginTop: 8,
   },
   illustrationWrap: {

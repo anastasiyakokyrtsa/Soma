@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: 18,
     lineHeight: 18 * 1.4,
-    color: colors.textPrimary,
+    color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
   },
   // No card/border - round 2 after a bordered card still read wrong to her

@@ -257,7 +257,10 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: 15,
     lineHeight: 15 * 1.45,
-    color: colors.textSecondary,
+    // White at 75%, not textSecondary - this is a continuation of the
+    // section title's content (an explanation), not a UI chrome label
+    // (her secondary-color rule, 2026-10-12).
+    color: 'rgba(255,255,255,0.75)',
   },
   columns: {
     marginTop: 16,

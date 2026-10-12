@@ -206,7 +206,11 @@ const styles = StyleSheet.create({
     fontFamily: type.bodyL.fontFamily,
     fontSize: type.bodyL.fontSize,
     lineHeight: type.bodyL.fontSize * 1.1,
-    color: colors.textPrimary,
+    // White at 75% opacity, not solid textPrimary - same treatment as
+    // AnalyticsScreen's card value/MiniRitualTile's time/QuoteCard's
+    // author/MoodScale's label (her ask, 2026-10-12, extended to every
+    // "title + description" screen header's subtext).
+    color: 'rgba(255,255,255,0.75)',
   },
   content: {
     flex: 1,

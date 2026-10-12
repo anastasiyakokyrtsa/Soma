@@ -848,7 +848,7 @@ button{font-family:inherit;}
 .pstep-text{flex:1; min-width:0; height:38px; display:flex; flex-direction:column; justify-content:center; gap:4px;}
 .pstep-row.is-active .pstep-text, .pstep-row.is-done .pstep-text{width:236px; flex:none;}
 .pstep-title{font-family:var(--font-nunito); font-size:18px; font-weight:600; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
-.pstep-sub{font-family:var(--font-nunito); font-size:18px; font-weight:500; line-height:1; margin:0; color:var(--text-primary); white-space:nowrap;}
+.pstep-sub{font-family:var(--font-nunito); font-size:18px; font-weight:500; line-height:1; margin:0; color:rgba(255,255,255,.75); white-space:nowrap;}
 .pstep-row.is-inactive .pstep-title, .pstep-row.is-inactive .pstep-sub{color:var(--text-tertiary);}
 /* progress-circle.svg/-alt.svg used to ship as a shared sprite-sheet crop with ~25% empty padding
    baked in around the visible ring, so sizing the <img> at 38px like the number circle rendered the

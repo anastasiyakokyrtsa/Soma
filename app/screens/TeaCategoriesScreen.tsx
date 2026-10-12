@@ -144,7 +144,10 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     fontSize: 16,
     lineHeight: 16 * 1.4,
-    color: colors.textSecondary,
+    // White at 75%, not textSecondary - subtext under the screen title,
+    // same role as every other "title + description" screen header (her
+    // secondary-color rule, 2026-10-12).
+    color: 'rgba(255,255,255,0.75)',
   },
   list: {
     marginTop: 32,
