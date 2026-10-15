@@ -1,0 +1,82 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#ECE9E1; --ink:#15161D; --mute:#6D6B66; --rule:#15161D; --v:#5B4FD0; }
+  * { box-sizing:border-box; margin:0; }
+  body { width:1400px; background:var(--paper); color:var(--ink); font-family:'Newsreader',serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+  section { position:relative; padding:56px 80px 90px; }
+  .head { display:flex; justify-content:space-between; border-top:2px solid var(--rule); border-bottom:1px solid var(--rule); padding:9px 0; }
+  h1 { font-weight:300; font-size:136px; line-height:.9; letter-spacing:-.035em; }
+  h1 i { font-weight:300; }
+  h2 { font-weight:300; font-size:62px; line-height:1; letter-spacing:-.025em; }
+  p { font-size:19px; line-height:1.5; }
+  sup { font-family:'IBM Plex Mono'; font-size:10px; color:var(--v); }
+  .fig img { display:block; width:100%; border-radius:18px; }
+  .figcap { margin-top:14px; font-size:14px; line-height:1.4; color:var(--mute); }
+  .figcap b { font-family:'IBM Plex Mono'; font-weight:500; font-size:11px; letter-spacing:.06em; color:var(--ink); margin-right:6px; }
+  .notes { border-top:1px solid var(--rule); padding-top:12px; font-size:13px; line-height:1.5; color:var(--mute); }
+  .notes span { font-family:'IBM Plex Mono'; color:var(--v); margin-right:6px; }
+</style></head><body>
+
+<!-- cover -->
+<section>
+  <div class="head mono"><span>Soma · A case study in product design</span><span>Vol. 1 — 2026</span><span>Anastasiia Kokyrtsa</span></div>
+
+  <h1 style="margin-top:64px">Reading the body<br><i>as a system</i></h1>
+
+  <div style="display:grid;grid-template-columns:330px 1fr;gap:56px;margin-top:64px">
+    <div>
+      <div class="mono" style="margin-bottom:12px">Abstract</div>
+      <p style="font-size:17px">People feel tired, flat or restless and can’t tell why. Soma reads sleep, mood, the menstrual cycle and lunar phases together and explains the day — without guilt, without clinical charts, without asking too much up front.<sup>1</sup></p>
+      <div class="notes" style="margin-top:40px"><span>1</span>Based on 4 personas and a 7-stage customer journey map. Barriers found: tools felt either “too esoteric” or “too clinical”.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,230px);gap:40px;justify-content:end;align-items:start">
+      <div class="fig"><img src="../assets/screens/AboutApp1.png"><div class="figcap"><b>Fig. 1a</b>Onboarding opens with an idea, not a form.</div></div>
+      <div class="fig" style="margin-top:60px"><img src="../assets/screens/Main_Home.png"><div class="figcap"><b>Fig. 1b</b>Home: today’s state in one read.</div></div>
+      <div class="fig" style="margin-top:120px"><img src="../assets/screens/BreathingInfo.png"><div class="figcap"><b>Fig. 1c</b>Two-minute practice, chosen by state.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- §2 two approaches -->
+<section style="border-top:1px solid var(--rule)">
+  <div class="mono" style="display:flex;justify-content:space-between"><span>§ 2</span><span>Method</span><span>p. 04</span></div>
+
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:80px;margin-top:40px">
+    <div>
+      <h2>Two ways to read<br><i>the same body</i></h2>
+      <p style="margin-top:28px;width:620px">Research split the audience in two. Some trust data: sleep hours, cycle days, biorhythm curves. Others trust the moon and the natal chart. Instead of picking one, onboarding asks once — and the whole app follows that language.</p>
+
+      <svg id="flow" width="760" height="560" style="margin-top:50px;display:block"></svg>
+      <div class="figcap" style="width:620px"><b>Fig. 3</b>User flow, simplified. Both branches share sign-up and converge on personalization, so the core stays one product.</div>
+    </div>
+
+    <div>
+      <div class="fig" style="margin-top:8px"><img src="../assets/screens/ChooseApproach.png"><div class="figcap"><b>Fig. 2</b>“Choose your language of self-observation.” A third option combines both.</div></div>
+      <blockquote style="margin-top:56px;border-left:2px solid var(--v);padding-left:20px;font-size:26px;line-height:1.3;font-style:italic">“I want it to explain why — not just tell me I slept badly.”</blockquote>
+      <div class="mono" style="margin-top:12px;color:var(--mute)">— Timur, 20, physics student</div>
+    </div>
+  </div>
+</section>
+
+<script>
+const f = document.getElementById('flow');
+const node = (x, y, label, sub, filled) => `
+  <circle cx="${x}" cy="${y}" r="6" fill="${filled ? '#5B4FD0' : '#ECE9E1'}" stroke="#15161D"/>
+  <text x="${x + 16}" y="${y + 5}" font-family="Newsreader" font-size="20">${label}</text>
+  ${sub ? `<text x="${x + 16}" y="${y + 26}" font-family="IBM Plex Mono" font-size="10" letter-spacing=".6" fill="#6D6B66">${sub}</text>` : ''}`;
+const L = (d, dash) => `<path d="${d}" fill="none" stroke="#15161D" stroke-width="1" ${dash ? 'stroke-dasharray="3 4"' : ''}/>`;
+f.innerHTML =
+  L('M20 40 V160') + L('M20 160 V205 H420 V250') + L('M120 205 V250') +
+  L('M120 390 V455 H420 V390') + L('M120 250 V390') + L('M420 250 V390') + L('M270 455 V500') +
+  node(20, 40, 'Sign up · name · gender', 'SHARED') +
+  node(20, 160, 'What feels closer to you?', 'CHOICE', true) +
+  node(120, 250, 'Scientific', 'SLEEP · CYCLE · STATE · GOALS') +
+  node(420, 250, 'Astrological', 'BIRTH DATE · TIME · PLACE') +
+  node(120, 390, 'Biorhythm home', 'CHARTS · PRACTICES') +
+  node(420, 390, 'Lunar home', 'MOON · TRANSITS · TAROT') +
+  node(270, 500, 'Personalization → Home', 'SHARED', true);
+</script>
+</body></html>

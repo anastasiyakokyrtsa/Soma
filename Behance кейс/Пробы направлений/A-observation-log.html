@@ -1,0 +1,114 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050816; --line:rgba(168,156,248,.10); --line2:rgba(168,156,248,.22); --ink:#E9E7F5; --mute:#7C80A0; --v:#A89CF8; --g:#6EE7B7; --p:#F3A6E0; }
+  * { box-sizing:border-box; margin:0; }
+  body { width:1400px; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; }
+  .mono { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+  section { position:relative; overflow:hidden; border-bottom:1px solid var(--line2); }
+  .grid { position:absolute; inset:0; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:100px 100px; background-position:-1px -1px; }
+  .ticks { position:absolute; left:0; right:0; display:flex; }
+  .ticks span { width:100px; padding-left:6px; font-family:'IBM Plex Mono'; font-size:9px; color:#4A4E6E; }
+  .shot { position:absolute; border-radius:22px; overflow:hidden; outline:1px solid var(--line2); outline-offset:10px; }
+  .shot img { display:block; width:100%; }
+  .cap { position:absolute; }
+  .cap b { display:block; font-family:'IBM Plex Mono'; font-weight:500; font-size:11px; letter-spacing:.08em; color:var(--v); margin-bottom:4px; }
+  .cap span { background:var(--bg); font-size:13px; color:var(--mute); line-height:1.45; }
+  h1 { font-family:'Onest'; font-weight:300; font-size:200px; letter-spacing:-.04em; line-height:.8; }
+  h2 { font-family:'Onest'; font-weight:300; font-size:64px; letter-spacing:-.03em; line-height:1; }
+  .ann { position:absolute; width:250px; }
+  .ann .n { font-family:'IBM Plex Mono'; font-size:11px; color:var(--v); letter-spacing:.08em; }
+  .ann p { font-size:15px; line-height:1.5; color:#C4C6DA; margin-top:6px; }
+  .ann p em { font-style:normal; color:var(--ink); font-weight:600; }
+  svg.over { position:absolute; inset:0; pointer-events:none; }
+</style></head><body>
+
+<!-- PLATE I — cover -->
+<section style="height:1000px">
+  <div class="grid"></div>
+  <div class="ticks" style="top:8px"><span>00h</span><span>02h</span><span>04h</span><span>06h</span><span>08h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span><span>20h</span><span>22h</span><span>24h</span><span></span></div>
+  <div class="mono" style="position:absolute;left:60px;top:60px">Soma — Observation log</div>
+  <div class="mono" style="position:absolute;left:600px;top:60px">Plate I</div>
+  <div class="mono" style="position:absolute;right:60px;top:60px;text-align:right">Case study · 2026</div>
+
+  <svg class="over" id="curves" width="1400" height="1000" style="-webkit-mask-image:linear-gradient(90deg,transparent 360px,#000 480px)"></svg>
+
+  <div class="shot" style="left:430px;top:170px;width:250px"><img src="../assets/screens/AboutApp2.png"></div>
+  <div class="cap" style="left:430px;top:735px;width:250px"><b>OBJ. 01 — ONBOARDING</b><span>Patterns before forms</span></div>
+
+  <div class="shot" style="left:760px;top:250px;width:270px"><img src="../assets/screens/Main_Home.png"></div>
+  <div class="cap" style="left:760px;top:845px;width:270px"><b>OBJ. 02 — HOME</b><span>The daily reading</span></div>
+
+  <div class="shot" style="left:1110px;top:130px;width:230px"><img src="../assets/screens/Main_Care.png"></div>
+  <div class="cap" style="left:1110px;top:648px;width:230px"><b>OBJ. 03 — CARE</b><span>What helps right now</span></div>
+
+  <h1 style="position:absolute;left:52px;top:150px">So<br>ma</h1>
+  <div style="position:absolute;left:60px;top:520px;width:300px;font-size:19px;line-height:1.45;color:#C4C6DA">A personal observatory for the body’s rhythms — sleep, mood, cycles and the moon, read as one system.</div>
+  <div style="position:absolute;left:60px;bottom:60px;display:grid;grid-template-columns:auto auto;gap:6px 28px">
+    <div class="mono">Role</div><div style="font-size:13px">Product design, research, UI, motion</div>
+    <div class="mono">Platform</div><div style="font-size:13px">iOS · Android (React Native)</div>
+    <div class="mono">Year</div><div style="font-size:13px">2026</div>
+  </div>
+  <div class="mono" style="position:absolute;right:60px;bottom:60px;text-align:right;line-height:1.8">
+    <span style="color:var(--g)">━ Physical 23 d</span><br><span style="color:var(--p)">━ Emotional 28 d</span><br><span style="color:var(--v)">━ Intellectual 33 d</span></div>
+</section>
+
+<!-- PLATE II — annotated screen + cycle diagram -->
+<section style="height:1400px">
+  <div class="grid"></div>
+  <div class="mono" style="position:absolute;left:60px;top:60px">Plate II — The daily reading</div>
+  <div class="mono" style="position:absolute;right:60px;top:60px">02 / 09</div>
+  <h2 style="position:absolute;left:60px;top:130px;width:620px">One screen answers<br>“why do I feel<br>this way today?”</h2>
+
+  <div class="shot" style="left:400px;top:440px;width:400px;border-radius:34px"><img src="../assets/screens/Main_Home.png"></div>
+
+  <svg class="over" width="1400" height="1400">
+    <g stroke="#A89CF8" stroke-width="1" fill="#A89CF8" opacity=".75">
+      <line x1="345" y1="610" x2="430" y2="610"/><circle cx="430" cy="610" r="3"/>
+      <line x1="345" y1="890" x2="440" y2="890"/><circle cx="440" cy="890" r="3"/>
+      <line x1="345" y1="1140" x2="440" y2="1140"/><circle cx="440" cy="1140" r="3"/>
+      <line x1="855" y1="1232" x2="646" y2="1232"/><circle cx="646" cy="1232" r="3"/>
+    </g>
+  </svg>
+  <div class="ann" style="left:90px;top:580px"><div class="n">01 · CHECK-IN</div><p><em>One tap, no form.</em> Mood is logged with an abstract shape, not a smiley — no judgement attached.</p></div>
+  <div class="ann" style="left:90px;top:860px"><div class="n">02 · CHART</div><p><em>Nine days at a glance.</em> Today sits in the centre, so the eye reads trend, not a single number.</p></div>
+  <div class="ann" style="left:90px;top:1110px"><div class="n">03 · CYCLES</div><p><em>Three rings, three systems.</em> Body, emotion and mind are separated — a dip in one isn’t a bad day.</p></div>
+  <div class="ann" style="left:870px;top:1202px"><div class="n">04 · ACTION</div><p><em>Logging is always one thumb away.</em> The centre button stays reachable in one-handed use.</p></div>
+
+  <!-- cycle "star chart" -->
+  <svg id="orbits" style="position:absolute;left:860px;top:400px" width="480" height="480"></svg>
+  <div class="cap" style="left:870px;top:900px;width:420px"><b>FIG. 2 — THREE PERIODS</b><span>Each ring is one cycle, ticked by day. Where they align, the app explains the day instead of rating it.</span></div>
+</section>
+
+<script>
+// cover: three biorhythm sines across the plate (periods scaled 23/28/33)
+const c = document.getElementById('curves');
+const curve = (period, phase, amp, mid, color) => {
+  let d = '';
+  for (let x = 0; x <= 1400; x += 4) {
+    const y = mid + amp * Math.sin((x / (period * 26)) * Math.PI * 2 + phase);
+    d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
+  }
+  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="1.2" opacity=".55"/>`;
+};
+c.innerHTML = curve(23, 0.4, 170, 600, '#6EE7B7') + curve(28, 2.1, 170, 600, '#F3A6E0') + curve(33, 4.0, 170, 600, '#A89CF8')
+  + '<line x1="0" y1="600" x2="1400" y2="600" stroke="rgba(168,156,248,.25)" stroke-dasharray="2 6"/>';
+
+// plate II: concentric period rings with day ticks
+const o = document.getElementById('orbits'), cx = 240, cy = 240;
+let s = '';
+[[23, 110, '#6EE7B7'], [28, 160, '#F3A6E0'], [33, 210, '#A89CF8']].forEach(([n, r, col], i) => {
+  s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-opacity=".5"/>`;
+  for (let k = 0; k < n; k++) {
+    const a = k / n * Math.PI * 2 - Math.PI / 2, l = k === 0 ? 10 : 4;
+    s += `<line x1="${cx + Math.cos(a) * (r - l)}" y1="${cy + Math.sin(a) * (r - l)}" x2="${cx + Math.cos(a) * (r + l)}" y2="${cy + Math.sin(a) * (r + l)}" stroke="${col}" stroke-opacity="${k === 0 ? 1 : .45}"/>`;
+  }
+  const today = [5, 19, 25][i], a = today / n * Math.PI * 2 - Math.PI / 2;
+  s += `<circle cx="${cx + Math.cos(a) * r}" cy="${cy + Math.sin(a) * r}" r="6" fill="${col}"/><circle cx="${cx + Math.cos(a) * r}" cy="${cy + Math.sin(a) * r}" r="14" fill="${col}" opacity=".18"/>`;
+  s += `<text x="${cx + 6}" y="${cy - r - 14}" fill="${col}" font-family="IBM Plex Mono" font-size="10" letter-spacing="1">${n} D</text>`;
+});
+s += `<circle cx="${cx}" cy="${cy}" r="3" fill="#E9E7F5"/><line x1="${cx}" y1="0" x2="${cx}" y2="480" stroke="rgba(168,156,248,.18)" stroke-dasharray="2 5"/><line x1="0" y1="${cy}" x2="480" y2="${cy}" stroke="rgba(168,156,248,.18)" stroke-dasharray="2 5"/>`;
+o.innerHTML = s;
+</script>
+</body></html>

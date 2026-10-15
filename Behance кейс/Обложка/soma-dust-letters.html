@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>SOMA dust letters</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Static "SOMA" built from luminous particles in the onboarding "Inner Cosmos" style:
+     thousands of fine violet specks tracing the exact Onest glyph contours, dense on the edges,
+     thinning toward the interior, dissolving softly into the dark, a few luminous focal points.
+     Rendered on a TRANSPARENT canvas (for Figma) — or on #050816 with ?bg=1 for preview.
+     URL params: scale (render scale, default 2), weight, seed, bg=1. -->
+<style>html,body{margin:0;background:#050816}canvas{display:block;max-width:100vw}</style>
+</head><body>
+<canvas id="c"></canvas>
+<script>
+const P = new URLSearchParams(location.search);
+const SCALE = +(P.get('scale') || 2);
+const WEIGHT = P.get('weight') || '600';
+const SEED = +(P.get('seed') || 12);
+const BG = P.get('bg') === '1';
+
+// layout matches the cover: Onest 420px, 10% tracking (×SCALE)
+const FS = 420 * SCALE, LS = 0.10;
+const PAD = 160 * SCALE;
+let s = SEED >>> 0;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const gauss = () => { let u = 0; for (let i = 0; i < 4; i++) u += rnd(); return (u - 2) / 2; }; // ~N(0, .29)
+
+// smooth value noise for natural, uneven density across the letters
+const NG = 64, grid = Array.from({ length: NG * NG }, () => rnd());
+function noise(x, y) {
+  const gx = x * (NG - 1), gy = y * (NG - 1), x0 = Math.floor(gx), y0 = Math.floor(gy), fx = gx - x0, fy = gy - y0;
+  const g = (i, j) => grid[Math.min(j, NG - 1) * NG + Math.min(i, NG - 1)];
+  const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+  return (g(x0, y0) * (1 - sx) + g(x0 + 1, y0) * sx) * (1 - sy) + (g(x0, y0 + 1) * (1 - sx) + g(x0 + 1, y0 + 1) * sx) * sy;
+}
+
+const PALETTE = [ // locked SOMA palette, no blue/cyan
+  [139, 124, 246, 0.34],   // #8B7CF6 primary violet
+  [168, 156, 248, 0.34],   // #A89CF8 secondary violet
+  [222, 214, 255, 0.20],   // pale lavender
+  [250, 246, 255, 0.07],   // white-violet sparks
+  [226, 133, 209, 0.05],   // #E285D1 restrained pink-violet
+];
+const pick = () => { let r = rnd(), a = 0; for (const c of PALETTE) { a += c[3]; if (r <= a) return c; } return PALETTE[0]; };
+
+window.ready = document.fonts.load(`${WEIGHT} 100px Onest`).then(() => {
+  // 1. glyph mask
+  const m = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  m.font = `${WEIGHT} ${FS}px Onest`;
+  if ('letterSpacing' in m) m.letterSpacing = `${Math.round(FS * LS)}px`;
+  const textW = m.measureText('SOMA').width - FS * LS;
+  const W = Math.ceil(textW + PAD * 2), H = Math.ceil(FS * 1.05 + PAD * 2);
+  m.canvas.width = W; m.canvas.height = H;
+  m.font = `${WEIGHT} ${FS}px Onest`;
+  if ('letterSpacing' in m) m.letterSpacing = `${Math.round(FS * LS)}px`;
+  m.textBaseline = 'middle'; m.fillStyle = '#fff';
+  m.fillText('SOMA', PAD, H / 2 + FS * 0.03);
+  const mask = m.getImageData(0, 0, W, H).data;
+  // blurred copy → edge factor (1 on the contour, 0 deep inside / far outside)
+  const b = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  b.canvas.width = W; b.canvas.height = H;
+  b.filter = `blur(${Math.round(9 * SCALE)}px)`; b.drawImage(m.canvas, 0, 0);
+  const blur = b.getImageData(0, 0, W, H).data;
+  const A = (x, y) => mask[(y * W + x) * 4 + 3] / 255;
+  const Bv = (x, y) => blur[(y * W + x) * 4 + 3] / 255;
+
+  const cv = document.getElementById('c');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const layer = document.createElement('canvas'); layer.width = W; layer.height = H;
+  const L = layer.getContext('2d');
+  L.globalCompositeOperation = 'lighter';
+  const dot = (x, y, r, c, a) => { L.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`; L.beginPath(); L.arc(x, y, r, 0, 7); L.fill(); };
+
+  // 2. particles: probability = edge emphasis × organic density noise
+  const STEP = 1.6 * SCALE;
+  const edges = [];
+  let count = 0;
+  for (let y = 0; y < H; y += STEP) for (let x = 0; x < W; x += STEP) {
+    const jx = x + (rnd() - .5) * STEP * 1.8, jy = y + (rnd() - .5) * STEP * 1.8;
+    const ix = Math.round(jx), iy = Math.round(jy);
+    if (ix < 8 || iy < 8 || ix >= W - 8 || iy >= H - 8) continue;
+    const a = A(ix, iy), bl = Bv(ix, iy);
+    const edge = 1 - Math.abs(bl - 0.5) * 2;            // peaks on the contour
+    const n = noise(jx / W, jy / H * (H / W) * 1.6);     // low-frequency unevenness
+    let p;
+    if (a > 0.5) p = 0.1 + 0.78 * Math.pow(edge, 1.5);  // inside: denser toward the edge
+    else p = 0.07 * Math.pow(edge, 1.6);                // outside: a faint dissolving halo
+    p *= 0.2 + 1.25 * Math.pow(n, 1.3);
+    if (rnd() > p) continue;
+    // some particles drift off the surface → soft dissolution, never breaking the silhouette
+    const drift = a > 0.5 ? 0 : gauss() * 12 * SCALE;
+    const r = (0.45 + Math.pow(rnd(), 6) * 1.5) * SCALE * 0.75;
+    const c = pick();
+    const alpha = Math.min(1, (a > 0.5 ? 0.7 + 0.5 * edge : 0.4) * (0.6 + 0.4 * rnd()));
+    dot(jx + drift, jy + drift * 0.6, r, c, alpha);
+    if (a > 0.5 && edge > 0.85) edges.push([jx, jy]);
+    count++;
+  }
+
+  // 3. a few luminous focal particles with soft white-violet cores on the structure
+  const focal = [];
+  for (let tries = 0; focal.length < 13 && tries < 4000 && edges.length; tries++) {
+    const [x, y] = edges[Math.floor(rnd() * edges.length)];
+    if (focal.some(([fx, fy]) => Math.hypot(fx - x, fy - y) < FS * 0.45)) continue; // keep them apart
+    focal.push([x, y]);
+    const R = (8 + rnd() * 10) * SCALE;
+    const g = L.createRadialGradient(x, y, 0, x, y, R);
+    g.addColorStop(0, 'rgba(255,250,255,0.85)'); g.addColorStop(0.12, 'rgba(201,187,250,0.45)');
+    g.addColorStop(0.45, 'rgba(139,124,246,0.12)'); g.addColorStop(1, 'rgba(139,124,246,0)');
+    L.fillStyle = g; L.beginPath(); L.arc(x, y, R, 0, 7); L.fill();
+  }
+
+  // 4. composite with a restrained volumetric bloom (soft, never neon)
+  if (BG) { ctx.fillStyle = '#050816'; ctx.fillRect(0, 0, W, H); }
+  ctx.globalCompositeOperation = 'lighter';
+  const tint = document.createElement('canvas'); tint.width = W; tint.height = H;
+  const T = tint.getContext('2d'); T.drawImage(m.canvas, 0, 0);
+  T.globalCompositeOperation = 'source-in'; T.fillStyle = '#6355D6'; T.fillRect(0, 0, W, H);
+  ctx.filter = `blur(${Math.round(34 * SCALE)}px)`; ctx.globalAlpha = 0.24; ctx.drawImage(tint, 0, 0);
+  ctx.filter = `blur(${Math.round(10 * SCALE)}px)`; ctx.globalAlpha = 0.08; ctx.drawImage(tint, 0, 0);
+  ctx.filter = `blur(${Math.round(16 * SCALE)}px)`; ctx.globalAlpha = 0.7; ctx.drawImage(layer, 0, 0);
+  ctx.filter = `blur(${Math.round(4 * SCALE)}px)`; ctx.globalAlpha = 0.6; ctx.drawImage(layer, 0, 0);
+  ctx.filter = 'none'; ctx.globalAlpha = 1; ctx.drawImage(layer, 0, 0);
+  window.info = { W, H, count, scale: SCALE, textW: Math.round(textW / SCALE) };
+});
+</script>
+</body></html>

@@ -1,0 +1,238 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>SOMA particles</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- "SOMA" assembling from cosmic particles — a seamless loop, rendered in real perspective:
+     particles arrive from deep space (a point just below the top-left corner), travel diagonally
+     and form the word letter by letter starting with S; the word holds; then, again starting
+     with S, particles continue along the same diagonal toward the viewer and fly past the camera.
+     Every frame is a pure function of time (renderFrame(t)), so the GIF export renders exactly
+     the same frames as the live preview.
+     URL params: w, h (canvas size), dur (loop seconds), weight (font weight), step (particle
+     density: lower = more particles), glow (0–2), seed, export=1 (no rAF loop). -->
+<style>
+  html, body { margin:0; background:#050816; }
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  canvas { display:block; max-width:100vw; max-height:100vh; }
+</style></head><body>
+<canvas id="c"></canvas>
+<script>
+const P = new URLSearchParams(location.search);
+const W = +(P.get('w') || 1920), H = +(P.get('h') || 900);
+const DUR = +(P.get('dur') || 16);
+const WEIGHT = P.get('weight') || '400';
+const STEP = +(P.get('step') || 3.4);
+const GLOW = +(P.get('glow') || 1);
+const SEED = +(P.get('seed') || 7);
+const EXPORT = P.get('export') === '1';
+
+const cv = document.getElementById('c');
+cv.width = W; cv.height = H;
+const main = cv.getContext('2d');
+// particles are drawn on their own transparent layer so only they get the bloom, not the background
+const layer = document.createElement('canvas'); layer.width = W; layer.height = H;
+const ctx = layer.getContext('2d');
+
+// seeded RNG so every run (preview and export) is identical
+let s = SEED >>> 0;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+// palette from the app: lavender / violet / pink / white sparks
+const PALETTE = [
+  [168, 156, 248, 0.55],  // violet300
+  [139, 124, 246, 0.22],  // violet400
+  [243, 166, 224, 0.13],  // pink400
+  [255, 246, 255, 0.10],  // white sparks
+];
+const pickColor = () => { let r = rnd(), a = 0; for (const c of PALETTE) { a += c[3]; if (r <= a) return c; } return PALETTE[0]; };
+
+const easeInOut = x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const easeOut = x => x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3);
+const easeIn = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * x;
+const clamp01 = x => Math.max(0, Math.min(1, x));
+
+// --- perspective camera -------------------------------------------------------
+// World z = 0 is the plane of the word (scale 1). Positive z = deeper into space,
+// negative z = toward the viewer; the camera sits at z = -F.
+const F = W * 0.9;
+const CX = W / 2, CY = H / 2;
+const scaleAt = z => F / (F + z);
+const project = (x, y, z) => { const k = scaleAt(z); return [CX + (x - CX) * k, CY + (y - CY) * k, k]; };
+
+// where particles come from: the area above the S (they are born invisible, deep in space)
+const ORIGIN = [W * 0.20, H * 0.22], ORIGIN_R = [W * 0.17, H * 0.17];
+// where the dissolving word streams to before flying at the viewer: lower right
+const SINK = [W * 0.76, H * 0.76], SINK_R = [W * 0.11, H * 0.08];
+const Z_FAR = F * 10;      // how deep they start
+const Z_NEAR = -F * 0.94;  // where they pass the camera
+
+// timeline (fractions of the loop): gather 0→.46, hold .46→.64, dissolve .64→1
+const T_IN = 0.46, T_HOLD = 0.64;
+const TRAVEL = 0.6;        // share of the gather phase one particle spends flying (the rest is the S→A stagger)
+const TRAVEL_OUT = 0.4;    // shorter on the way out, so departing particles form a thin stream, not a crowd
+
+const bez = (a, b, c, d, t) => { const m = 1 - t; return m * m * m * a + 3 * m * m * t * b + 3 * m * t * t * c + t * t * t * d; };
+// Catmull-Rom through a list of [x,y] points, t in 0..1 across the whole list
+function crPath(pts, t) {
+  const n = pts.length - 1, f = Math.min(t * n, n - 1e-6), i = Math.floor(f), u = f - i;
+  const p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(i + 2, n)];
+  const c = (a, b, cc, d) => 0.5 * ((2 * b) + (-a + cc) * u + (2 * a - 5 * b + 4 * cc - d) * u * u + (-a + 3 * b - 3 * cc + d) * u * u * u);
+  return [c(p0[0], p1[0], p2[0], p3[0]), c(p0[1], p1[1], p2[1], p3[1])];
+}
+const gauss = () => (rnd() + rnd() + rnd() - 1.5) / 1.5; // soft -1..1, denser in the middle
+
+let particles = [], stars = [];
+
+function build() {
+  // 1. rasterize the word offscreen and sample its pixels as targets
+  const off = document.createElement('canvas'); off.width = W; off.height = H;
+  const o = off.getContext('2d');
+  const size = Math.round(H * 0.44);
+  o.font = `${WEIGHT} ${size}px 'Nunito Sans'`;
+  o.textAlign = 'center'; o.textBaseline = 'middle';
+  if ('letterSpacing' in o) o.letterSpacing = `${Math.round(size * 0.22)}px`;
+  o.fillStyle = '#fff';
+  o.fillText('SOMA', W / 2 + size * 0.11, H / 2); // letterSpacing adds trailing space; nudge back to centre
+  const data = o.getImageData(0, 0, W, H).data;
+  const targets = [];
+  let minX = W, maxX = 0;
+  for (let y = 0; y < H; y += STEP) for (let x = 0; x < W; x += STEP) {
+    const jx = x + (rnd() - .5) * STEP, jy = y + (rnd() - .5) * STEP;
+    const i = ((Math.round(jy) * W) + Math.round(jx)) * 4;
+    if (data[i + 3] > 128) { targets.push([jx, jy]); minX = Math.min(minX, jx); maxX = Math.max(maxX, jx); }
+  }
+
+  particles = targets.map(([tx, ty]) => {
+    // order along the word: 0 at the left edge of S, 1 at the right edge of A
+    const order = (tx - minX) / (maxX - minX);
+
+    // ARRIVAL: born somewhere in the area above the S, deep in space; each flies its own
+    // loose, curving route (control points thrown about at random), so routes cross chaotically
+    const sx = ORIGIN[0] + gauss() * ORIGIN_R[0], sy = ORIGIN[1] + gauss() * ORIGIN_R[1];
+    const zs = Z_FAR * (0.4 + rnd() * 0.6);
+    const c1x = sx + (rnd() - .3) * W * 0.32, c1y = sy + (rnd() - .4) * H * 0.55;
+    const c2x = tx + (rnd() - .6) * W * 0.18, c2y = ty + (rnd() - .5) * H * 0.35;
+
+    // DEPARTURE: the letter loosens, then particles stream as a wavy ribbon (a "snake") into the
+    // lower-right area, then rush at the viewer and out past the frame (over our shoulders)
+    const lx = tx + 15 + rnd() * 45, ly = ty + 10 + rnd() * 40;                   // loosening drift
+    const ex = SINK[0] + gauss() * SINK_R[0], ey = SINK[1] + gauss() * SINK_R[1];  // the sink
+    const mx = tx + (ex - tx) * 0.55 + gauss() * W * 0.02, my = Math.max(ty, ey) + H * 0.06 + gauss() * H * 0.03; // ribbon dips below
+    let ox = ex - CX, oy = ey - CY; const ol = Math.hypot(ox, oy) || 1; ox /= ol; oy /= ol;
+    const fan = (rnd() - .5) * 2.2;                                                  // fan out as they near the camera
+    const fx = ex + (ox * Math.cos(fan) - oy * Math.sin(fan)) * W * 0.75, fy = ey + (ox * Math.sin(fan) + oy * Math.cos(fan)) * W * 0.75;
+    const exitPts = [[tx, ty], [lx, ly], [mx, my], [ex, ey], [fx, fy]];
+    const ze = Z_NEAR * (0.95 + rnd() * 0.05);
+    return {
+      sx, sy, zs, c1x, c1y, c2x, c2y, tx, ty, exitPts, ze, order,
+      lane: gauss(),                                  // position across the ribbon's width
+      r: 0.6 + Math.pow(rnd(), 5) * 1.1,             // almost all very fine
+      col: pickColor(), glow: rnd() < 0.015 * GLOW,   // rare soft halos
+      delayIn: order * (1 - TRAVEL) * 0.92 + rnd() * (1 - TRAVEL) * 0.08,
+      delayOut: order * (1 - TRAVEL_OUT) * 0.94 + rnd() * (1 - TRAVEL_OUT) * 0.06,
+      tw: rnd() * Math.PI * 2, twS: 1 + Math.floor(rnd() * 4),
+    };
+  });
+
+  // background dust that never forms letters — the frame is never empty
+  stars = Array.from({ length: Math.round(W * H / 2400) }, () => ({
+    x: rnd() * W, y: rnd() * H, r: 0.3 + Math.pow(rnd(), 5) * 0.9,
+    a: 0.10 + rnd() * 0.30, tw: rnd() * Math.PI * 2, twS: 1 + Math.floor(rnd() * 3), col: pickColor(),
+  }));
+}
+
+function renderFrame(t) {
+  const u = ((t % DUR) + DUR) % DUR / DUR;      // 0..1 loop phase
+  const tau = u * Math.PI * 2;                   // periodic twinkle closes the loop cleanly
+  main.globalCompositeOperation = 'source-over'; main.filter = 'none'; main.globalAlpha = 1;
+  main.fillStyle = '#050816'; main.fillRect(0, 0, W, H);
+  ctx.clearRect(0, 0, W, H);
+
+  // faint nebula behind the word that brightens while it is formed
+  const formed = u < T_IN ? easeInOut(clamp01((u / T_IN - 0.3) / 0.7)) : u < T_HOLD ? 1 : 1 - easeInOut(clamp01((u - T_HOLD) / (1 - T_HOLD) / 0.7));
+  const neb = main.createRadialGradient(CX, CY, 0, CX, CY, W * 0.45);
+  neb.addColorStop(0, `rgba(123,111,240,${0.05 + 0.11 * formed})`);
+  neb.addColorStop(0.5, `rgba(99,85,214,${0.02 + 0.04 * formed})`);
+  neb.addColorStop(1, 'rgba(5,8,22,0)');
+  main.fillStyle = neb; main.fillRect(0, 0, W, H);
+
+  ctx.globalCompositeOperation = 'lighter';
+
+  for (const st of stars) {
+    const a = st.a * (0.6 + 0.4 * Math.sin(tau * st.twS + st.tw));
+    ctx.fillStyle = `rgba(${st.col[0]},${st.col[1]},${st.col[2]},${a})`;
+    ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 7); ctx.fill();
+  }
+
+  for (const p of particles) {
+    let x, y, z, vis;
+    if (u < T_IN) {
+      // arriving: out of the depth along its own curving route, decelerating as it lands
+      const q = clamp01((u / T_IN - p.delayIn) / TRAVEL);
+      if (q <= 0) continue;
+      const k = easeInOut(q);
+      x = bez(p.sx, p.c1x, p.c2x, p.tx, k); y = bez(p.sy, p.c1y, p.c2y, p.ty, k);
+      z = p.zs * Math.pow(1 - k, 1.5);
+      vis = easeInOut(clamp01((k - 0.12) / 0.4));   // invisible at birth; kindles only once it is on its way
+    } else if (u < T_HOLD) {
+      x = p.tx; y = p.ty; z = 0; vis = 1;
+    } else {
+      // departing: loosen → wavy ribbon to the lower right → at the viewer and out of frame
+      const q = clamp01(((u - T_HOLD) / (1 - T_HOLD) - p.delayOut) / TRAVEL_OUT);
+      if (q >= 1) continue;
+      const k = Math.pow(q, 1.35);                  // slow, hesitant start: the letter first loses shape
+      [x, y] = crPath(p.exitPts, k);
+      // snake: a wave travelling along the ribbon, plus each particle's lane across its width
+      const env = Math.sin(Math.PI * Math.min(k / 0.75, 1));
+      const wave = Math.sin(k * Math.PI * 3.2 - p.order * Math.PI * 2.4 + tau * 0.0);
+      x += (-0.6) * (wave * H * 0.08 + p.lane * H * 0.022) * env;
+      y += (0.8) * (wave * H * 0.08 + p.lane * H * 0.022) * env;
+      z = k < 0.55 ? 0 : p.ze * easeIn((k - 0.55) / 0.45); // the last stretch comes at us
+      vis = 1 - clamp01((k - 0.8) / 0.2);
+    }
+    if (u >= T_IN && u < T_HOLD) { // tiny breathing drift so the held word feels alive
+      x += Math.sin(tau * 2 + p.tw) * 0.6; y += Math.cos(tau * 3 + p.tw) * 0.6;
+    }
+
+    const sx = x, sy = y, k = scaleAt(z);         // screen-space path; depth sets size and brightness
+    if (sx < -60 || sx > W + 60 || sy < -60 || sy > H + 60) continue;
+    const r = Math.max(0.55, p.r * Math.min(k, 9)); // far particles stay visible as fine specks
+    const twinkle = 0.78 + 0.22 * Math.sin(tau * p.twS * 3 + p.tw);
+    // far = dim, on the word = full, very close = softer (big, out-of-focus dots)
+    const depthA = k < 1 ? 0.5 + 0.5 * Math.sqrt(k) : 1 / Math.sqrt(k);
+    const alpha = depthA * vis * twinkle;
+    if (alpha < 0.01) continue;
+    const [cr, cg, cb] = p.col;
+    if (p.glow) {
+      const R = r * 6;
+      const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, R);
+      gr.addColorStop(0, `rgba(${cr},${cg},${cb},${0.3 * alpha})`);
+      gr.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(sx, sy, R, 0, 7); ctx.fill();
+    }
+    ctx.fillStyle = `rgba(${cr},${cg},${cb},${alpha})`;
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, 7); ctx.fill();
+  }
+
+  // composite: sharp particles, plus two blurred copies of the particle layer for a soft bloom
+  main.globalCompositeOperation = 'lighter';
+  main.drawImage(layer, 0, 0);
+  main.filter = `blur(${Math.round(W / 320)}px)`; main.globalAlpha = 0.9 * GLOW;
+  main.drawImage(layer, 0, 0);
+  main.filter = `blur(${Math.round(W / 90)}px)`; main.globalAlpha = 0.55 * GLOW;
+  main.drawImage(layer, 0, 0);
+  main.filter = 'none'; main.globalAlpha = 1; main.globalCompositeOperation = 'source-over';
+}
+
+window.renderFrame = renderFrame;
+window.ready = document.fonts.load(`${WEIGHT} 100px 'Nunito Sans'`).then(() => {
+  build();
+  window.particleCount = particles.length;
+  if (!EXPORT) {
+    const t0 = performance.now();
+    const loop = now => { renderFrame((now - t0) / 1000); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  } else renderFrame(0);
+});
+</script>
+</body></html>
