@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Block 2 — C2 typography</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&family=Onest:wght@200;300;400&display=swap" rel="stylesheet">
+<!-- C2 (tilted orbit around "you") with: OBSERVE left, UNDERSTAND right, RESPOND at the near centre node;
+     one continuous gradient line (no segments); four typography treatments for the three words. -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --head:#B9B7CF; --lav:#A89CF8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 10px; letter-spacing:.02em; line-height:1.5; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1180px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; margin-bottom:-319px; }
+  .frame::before { content:''; position:absolute; left:50%; top:-280px; width:1000px; height:560px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(60,52,150,.30), transparent); }
+  .label { position:absolute; left:96px; top:150px; font-size:20px; letter-spacing:.04em; background:linear-gradient(90deg,#C9BBFA,#8B7CF6); -webkit-background-clip:text; color:transparent; }
+  h1 { position:absolute; left:96px; top:212px; margin:0; font-weight:300; font-size:72px; line-height:1.15; color:var(--head); letter-spacing:-.01em; }
+  h1 em { font-style:normal; color:var(--lav); }
+  .lead { position:absolute; left:96px; top:330px; width:1720px; margin:0; font-weight:300; font-size:38px; line-height:1.5; color:var(--body); }
+  svg { position:absolute; left:0; top:0; }
+  .t { position:absolute; transform:translateX(-50%); text-align:center; white-space:nowrap; }
+  .you { position:absolute; transform:translateX(-50%); font-size:16px; letter-spacing:.3em; text-transform:uppercase; color:#4F5373; }
+  .grad { background:linear-gradient(90deg,#FFC6F1 0%,#A89CF8 60%,#8B7CF6 100%); -webkit-background-clip:text; color:transparent; }
+</style></head><body><div class="wrap">
+
+<template id="head">
+  <div class="label">01 / Overview</div>
+  <h1>What if your state was something you could <em>observe</em>?</h1>
+  <p class="lead">Some days feel heavier for no clear reason. Soma brings sleep, mood, energy and the cycles you choose to follow into one calm view. Over time you start to notice your own patterns and what might be shaping your day, with small, low‑effort rituals for harder days. No judgement, no guilt.</p>
+</template>
+
+<div class="opt"><b>1 · As before</b> · Onest Light, capitals, wide spacing. Now with one continuous line and the new order</div>
+<div class="frame" data-type="1"></div>
+
+<div class="opt"><b>2 · Airy capitals</b> · Nunito Sans ExtraLight, smaller and much wider spacing, with a tiny step number above each word. Lighter and more “quiet luxury”</div>
+<div class="frame" data-type="2"></div>
+
+<div class="opt"><b>3 · Editorial title case</b> · words in regular case, Nunito Sans Light, larger, no extra spacing; a small capitals label “Step 01” above. Softer and more human, closer to the headline above</div>
+<div class="frame" data-type="3"></div>
+
+<div class="opt"><b>4 · Echo of the headline</b> · lower‑case words in the same light style as the headline, filled with the app’s pink‑lilac gradient, just like “observe” in the question above. Ties the steps to the headline</div>
+<div class="frame" data-type="4"></div>
+
+</div>
+<script>
+const head = document.getElementById('head').innerHTML;
+const cx = 960, cy = 880, rx = 720, ry = 150;
+const P = a => [cx + rx * Math.cos(a), cy + ry * Math.sin(a)];
+const deg = d => d * Math.PI / 180;
+const pL = P(deg(195)), pR = P(deg(-15)), pF = P(deg(90));
+
+// one smooth ellipse: far half quiet, near half brighter, both as single arc paths with gradients
+const orbit = `<defs>
+  <linearGradient id="nearG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFC6F1" stop-opacity=".55"/><stop offset=".5" stop-color="#C9BBFA" stop-opacity=".75"/><stop offset="1" stop-color="#8B7CF6" stop-opacity=".55"/></linearGradient>
+  <linearGradient id="farG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".22"/><stop offset=".5" stop-color="#C9BBFA" stop-opacity=".1"/><stop offset="1" stop-color="#C9BBFA" stop-opacity=".22"/></linearGradient>
+  <radialGradient id="halo"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".7"/><stop offset="1" stop-color="#8B7CF6" stop-opacity="0"/></radialGradient>
+  <radialGradient id="core"><stop offset="0" stop-color="#A89CF8" stop-opacity=".42"/><stop offset=".4" stop-color="#6355D6" stop-opacity=".16"/><stop offset="1" stop-color="#050816" stop-opacity="0"/></radialGradient></defs>
+  <path d="M${cx - rx} ${cy} A${rx} ${ry} 0 0 1 ${cx + rx} ${cy}" fill="none" stroke="url(#farG)" stroke-width="1.2"/>
+  <circle cx="${cx}" cy="${cy}" r="140" fill="url(#core)"/><circle cx="${cx}" cy="${cy}" r="4" fill="#EDE8FF" opacity=".8"/>
+  <path d="M${cx + rx} ${cy} A${rx} ${ry} 0 0 1 ${cx - rx} ${cy}" fill="none" stroke="url(#nearG)" stroke-width="1.5"/>`;
+const node = ([x, y], r, g, op) => `<circle cx="${x}" cy="${y}" r="${g}" fill="url(#halo)" opacity="${op}"/><circle cx="${x}" cy="${y}" r="${r}" fill="#EDE8FF" opacity="${op}"/>`;
+
+const T = {
+  1: (w, i, side) => `<div style="font-family:Onest; font-weight:300; letter-spacing:.3em; font-size:${side ? 36 : 44}px; color:${['#FFD9F5', '#A89CF8', '#C9BBFA'][i]}">${w}</div>`,
+  2: (w, i, side) => `<div style="font-size:15px; letter-spacing:.3em; color:#4F5373; margin-bottom:14px">0${[1, 2, 3][i]}</div><div style="font-weight:200; letter-spacing:.55em; font-size:${side ? 28 : 32}px; color:${['#F3D9F0', '#BCB1F5', '#D6CEFB'][i]}; margin-right:-.55em">${w}</div>`,
+  3: (w, i, side) => `<div style="font-size:15px; letter-spacing:.24em; text-transform:uppercase; color:#4F5373; margin-bottom:10px">Step 0${[1, 2, 3][i]}</div><div style="font-weight:300; font-size:${side ? 50 : 58}px; letter-spacing:-.005em; color:${['#F0DDF0', '#B8AEF2', '#D2CAF8'][i]}">${w[0] + w.slice(1).toLowerCase()}</div>`,
+  4: (w, i, side) => `<div class="grad" style="font-weight:300; font-size:${side ? 56 : 66}px; letter-spacing:-.005em">${w.toLowerCase()}</div>`,
+};
+// order: OBSERVE (left), RESPOND (near centre), UNDERSTAND (right); step numbers follow the reading of the loop
+const slots = [[pL, 'OBSERVE', 0, true], [pF, 'RESPOND', 2, false], [pR, 'UNDERSTAND', 1, true]];
+
+document.querySelectorAll('.frame').forEach(f => {
+  const type = f.dataset.type;
+  f.insertAdjacentHTML('afterbegin', head);
+  f.insertAdjacentHTML('beforeend', `<svg width="1920" height="1180">${orbit}${node(pL, 4, 12, .75)}${node(pR, 4, 12, .75)}${node(pF, 7, 22, 1)}</svg>`);
+  slots.forEach(([[x, y], w, i, side]) => {
+    const top = side ? y - (type === '1' || type === '4' ? 76 : 112) : y + 34;
+    f.insertAdjacentHTML('beforeend', `<div class="t" style="left:${x}px; top:${top}px">${T[type](w, i, side)}</div>`);
+  });
+  f.insertAdjacentHTML('beforeend', `<div class="you" style="left:${cx}px; top:${cy - 50}px">you</div>`);
+});
+</script>
+</body></html>

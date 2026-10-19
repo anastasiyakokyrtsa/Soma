@@ -1,0 +1,146 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Soma case — personas block options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&family=Onest:wght@300;400&display=swap" rel="stylesheet">
+<!-- Five ways to show the 4 research personas (block 03). 1920-wide frames at Behance's ~73%.
+     Persona facts come from the Figma persona page; the "questions" are paraphrased from each
+     persona's core need (not interview quotes) and are labelled as such. -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --head:#B9B7CF; --lav:#A89CF8; --ink:#E4E1F2; --muted:#8A8DAA; --cap:#4F5373; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 90px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 12px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; }
+  .frame::before { content:''; position:absolute; right:-300px; top:-200px; width:1300px; height:900px; background:radial-gradient(closest-side, rgba(76,65,176,.14), transparent); }
+  .label { position:absolute; left:102px; top:120px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  h2 { position:absolute; left:102px; top:190px; width:1728px; margin:0; font-weight:300; font-size:68px; line-height:1.15; color:var(--head); letter-spacing:-.01em; }
+  h2 em { font-style:normal; color:var(--lav); }
+  .t { position:absolute; }
+  .caps { font-size:15px; letter-spacing:.3em; text-transform:uppercase; color:var(--cap); }
+  .name { font-family:Onest; font-weight:300; font-size:36px; color:var(--ink); }
+  .role { font-size:20px; color:var(--muted); margin-top:6px; letter-spacing:.02em; }
+  .txt { font-size:24px; line-height:1.5; color:var(--body); font-weight:300; }
+  .q { font-weight:200; font-size:40px; line-height:1.3; color:var(--ink); }
+  .note { position:absolute; font-size:15px; color:var(--cap); letter-spacing:.06em; }
+  svg { position:absolute; left:0; top:0; }
+  .tag { display:inline-block; font-size:15px; letter-spacing:.2em; text-transform:uppercase; padding:8px 16px; border-radius:999px; border:1px solid rgba(201,187,250,.25); color:#C9BBFA; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Map (the first idea).</b> Four people as glowing points on two tensions from the research: logic ↔ rhythm, curious ↔ overloaded.</div>
+<div class="frame" style="height:1560px" id="v1">
+  <div class="label">03 / Who it’s for</div>
+  <h2>Four people. One question: <em>why</em> do I feel this way?</h2>
+  <div class="caps t" style="left:102px; top:880px">Logic &amp; data</div>
+  <div class="caps t" style="right:90px; top:880px; text-align:right">Rhythm &amp; nature</div>
+  <div class="caps t" style="left:960px; top:420px; transform:translateX(-50%)">Curious</div>
+  <div class="caps t" style="left:960px; top:1350px; transform:translateX(-50%)">Overloaded</div>
+  <div class="t" style="left:300px; top:470px"><div class="name">Timur, 20</div><div class="role">Physics student · Kazan</div><div class="txt" style="width:380px; margin-top:14px">Wants to see his wrecked sleep as clear data, not as a lecture.</div></div>
+  <div class="t" style="left:1300px; top:520px"><div class="name">Alina, 26</div><div class="role">Yoga teacher · Sochi &amp; Bali</div><div class="txt" style="width:380px; margin-top:14px">Follows her moods through lunar and body cycles, and wants it to feel beautiful.</div></div>
+  <div class="t" style="left:240px; top:1010px"><div class="name">Philipp, 32</div><div class="role">Product designer · Moscow</div><div class="txt" style="width:380px; margin-top:14px">Wants to catch energy dips before they turn into burnout.</div></div>
+  <div class="t" style="left:1120px; top:1080px"><div class="name">Irina, 47</div><div class="role">Teacher · Novosibirsk</div><div class="txt" style="width:380px; margin-top:14px">Needs simple tools for winter fatigue, without feeling guilty.</div></div>
+</div>
+
+<div class="opt"><b>2 · Four questions.</b> Each person is introduced by the question they bring to the app, set large and light. The block reads like the case’s opening question, split into four lives. Staggered, editorial.</div>
+<div class="frame" style="height:1520px" id="v2">
+  <div class="label">03 / Who it’s for</div>
+  <h2>Four people, four versions of the same <em>question</em>.</h2>
+  <div class="t" style="left:102px; top:440px; width:760px"><div class="q">“How do I see the crash before it comes?”</div><div class="name" style="font-size:28px; margin-top:34px">Philipp, 32</div><div class="role">Product designer · Moscow · works 10–12 hours a day</div></div>
+  <div class="t" style="left:1060px; top:560px; width:760px"><div class="q">“Do my moods follow a rhythm I can learn to read?”</div><div class="name" style="font-size:28px; margin-top:34px">Alina, 26</div><div class="role">Yoga teacher · Sochi &amp; Bali · follows lunar cycles</div></div>
+  <div class="t" style="left:102px; top:960px; width:760px"><div class="q">“Why is winter so hard, and why do I blame myself for it?”</div><div class="name" style="font-size:28px; margin-top:34px">Irina, 47</div><div class="role">Literature teacher · Novosibirsk · seasonal fatigue</div></div>
+  <div class="t" style="left:1060px; top:1080px; width:760px"><div class="q">“Why can’t I fix my sleep, even when I really try?”</div><div class="name" style="font-size:28px; margin-top:34px">Timur, 20</div><div class="role">Physics student · Kazan · skeptical but curious</div></div>
+  <div class="note" style="left:102px; top:1420px">Research personas · questions paraphrased from each persona’s core need</div>
+</div>
+
+<div class="opt"><b>3 · Four orbits.</b> Each persona gets a small orbit, the same motif as the Introduction. The node’s position on the ring shows where they stand between data and rhythm. Name, one line of need, one line of what gets in the way.</div>
+<div class="frame" style="height:1240px" id="v3">
+  <div class="label">03 / Who it’s for</div>
+  <h2>Four people. One question: <em>why</em> do I feel this way?</h2>
+  <svg width="1920" height="1240" id="v3svg"></svg>
+  <div id="v3cols"></div>
+</div>
+
+<div class="opt"><b>4 · One spectrum.</b> A single thin line from “logic &amp; data” to “rhythm &amp; nature”. The four people sit on it as nodes; how much energy they have is shown by the size of the glow. Details drop below each node. Very clean, reads in two seconds.</div>
+<div class="frame" style="height:1120px" id="v4">
+  <div class="label">03 / Who it’s for</div>
+  <h2>Four people. One question: <em>why</em> do I feel this way?</h2>
+  <svg width="1920" height="1120" id="v4svg"></svg>
+  <div class="caps t" style="left:102px; top:560px">Logic &amp; data</div>
+  <div class="caps t" style="right:90px; top:560px; text-align:right">Rhythm &amp; nature</div>
+  <div id="v4cols"></div>
+  <div class="note" style="left:102px; top:1030px">Glow = energy: bright for curious, dim for overloaded</div>
+</div>
+
+<div class="opt"><b>5 · Editorial table.</b> Four columns, four quiet rows (who, wants, struggles with, prefers), divided by hairlines. The most “research” look: dense with information, but calm. Good if the case needs to feel rigorous.</div>
+<div class="frame" style="height:1330px" id="v5">
+  <div class="label">03 / Who it’s for</div>
+  <h2>Four people. One question: <em>why</em> do I feel this way?</h2>
+  <div id="v5table"></div>
+</div>
+
+</div>
+<script>
+const P = [
+  { name: 'Timur, 20', role: 'Physics student · Kazan', need: 'Wants to see his wrecked sleep as clear data.', barrier: 'Skeptical of anything that feels esoteric.', prefers: 'Graphs and numbers, not advice', lens: .06, energy: 1 },
+  { name: 'Philipp, 32', role: 'Product designer · Moscow', need: 'Wants to catch energy dips before they turn into burnout.', barrier: 'No time or energy for long forms.', prefers: 'A quick, logical read of the day', lens: .36, energy: .35 },
+  { name: 'Irina, 47', role: 'Teacher · Novosibirsk', need: 'Needs simple tools for winter fatigue, without guilt.', barrier: 'Overwhelmed by information‑heavy apps.', prefers: 'Short, gentle, simple steps', lens: .64, energy: .25 },
+  { name: 'Alina, 26', role: 'Yoga teacher · Sochi & Bali', need: 'Follows her moods through lunar and body cycles.', barrier: 'Clinical tools feel cold and say nothing about her.', prefers: 'Beauty, rhythm, nature', lens: .94, energy: .9 },
+];
+const defs = `<defs><radialGradient id="h"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".75"/><stop offset="1" stop-color="#8B7CF6" stop-opacity="0"/></radialGradient>
+<linearGradient id="spec" gradientUnits="userSpaceOnUse" x1="102" y1="0" x2="1830" y2="0"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".35"/><stop offset=".5" stop-color="#A89CF8" stop-opacity=".6"/><stop offset="1" stop-color="#FFC6F1" stop-opacity=".45"/></linearGradient></defs>`;
+const node = (x, y, r = 5, g = 18, op = 1) => `<circle cx="${x}" cy="${y}" r="${g}" fill="url(#h)" opacity="${op}"/><circle cx="${x}" cy="${y}" r="${r}" fill="#EDE8FF" opacity="${op}"/>`;
+const add = (id, html) => { const el = document.getElementById(id); el.outerHTML = html; };
+
+// v1 map
+document.getElementById('v1').insertAdjacentHTML('afterbegin', `<svg width="1920" height="1560">${defs}
+  <line x1="102" y1="900" x2="1830" y2="900" stroke="#C9BBFA" stroke-opacity=".14"/><line x1="960" y1="460" x2="960" y2="1330" stroke="#C9BBFA" stroke-opacity=".14"/>
+  <circle cx="960" cy="900" r="240" fill="none" stroke="#C9BBFA" stroke-opacity=".05"/><circle cx="960" cy="900" r="420" fill="none" stroke="#C9BBFA" stroke-opacity=".04"/>
+  ${node(270, 488)}${node(1270, 538)}${node(210, 1028)}${node(1090, 1098)}</svg>`);
+
+// v3 four orbits: node angle encodes lens (0 = data at left, 1 = rhythm at right) along the near half
+{ let svg = defs, html = ''; const colW = 1728 / 4;
+  P.forEach((p, i) => {
+    const cx = 102 + colW * i + colW / 2 - 20, cy = 560, rx = 150, ry = 46;
+    const a = Math.PI - p.lens * Math.PI; // left → right along the near half
+    const nx = cx + rx * Math.cos(a), ny = cy + ry * Math.sin(a);
+    svg += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#C9BBFA" stroke-opacity=".22"/>
+      <circle cx="${cx}" cy="${cy}" r="60" fill="url(#h)" opacity=".18"/><circle cx="${cx}" cy="${cy}" r="3" fill="#EDE8FF" opacity=".7"/>` + node(nx, ny, 5, 16);
+    const x = 102 + colW * i;
+    html += `<div class="t" style="left:${x}px; top:680px; width:${colW - 50}px">
+      <div class="name">${p.name}</div><div class="role">${p.role}</div>
+      <div class="caps" style="margin-top:44px">Wants</div><div class="txt" style="margin-top:10px">${p.need}</div>
+      <div class="caps" style="margin-top:34px">Gets in the way</div><div class="txt" style="margin-top:10px">${p.barrier}</div></div>`;
+  });
+  svg += `<text x="102" y="470" fill="#4F5373" font-family="Nunito Sans" font-size="15" letter-spacing="4">DATA ←</text><text x="1830" y="470" text-anchor="end" fill="#4F5373" font-family="Nunito Sans" font-size="15" letter-spacing="4">→ RHYTHM</text>`;
+  document.getElementById('v3svg').innerHTML = svg; add('v3cols', html);
+}
+
+// v4 spectrum
+{ const y = 600, L = 102, R = 1830; let svg = defs + `<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="url(#spec)" stroke-width="1.4"/>`, html = '';
+  P.forEach(p => {
+    const x = L + 300 + p.lens * (R - L - 600), g = 16 + 30 * p.energy, op = .45 + .55 * p.energy;
+    svg += node(x, y, 4 + 3 * p.energy, g, op) + `<line x1="${x}" y1="${y + 30}" x2="${x}" y2="${y + 110}" stroke="#C9BBFA" stroke-opacity=".14"/>`;
+    html += `<div class="t" style="left:${x}px; top:${y + 140}px; width:340px; transform:translateX(-50%); text-align:center">
+      <div class="name">${p.name}</div><div class="role">${p.role}</div><div class="txt" style="margin-top:18px">${p.need}</div></div>`;
+  });
+  document.getElementById('v4svg').innerHTML = svg; add('v4cols', html);
+}
+
+// v5 table
+{ const rows = [['Who', p => `<div class="name" style="font-size:32px">${p.name}</div><div class="role">${p.role}</div>`], ['Wants', p => p.need], ['Struggles with', p => p.barrier], ['Prefers', p => p.prefers]];
+  const colW = (1728 - 220) / 4; let html = '', y = 430;
+  rows.forEach(([title, f], r) => {
+    const h = r === 0 ? 130 : 150;
+    html += `<div class="t" style="left:102px; top:${y}px; width:1728px; height:1px; background:rgba(201,187,250,.12)"></div>`;
+    html += `<div class="t caps" style="left:102px; top:${y + 34}px">${title}</div>`;
+    P.forEach((p, i) => html += `<div class="t txt" style="left:${322 + colW * i}px; top:${y + 28}px; width:${colW - 40}px; ${r ? '' : 'color:inherit'}">${f(p)}</div>`);
+    y += h + (r === 0 ? 40 : 30);
+  });
+  html += `<div class="t" style="left:102px; top:${y}px; width:1728px; height:1px; background:rgba(201,187,250,.12)"></div>`;
+  add('v5table', html);
+}
+
+document.querySelectorAll('.frame').forEach(f => f.style.marginBottom = `-${Math.round(parseInt(f.style.height) * (1 - .7292))}px`);
+</script>
+</body></html>

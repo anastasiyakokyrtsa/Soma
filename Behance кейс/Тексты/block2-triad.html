@@ -1,0 +1,103 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Block 2 — Observe · Understand · Respond</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&family=Onest:wght@200;300;400&display=swap" rel="stylesheet">
+<!-- Her current Block 2 (left-aligned label / headline / body) + five ways to set OBSERVE · UNDERSTAND · RESPOND
+     beneath it. 1920-wide frames shown at Behance's ~73% (1400px). -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --head:#B9B7CF; --lav:#A89CF8; --vio:#8B7CF6; --pink:#FFC6F1; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 10px; letter-spacing:.02em; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; }
+  .frame::before { content:''; position:absolute; left:50%; top:-280px; width:1000px; height:560px; transform:translateX(-50%); background:radial-gradient(closest-side, rgba(60,52,150,.30), transparent); }
+  .label { position:absolute; left:96px; top:150px; font-size:20px; letter-spacing:.04em; background:linear-gradient(90deg,#C9BBFA,#8B7CF6); -webkit-background-clip:text; color:transparent; }
+  h1 { position:absolute; left:96px; top:212px; margin:0; font-weight:300; font-size:72px; line-height:1.15; color:var(--head); letter-spacing:-.01em; }
+  h1 em { font-style:normal; color:var(--lav); }
+  .lead { position:absolute; left:96px; top:330px; width:1720px; margin:0; font-weight:300; font-size:38px; line-height:1.5; color:var(--body); }
+  .grad { background:linear-gradient(90deg,var(--pink) 0%, var(--lav) 60%, var(--vio) 100%); -webkit-background-clip:text; color:transparent; }
+  .mono { font-size:18px; letter-spacing:.14em; text-transform:uppercase; color:#4F5373; }
+  .desc { font-size:24px; line-height:1.5; color:var(--body); font-weight:300; }
+  .hair { position:absolute; height:1px; background:rgba(255,255,255,.10); }
+  .node { position:absolute; width:10px; height:10px; border-radius:50%; background:#C9BBFA; box-shadow:0 0 14px 3px rgba(168,156,248,.55); }
+</style></head><body><div class="wrap">
+
+<!-- shared header, injected into every frame -->
+<template id="head">
+  <div class="label">01 / Overview</div>
+  <h1>What if your state was something you could <em>observe</em>?</h1>
+  <p class="lead">Some days feel heavier for no clear reason. Soma brings sleep, mood, energy and the cycles you choose to follow into one calm view. Over time you start to notice your own patterns and what might be shaping your day, with small, low‑effort rituals for harder days. No judgement, no guilt.</p>
+</template>
+
+<!-- A -->
+<div class="opt"><b>A · Three columns</b> · a hairline, index numbers, a word and one quiet line each. The most “product-case” look: clean and readable</div>
+<div class="frame" style="height:960px" data-head>
+  <div class="hair" style="left:96px; right:96px; top:640px"></div>
+  <div style="position:absolute; left:96px; top:690px; display:grid; grid-template-columns:repeat(3, 576px);">
+    <div><div class="mono">01</div><div style="font-family:Onest; font-weight:300; font-size:58px; letter-spacing:.16em; color:#E9E7F5; margin:22px 0 18px">OBSERVE</div><div class="desc" style="width:440px">Sleep, mood, energy and cycles in one calm view.</div></div>
+    <div><div class="mono">02</div><div style="font-family:Onest; font-weight:300; font-size:58px; letter-spacing:.16em; color:#E9E7F5; margin:22px 0 18px">UNDERSTAND</div><div class="desc" style="width:440px">A gentle read on what might be shaping your day.</div></div>
+    <div><div class="mono">03</div><div style="font-family:Onest; font-weight:300; font-size:58px; letter-spacing:.16em; color:#E9E7F5; margin:22px 0 18px">RESPOND</div><div class="desc" style="width:440px">Small, low‑effort rituals for harder days.</div></div>
+  </div>
+</div>
+
+<!-- B -->
+<div class="opt"><b>B · Rhythm steps</b> · the words step down to the right like phases of a rhythm, joined by a hairline with glowing nodes (the nodes echo the chart dots in the app)</div>
+<div class="frame" style="height:1080px" data-head>
+  <svg style="position:absolute; left:0; top:0" width="1920" height="1080"><polyline points="101,665 101,705 720,705 720,805 1340,805 1340,905" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1"/></svg>
+  <div class="node" style="left:96px; top:660px"></div><div class="node" style="left:715px; top:760px"></div><div class="node" style="left:1335px; top:860px"></div>
+  <div style="position:absolute; left:130px; top:634px; font-family:Onest; font-weight:200; font-size:64px; letter-spacing:.22em; color:#FFD9F5">OBSERVE</div>
+  <div style="position:absolute; left:750px; top:734px; font-family:Onest; font-weight:200; font-size:64px; letter-spacing:.22em; color:#C9BBFA">UNDERSTAND</div>
+  <div style="position:absolute; left:1370px; top:834px; font-family:Onest; font-weight:200; font-size:64px; letter-spacing:.22em; color:#A89CF8">RESPOND</div>
+</div>
+
+<!-- C -->
+<div class="opt"><b>C · A loop on an orbit</b> · the three steps sit on a thin ring, as a cycle you repeat every day rather than a one-off line. Echoes the orbit ring from onboarding</div>
+<div class="frame" style="height:1240px" data-head>
+  <svg style="position:absolute; left:0; top:0" width="1920" height="1240">
+    <defs><linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC6F1" stop-opacity=".55"/><stop offset=".6" stop-color="#A89CF8" stop-opacity=".35"/><stop offset="1" stop-color="#8B7CF6" stop-opacity=".15"/></linearGradient></defs>
+    <circle cx="960" cy="900" r="230" fill="none" stroke="url(#ring)" stroke-width="1.2"/>
+    <circle cx="960" cy="900" r="300" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+  </svg>
+  <div class="node" style="left:955px; top:665px"></div>
+  <div class="node" style="left:1154px; top:1010px"></div>
+  <div class="node" style="left:756px; top:1010px"></div>
+  <div style="position:absolute; left:0; right:0; top:600px; text-align:center; font-family:Onest; font-weight:300; font-size:40px; letter-spacing:.3em; color:#FFD9F5">OBSERVE</div>
+  <div style="position:absolute; left:1210px; top:1040px; font-family:Onest; font-weight:300; font-size:40px; letter-spacing:.3em; color:#A89CF8">RESPOND</div>
+  <div style="position:absolute; right:1210px; top:1040px; text-align:right; font-family:Onest; font-weight:300; font-size:40px; letter-spacing:.3em; color:#C9BBFA">UNDERSTAND</div>
+  <div class="mono" style="position:absolute; left:0; right:0; top:890px; text-align:center">a daily loop</div>
+</div>
+
+<!-- D -->
+<div class="opt"><b>D · One line</b> · three words across the full width with long hairlines between them, coloured along the app’s headline gradient. The most minimal and “quiet” option</div>
+<div class="frame" style="height:820px" data-head>
+  <div style="position:absolute; left:96px; right:96px; top:640px; display:flex; align-items:center; gap:40px; font-family:Onest; font-weight:300; font-size:44px; letter-spacing:.3em;">
+    <span style="color:#FFD9F5">OBSERVE</span>
+    <span style="flex:1; height:1px; background:linear-gradient(90deg, rgba(255,198,241,.45), rgba(201,187,250,.25))"></span>
+    <span style="color:#C9BBFA">UNDERSTAND</span>
+    <span style="flex:1; height:1px; background:linear-gradient(90deg, rgba(201,187,250,.25), rgba(139,124,246,.4))"></span>
+    <span style="color:#A89CF8">RESPOND</span>
+  </div>
+</div>
+
+<!-- E -->
+<div class="opt"><b>E · Large editorial stack</b> · three big words in a column with a growing indent, like a breath getting deeper; the first one in the app gradient, the other two as quiet thin outlines</div>
+<div class="frame" style="height:1220px" data-head>
+  <div style="position:absolute; left:96px; top:600px; font-family:Onest; font-weight:300; font-size:150px; line-height:1.02; letter-spacing:.04em;">
+    <div class="grad">OBSERVE</div>
+    <div style="margin-left:240px; color:transparent; -webkit-text-stroke:1.2px rgba(201,187,250,.75)">UNDERSTAND</div>
+    <div style="margin-left:480px; color:transparent; -webkit-text-stroke:1.2px rgba(168,156,248,.55)">RESPOND</div>
+  </div>
+  <div class="mono" style="position:absolute; right:96px; top:640px; text-align:right">01<br><br>02<br><br>03</div>
+</div>
+
+</div>
+<script>
+  const head = document.getElementById('head').innerHTML;
+  document.querySelectorAll('[data-head]').forEach(f => {
+    f.insertAdjacentHTML('afterbegin', head);
+    f.style.marginBottom = `-${Math.round(parseInt(f.style.height) * (1 - .7292))}px`;
+  });
+</script>
+</body></html>
