@@ -24,8 +24,8 @@ export function ChooseApproachScreen({ navigation }: any) {
   return (
     <OnboardingStepLayout
       activeStep={5}
-      title="Выбери язык самонаблюдения"
-      description="Чтобы рекомендации и инсайты откликались тебе, выбери основной подход. Ты всегда можешь изменить его в настройках"
+      title="Выбери подход"
+      description="Это поможет точнее подобрать рекомендации. Подход всегда можно изменить в настройках"
       buttonDisabled={selected === null}
       onPressNext={() => navigation.navigate('VisualStyle')}
       onPressBack={() => navigation.goBack()}

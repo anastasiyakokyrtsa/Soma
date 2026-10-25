@@ -17,7 +17,7 @@ export const VISUAL_STYLES: {
   {
     id: 'cosmos',
     name: 'Космос',
-    tagline: 'Бескрайность и тайна — пространство для наблюдения за собой',
+    tagline: 'Бескрайность и тайна — пространство\nдля наблюдения за собой',
   },
   {
     // Tagline is verbatim from WF 13 — a real spec, not invented copy.
@@ -28,7 +28,7 @@ export const VISUAL_STYLES: {
   {
     id: 'nature',
     name: 'Природа',
-    tagline: 'Заземлённость и мягкость — ближе к телу и дыханию',
+    tagline: 'Заземлённость и мягкость —\nближе к телу и дыханию',
   },
   {
     // Renamed from "Тепло" 2026-08-07 — moodboard reference: Figma

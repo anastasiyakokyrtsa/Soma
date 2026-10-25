@@ -40,6 +40,14 @@ const MOOD: Record<
     headerFont: string;
     taglineFont: string;
     taglineSize: number;
+    // Only Cosmos sets this - its tagline now has an explicit \n (her ask,
+    // 2026-10-13: force exactly "Бескрайность и тайна — пространство" /
+    // "для наблюдения за собой"), and the shared 82% maxWidth below was
+    // narrow enough to still wrap line 1 again on top of that. Defaults to
+    // the existing 82% for every other mood, where the narrower measure is
+    // still the deliberate choice it always was (2026-08-08: "текст так не
+    // растекался").
+    taglineMaxWidth?: `${number}%`;
     buttonFont: string;
     buttonRadius: number;
     glow: boolean;
@@ -52,6 +60,7 @@ const MOOD: Record<
     headerFont: 'Onest_600SemiBold',
     taglineFont: 'NunitoSans_500Medium',
     taglineSize: 16,
+    taglineMaxWidth: '100%',
     buttonFont: 'NunitoSans_600SemiBold',
     buttonRadius: 16,
     glow: true,
@@ -189,7 +198,12 @@ export function StylePreviewScreen({ navigation, route }: any) {
         <Text
           style={[
             styles.tagline,
-            { fontFamily: mood.taglineFont, fontSize: mood.taglineSize, lineHeight: mood.taglineSize * 1.2 },
+            {
+              fontFamily: mood.taglineFont,
+              fontSize: mood.taglineSize,
+              lineHeight: mood.taglineSize * 1.2,
+              ...(mood.taglineMaxWidth ? { maxWidth: mood.taglineMaxWidth } : null),
+            },
           ]}
         >
           {style.tagline}

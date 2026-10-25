@@ -16,7 +16,7 @@ export function VisualStyleScreen({ navigation }: any) {
     <OnboardingStepLayout
       activeStep={6}
       title="Выбери свой стиль"
-      description="Выбери оформление, которое вдохновляет тебя. Стиль всегда можно изменить в настройках"
+      description="Выбери оформление, которое вдохновляет тебя. Позже его можно будет изменить в настройках"
       buttonLabel="Применить стиль"
       buttonDisabled={selected === null}
       // TODO: applying a non-Cosmos style doesn't actually re-theme the app
