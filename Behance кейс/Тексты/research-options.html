@@ -1,0 +1,140 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Research block — job stories and CJM</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- New block before The tension: job stories (Figma 59:1064, 11 stories, 4 personas) and the CJM (Figma 58:41, 5 stages).
+     Aura-style: tilted glass cards and a tilted table, cropped by edges. Four layouts at Behance scale. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .light { position:absolute; border-radius:50%; filter:blur(120px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .t2 { font-weight:300; font-size:52px; line-height:1.2; color:#E4E1F2; margin:0; }
+  .desc { font-weight:300; font-size:26px; line-height:1.5; color:#8A8DAA; margin:18px 0 0; }
+  .glass { border-radius:30px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 40px 80px rgba(0,0,0,.45); }
+  /* job story card */
+  .js { width:520px; padding:34px 36px 36px; }
+  .js .who { font-size:15px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .js h4 { margin:12px 0 0; font-weight:300; font-size:38px; line-height:1.15; color:#F2F0FA; }
+  .js p { margin:16px 0 0; font-size:19px; line-height:1.5; color:#A6ABC6; font-weight:400; }
+  .js p b { color:#D9D5F2; font-weight:600; }
+  .grid { display:grid; grid-template-columns:repeat(3, 520px); gap:26px; }
+  /* tilted surfaces (Aura-like) */
+  .tilt { position:absolute; transform-style:preserve-3d; }
+  .tiltA { transform:perspective(2400px) rotateX(24deg) rotateY(-14deg) rotateZ(9deg); transform-origin:0 0; }
+  .tiltB { transform:perspective(2400px) rotateX(24deg) rotateY(14deg) rotateZ(-9deg); transform-origin:100% 0; }
+  /* CJM table */
+  .cjm { width:1900px; border-radius:30px; overflow:hidden; }
+  .cjm table { border-collapse:collapse; width:100%; }
+  .cjm th, .cjm td { text-align:left; vertical-align:top; padding:26px 28px; border-bottom:1px solid rgba(201,187,250,.10); border-right:1px solid rgba(201,187,250,.10); }
+  .cjm th { font-weight:400; font-size:18px; letter-spacing:.12em; text-transform:uppercase; color:#A89CF8; background:rgba(255,255,255,.035); }
+  .cjm td { font-size:21px; line-height:1.45; color:#B9B7CF; }
+  .cjm td.st { color:#F2F0FA; font-size:24px; font-weight:300; width:300px; }
+  .cjm td.st span { display:block; font-size:15px; letter-spacing:.14em; color:#6E7390; margin-bottom:8px; }
+  .cjm td.resp { color:#E4E1F2; }
+  .cjm tr:last-child td { border-bottom:0; } .cjm td:last-child, .cjm th:last-child { border-right:0; }
+  /* panels for variant A */
+  .panel { position:absolute; border-radius:44px; overflow:hidden; background:linear-gradient(180deg,#0B0E22,#070A1A); box-shadow:inset 0 0 0 1px rgba(201,187,250,.08); }
+  .panel .head { position:absolute; left:72px; top:72px; width:640px; z-index:2; }
+  /* journey curve (D) */
+  .stage { position:absolute; width:300px; }
+  .stage .n { font-size:15px; letter-spacing:.14em; color:#6E7390; }
+  .stage .s { font-weight:300; font-size:30px; line-height:1.2; color:#F2F0FA; margin-top:8px; }
+  .stage .f { font-size:17px; letter-spacing:.06em; color:#A89CF8; margin-top:10px; }
+  .stage .k { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; margin-top:22px; }
+  .stage .v { font-size:19px; line-height:1.45; color:#A6ABC6; margin-top:6px; }
+  .stage .v.r { color:#E4E1F2; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · Two panels, like Aura.</b> Job stories and the journey side by side in two dark rounded panels. Inside, the cards and the table lie tilted and run off the panel edges. A faint light at the bottom of each panel.</div>
+<div class="frame" id="A" style="height:1500px; margin-bottom:-406px"></div>
+
+<div class="opt"><b>B · Open, no panels.</b> Same two pieces, but straight on the case background, like the rest of the case. The card wall tilts left and bleeds off the left edge, the table tilts right and bleeds off the right edge, so text and visuals swap sides. Lights continue the case rhythm.</div>
+<div class="frame" id="B" style="height:2500px; margin-bottom:-677px"></div>
+
+<div class="opt"><b>C · All eleven stories, by person.</b> Four rows of cards, one row per persona (name in the row), as one tilted wall. Below, the full journey table. Most complete, reads as real research.</div>
+<div class="frame" id="C" style="height:2560px; margin-bottom:-693px"></div>
+
+<div class="opt"><b>D · Freer: four voices and a journey curve.</b> One story per persona as floating cards at different depths (the case's free direction). The journey is drawn as a curve of feelings through five stages, with the barrier and the design response under each stage, instead of a table.</div>
+<div class="frame" id="D" style="height:2500px; margin-bottom:-677px"></div>
+
+</div>
+<script>
+// copy: no em dashes; nbsp after short words and before the last word (no widows, no hanging short words)
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const STORIES = [
+  ['Philipp', 'Wind down after work', 'When I come home tense and irritable after a long, stressful day, <b>I want a pleasant way to calm down</b>, so I can look after myself and not burn out.'],
+  ['Philipp', 'Why so drained today?', 'When my energy drops and I can’t focus, <b>I want to see quickly what is affecting me</b>, so I can stop blaming myself and adjust the day.'],
+  ['Philipp', 'Plan around low days', 'When a demanding stretch at work is coming, <b>I want to see possible low days in advance</b>, so I can spread the tasks and avoid burnout.'],
+  ['Alina', 'Gentle on low days', 'When I feel an emotional dip, <b>I want to see what moon phases or sleep changes might have played a part</b>, so I can support myself instead of blaming myself.'],
+  ['Alina', 'Balance the week', 'When I plan my classes and my own practice, <b>I want to know the higher and lower energy days</b>, so I can spread the load evenly.'],
+  ['Alina', 'A ritual, not a chore', 'When I open the app in the morning or evening, <b>I want a beautiful, calm space</b>, so caring for myself becomes a ritual.'],
+  ['Irina', 'Pause before I snap', 'When I feel close to snapping, <b>I want to see if it is lack of sleep, tiredness or the season</b>, so I can stop in time and not take it out on others.'],
+  ['Irina', 'Care without guilt', 'When I have no energy left and feel alone, <b>I want support and simple ways to recover</b>, so I can look after myself without guilt.'],
+  ['Irina', 'A nudge to pause', 'When I am caught up in endless tasks, <b>I want the app to suggest a short pause</b>, so I get a moment to stop and breathe.'],
+  ['Timur', 'Decide on data', 'When I experiment with sleep and workload, <b>I want to see the results visually</b>, so I decide on data, not on feelings.'],
+  ['Timur', 'Is it the sun?', 'When I read about things like solar flares, <b>I want to see if they relate to how I feel</b>, so I can be ready for the dips.'],
+];
+const AGE = { Philipp: 'Philipp, 32', Alina: 'Alina, 26', Irina: 'Irina, 47', Timur: 'Timur, 20' };
+const card = ([who, t, p], w = 520) => `<div class="glass js" style="width:${w}px"><div class="who">${AGE[who]}</div><h4>${nb(t)}</h4><p>${nb(p)}</p></div>`;
+const CJM = [
+  ['Home after a tense day', 'Calm down and lower the stress', 'Anxious, tense, tired', 'Can’t focus; busy apps feel like too much', 'A soft, unhurried onboarding'],
+  ['Onboarding', 'See quickly if it can really help', 'Curious, expectant', 'Fear of yet another shallow app', 'Show depth and flexibility early'],
+  ['Profile and current state', 'See how sleep and cycles relate to how they feel', 'Curious, hopeful', 'Too much data before any result', 'Skip now, fill in later; a first result right away'],
+  ['First results', 'Find what is behind the irritability', 'Interested, trusting', 'A bit of doubt about the claims', 'Sources in tooltips and short articles'],
+  ['Tries a practice', 'Feel calmer and fall asleep easily', 'Relieved, calm', 'Too busy, forgets to check in', 'Gentle, personal nudges'],
+];
+const table = (w = 1900) => `<div class="glass cjm" style="width:${w}px"><table><tr><th>Stage</th><th>Goal</th><th>Feels</th><th>Barrier</th><th>Design response</th></tr>${CJM.map((r, i) => `<tr><td class="st"><span>0${i + 1}</span>${nb(r[0])}</td><td>${nb(r[1])}</td><td>${nb(r[2])}</td><td>${nb(r[3])}</td><td class="resp">${nb(r[4])}</td></tr>`).join('')}</table></div>`;
+const L = (x, y, w, h, c, o) => `<div class="light" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:${c}; opacity:${o}"></div>`;
+const V = '#6355D6', PV = '#B45FC4', DI = '#3B2F9A', PR = '#8B7CF6';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (label, title) => `<div class="label">${label}</div><h2 class="h1">${title}</h2>`;
+const H = nb('What people come for, and where they might give up');
+
+// A · two panels
+put('A', head('04 / Research', 'What people come for, <em>and where</em><br>they might give up') +
+  `<div class="panel" style="left:102px; top:460px; width:846px; height:940px">${L(-100, 640, 700, 420, PV, .35)}${L(380, 700, 600, 380, V, .4)}
+    <div class="head"><h3 class="t2">Job stories</h3><p class="desc">${nb('Eleven stories from four people showed what really drives someone to a tool like Soma.')}</p></div>
+    <div class="tilt tiltA" style="left:60px; top:330px"><div class="grid" style="grid-template-columns:repeat(2,520px)">${[0, 6, 3, 9, 1, 7].map(i => card(STORIES[i])).join('')}</div></div></div>
+   <div class="panel" style="left:972px; top:460px; width:846px; height:940px">${L(200, 660, 760, 420, V, .38)}${L(-120, 720, 520, 360, PV, .28)}
+    <div class="head"><h3 class="t2">Customer journey</h3><p class="desc">${nb('I mapped the way from a tense evening to the first practice to see where people drop off.')}</p></div>
+    <div class="tilt tiltA" style="left:70px; top:320px">${table(1500)}</div></div>`);
+
+// B · open, no panels
+put('B', L(1100, 300, 1100, 900, DI, .5) + L(-300, 1500, 1200, 900, PV, .3) + head('04 / Research', 'What people come for, <em>and where</em><br>they might give up') +
+  `<div style="position:absolute; left:1258px; top:560px; width:560px"><h3 class="t2">Job stories</h3><p class="desc">${nb('Eleven stories from four people showed what really drives someone to a tool like Soma.')}</p></div>
+   <div class="tilt tiltB" style="right:780px; top:500px"><div class="grid">${[0, 3, 6, 1, 4, 9, 7, 2, 10].map(i => card(STORIES[i])).join('')}</div></div>
+   <div style="position:absolute; left:102px; top:1600px; width:560px"><h3 class="t2">Customer journey</h3><p class="desc">${nb('I mapped the way from a tense evening to the first practice to see where people drop off.')}</p></div>
+   <div class="tilt tiltA" style="left:720px; top:1520px">${table(1700)}</div>`);
+
+// C · all eleven, rows by persona, then the full table
+const rowsC = ['Philipp', 'Alina', 'Irina', 'Timur'].map(p => STORIES.filter(s => s[0] === p));
+put('C', L(900, 400, 1300, 1000, DI, .45) + L(-400, 1900, 1300, 900, PV, .28) + head('04 / Research', 'What people come for, <em>and where</em><br>they might give up') +
+  `<div style="position:absolute; left:102px; top:500px; width:520px"><h3 class="t2">Job stories</h3><p class="desc">${nb('Four people, eleven situations. One shared need: to see why they feel this way, without guilt.')}</p></div>
+   <div class="tilt tiltA" style="left:700px; top:440px">${rowsC.map(r => `<div style="display:flex; gap:26px; margin-bottom:26px">${r.map(s => card(s, 470)).join('')}</div>`).join('')}</div>
+   <div style="position:absolute; left:102px; top:1880px; width:520px"><h3 class="t2">Customer journey</h3><p class="desc">${nb('Five stages from a tense evening to the first practice, and the design answer to each barrier.')}</p></div>
+   <div class="tilt tiltA" style="left:700px; top:1820px">${table(1800)}</div>`);
+
+// D · four voices + journey curve
+const four = [[0, 700, 560, 500, 1], [3, 1300, 470, 470, .92], [6, 880, 930, 500, 1], [9, 1440, 1010, 420, .85]];
+const curveY = [200, 110, 60, 150, 20]; const xs = [180, 520, 860, 1200, 1540];
+const pts = xs.map((x, i) => [x + 30, curveY[i]]);
+const path = 'M' + pts.map(p => p.join(' ')).join(' L ');
+let smooth = `M ${pts[0][0]} ${pts[0][1]}`; for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], mx = (x0 + x1) / 2; smooth += ` C ${mx} ${y0}, ${mx} ${y1}, ${x1} ${y1}`; }
+put('D', L(1000, 500, 1000, 800, V, .3) + L(-300, 1500, 1100, 800, PV, .28) + head('04 / Research', 'What people come for, <em>and where</em><br>they might give up') +
+  `<div style="position:absolute; left:102px; top:600px; width:470px"><h3 class="t2">Job stories</h3><p class="desc">${nb('Eleven stories from four people. Here is one voice from each.')}</p></div>` +
+  four.map(([i, x, y, w, o]) => `<div style="position:absolute; left:${x}px; top:${y}px; opacity:${o}; transform:rotate(${i % 2 ? 2.5 : -2}deg)">${card(STORIES[i], w)}</div>`).join('') +
+  `<div style="position:absolute; left:102px; top:1500px; width:700px"><h3 class="t2">Customer journey</h3><p class="desc">${nb('How it feels from a tense evening to the first practice, and what the design does at each step.')}</p></div>
+   <svg style="position:absolute; left:0; top:1720px" width="1920" height="700" viewBox="0 0 1920 700"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#8B7CF6" stop-opacity=".2"/><stop offset=".5" stop-color="#C9BBFA"/><stop offset="1" stop-color="#FFC6F1" stop-opacity=".8"/></linearGradient></defs>
+     <path d="${smooth}" fill="none" stroke="url(#cg)" stroke-width="2"/>${pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="16" fill="#8B7CF6" opacity=".18"/><circle cx="${x}" cy="${y}" r="5" fill="#E4E1F2"/>`).join('')}</svg>` +
+  CJM.map((r, i) => `<div class="stage" style="left:${xs[i] + 10}px; top:${1720 + curveY[i] + 40}px"><div class="n">0${i + 1}</div><div class="s">${nb(r[0])}</div><div class="f">${r[2]}</div><div class="k">Barrier</div><div class="v">${nb(r[3])}</div><div class="k">Design response</div><div class="v r">${nb(r[4])}</div></div>`).join(''));
+</script>
+</body></html>

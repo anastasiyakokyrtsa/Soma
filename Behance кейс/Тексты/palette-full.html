@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Palette — complete</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&family=Onest:wght@700&display=swap" rel="stylesheet">
+<!-- Block 09 colour part: the "layers of atmosphere" language, now with the whole palette from UI Kit/css/style.css :root.
+     The current Figma panel misses violet-500, pink-400/500, green-300/500, red-400, the text levels and the heading gradient. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .panel { position:absolute; border-radius:28px; box-shadow:inset 0 0 0 1px rgba(201,187,250,.12); }
+  .lb { position:absolute; display:flex; align-items:center; gap:14px; white-space:nowrap; }
+  .lb i { display:block; height:1px; }
+  .n { font-size:17px; } .h { font-size:15px; letter-spacing:.04em; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>Now in Figma, for reference.</b> 8 colours. Missing: violet‑500, pink‑400 / 500, green‑300 / 500, red‑400, the four text levels and the heading gradient.</div>
+<div class="frame" id="N" style="height:780px; margin-bottom:-211px"></div>
+
+<div class="opt"><b>1 · Three skies.</b> The same atmosphere language in three panels of different widths: Night & violet (the main one, wide), Signals (pink, green, red), Text (white to the quietest grey). Every token labelled.</div>
+<div class="frame" id="V1" style="height:900px; margin-bottom:-244px"></div>
+
+<div class="opt"><b>2 · Main sky + signal horizon.</b> The big atmosphere for the base and violet scale; under it a thin horizon strip with the signal colours glowing in their order, like dawn at the edge. Text levels and the heading gradient written as type on the right.</div>
+<div class="frame" id="V2" style="height:1050px; margin-bottom:-284px"></div>
+
+<div class="opt"><b>3 · Atmosphere + words.</b> The atmosphere panel stays as it is (now with violet‑500); the rest of the palette is shown as words set in their own colour, in two quiet lines under it: signals and text levels. The heading gradient as a word too.</div>
+<div class="frame" id="V3" style="height:1200px; margin-bottom:-325px"></div>
+
+</div>
+<script>
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const isLight = c => { const v = parseInt(c.slice(1), 16), r = v >> 16, g = (v >> 8) & 255, b = v & 255; return (r * .3 + g * .59 + b * .11) > 150; };
+const BASE = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑500', '#7B6FF0'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA']];
+const SIG = [['pink‑500', '#E285D1'], ['pink‑400', '#F3A6E0'], ['pink‑300', '#FBD3F1'], ['green‑300', '#B7F5D8'], ['green‑400', '#6EE7B7'], ['green‑500', '#4ADE9A'], ['red‑400', '#F0847F']];
+const TEXT = [['text‑primary', '#FFFFFF'], ['text‑secondary', '#A6ABC6'], ['text‑tertiary', '#6E7390'], ['text‑disabled', '#454A63']];
+// a vertical "sky" panel; labels on the right edge inside the panel, each at its colour band
+const sky = (x, y, w, h, list, { title, lw = 200 } = {}) => {
+  const stops = list.map(([n, c], i) => `${c} ${(i + .5) / list.length * 100}%`).join(', ');
+  let s = `<div class="panel" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:linear-gradient(180deg, ${stops})"></div>`;
+  if (title) s += `<div class="abs cap" style="left:${x}px; top:${y - 44}px">${title}</div>`;
+  list.forEach(([n, c], i) => { const cy = y + (i + .5) / list.length * h, L = isLight(c);
+    s += `<div class="lb" style="left:${x + w - lw - 24}px; top:${cy - 12}px; width:${lw}px"><span class="n" style="color:${L ? '#0B0E22' : '#E4E1F2'}">${n}</span><span class="h" style="color:${L ? 'rgba(11,14,34,.6)' : 'rgba(255,255,255,.62)'}">${c}</span></div>`; });
+  return s; };
+
+// now
+put('N', sky(102, 100, 1716, 620, [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑300', '#FBD3F1']], { lw: 220 }));
+
+// 1 three skies
+put('V1', sky(102, 160, 900, 640, BASE, { title: 'Night & violet', lw: 220 }) + sky(1034, 160, 400, 640, SIG, { title: 'Signals', lw: 200 }) + sky(1466, 160, 352, 640, TEXT, { title: 'Text', lw: 220 }));
+
+// 2 main sky + signal horizon + type
+(() => { let h = sky(102, 120, 1180, 600, BASE, { lw: 220 });
+  const hz = SIG.map(([n, c], i) => `${c} ${(i + .5) / SIG.length * 100}%`).join(', ');
+  h += `<div class="panel" style="left:102px; top:760px; width:1180px; height:56px; background:linear-gradient(90deg, ${hz})"></div>`;
+  SIG.forEach(([n, c], i) => { const x = 102 + (i + .5) / SIG.length * 1180; h += `<div class="abs" style="left:${x - 70}px; top:836px; width:140px; text-align:center"><div class="n" style="color:#E4E1F2">${n}</div><div class="h" style="color:#8A8DAA">${c}</div></div>`; });
+  h += `<div class="abs cap" style="left:1360px; top:120px">Text</div>` + TEXT.map(([n, c], i) => `<div class="abs" style="left:1360px; top:${170 + i * 90}px"><div style="font-size:40px; font-weight:300; color:${c}">${n}</div><div class="h" style="color:#6E7390">${c}</div></div>`).join('');
+  h += `<div class="abs cap" style="left:1360px; top:560px">Heading gradient</div><div class="abs onest" style="left:1360px; top:600px; font-family:'Onest'; font-weight:700; font-size:56px; background:linear-gradient(90deg,#FFC6F1 25%,#A89CF8 70%,#8B7CF6 100%); -webkit-background-clip:text; background-clip:text; color:transparent">Good morning</div><div class="abs h" style="left:1360px; top:680px; color:#6E7390">#FFC6F1 → #A89CF8 → #8B7CF6</div>`;
+  put('V2', h); })();
+
+// 3 atmosphere + words
+(() => { let h = sky(102, 100, 1716, 560, BASE, { lw: 220 });
+  const words = (y, title, list) => `<div class="abs cap" style="left:102px; top:${y}px">${title}</div><div class="abs" style="left:102px; top:${y + 36}px; width:1716px; display:flex; flex-wrap:wrap; column-gap:40px; row-gap:10px; align-items:baseline">` +
+    list.map(([n, c]) => `<span style="font-size:32px; font-weight:300; color:${c}">${n}<span class="h" style="color:#6E7390; margin-left:12px">${c}</span></span>`).join('') + '</div>';
+  h += words(710, 'Signals', SIG) + words(890, 'Text', TEXT);
+  h += `<div class="abs" style="left:102px; top:1020px"><div class="cap">Heading gradient</div><div style="margin-top:20px; font-family:'Onest'; font-weight:700; font-size:44px; background:linear-gradient(90deg,#FFC6F1 25%,#A89CF8 70%,#8B7CF6 100%); -webkit-background-clip:text; background-clip:text; color:transparent">Good morning</div></div>`;
+  put('V3', h); })();
+</script>
+</body></html>

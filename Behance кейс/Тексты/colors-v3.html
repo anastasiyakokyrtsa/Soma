@@ -1,0 +1,93 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Colours — round 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 09, colour part only (type = variant 2 of colors-type-v2.html). No circles. Real tokens: UI Kit style.css / app theme. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:900px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-244px; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .tok { font-size:18px; color:#D9D5F2; }
+  .hex { font-size:15px; color:#6E7390; letter-spacing:.04em; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Beams of light.</b> Each colour is a tall slim beam that glows at the bottom and dissolves upwards into the dark, like light rising from a horizon. Name and hex below each beam.</div>
+<div class="frame" id="C1"></div>
+
+<div class="opt"><b>2 · Mostly silence, a few signals.</b> One long bar split by how much of the screen each colour takes: the night background fills most of it, violet a little, the bright signals only a sliver. Shows the hierarchy of the palette, not just the list.</div>
+<div class="frame" id="C2"></div>
+
+<div class="opt"><b>3 · Light trails.</b> Each colour drawn as one long thin glowing line, gently curved like a star trail in a long exposure, stacked from the deepest at the bottom to the brightest on top. Labels at the end of each trail.</div>
+<div class="frame" id="C3"></div>
+
+<div class="opt"><b>4 · Words in their colour.</b> No swatches at all: the token names written large in their own colour, flowing like a line of text, hex in small next to each. Fits the type-led look of the block.</div>
+<div class="frame" id="C4"></div>
+
+<div class="opt"><b>5 · Layers of atmosphere.</b> The palette as soft horizontal layers of one sky, from the deep night at the top to a faint glow at the horizon, blending into each other. Thin labels on the right edge of each layer.</div>
+<div class="frame" id="C5"></div>
+
+<div class="opt"><b>6 · Glass panels lit from inside.</b> Tall glass panels in the app’s card style, each glowing softly from below in one colour, like a screen in the dark. Name and hex engraved at the top.</div>
+<div class="frame" id="C6"></div>
+
+</div>
+<script>
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="abs cap" style="left:102px; top:100px">Colour</div>`;
+const P = [['bg‑0', '#050816', 'Night background'], ['card', '#0B0E1F', 'Cards'], ['violet‑700', '#4C41B0', ''], ['violet‑600', '#6355D6', ''], ['violet‑400', '#8B7CF6', 'Buttons, accents'], ['violet‑300', '#A89CF8', 'Accents'], ['violet‑200', '#C9BBFA', ''], ['pink‑300', '#FBD3F1', 'Emotional'], ['green‑400', '#6EE7B7', 'Physical']];
+const label = (x, y, n, c, w = 160, align = 'left') => `<div class="abs" style="left:${x}px; top:${y}px; width:${w}px; text-align:${align}"><div class="tok">${n}</div><div class="hex">${c}</div></div>`;
+
+// 1 beams
+(() => { const n = P.length, gap = 40, w = (1716 - gap * (n - 1)) / n; let h = head;
+  P.forEach(([t, c], i) => { const x = 102 + i * (w + gap); const dark = c === '#050816' || c === '#0B0E1F';
+    h += `<div class="abs" style="left:${x}px; top:200px; width:${w}px; height:520px; border-radius:${w / 2}px ${w / 2}px 16px 16px; background:linear-gradient(0deg, ${c} 0%, ${c}cc 30%, ${c}00 100%); ${dark ? 'box-shadow:inset 0 0 0 1px rgba(201,187,250,.14)' : `filter:drop-shadow(0 20px 40px ${c}33)`}"></div>
+      <div class="abs" style="left:${x}px; top:719px; width:${w}px; height:1px; background:rgba(201,187,250,.25)"></div>` + label(x, 744, t, c, w); });
+  put('C1', h); })();
+
+// 2 proportion bar
+(() => { const parts = [['bg‑0', '#050816', 58], ['card', '#0B0E1F', 16], ['violet‑700', '#4C41B0', 5], ['violet‑600', '#6355D6', 5], ['violet‑400', '#8B7CF6', 5], ['violet‑300', '#A89CF8', 4], ['violet‑200', '#C9BBFA', 3], ['pink‑300', '#FBD3F1', 2], ['green‑400', '#6EE7B7', 2]];
+  let x = 102, h = head + `<div class="abs" style="left:102px; top:340px; width:1716px; height:160px; border-radius:24px; overflow:hidden; display:flex; box-shadow:inset 0 0 0 1px rgba(201,187,250,.16)">` + parts.map(([t, c, p]) => `<div style="flex:${p}; background:${c}"></div>`).join('') + '</div>';
+  const lv = { 2: [-1, 0], 3: [1, 0], 4: [-1, 0], 5: [1, 0], 6: [-1, 1], 7: [1, 1], 8: [-1, 2] };
+  parts.forEach(([t, c, p], i) => { const w = p / 100 * 1716, lx = x + w / 2;
+    if (i < 2) { h += label(x + 24, 380, `${t} · ${p}%`, c, 220); x += w; return; }
+    const [dir, k] = lv[i], len = 50 + k * 70;
+    h += dir < 0 ? `<div class="abs" style="left:${lx}px; top:${340 - len}px; width:1px; height:${len}px; background:rgba(201,187,250,.3)"></div>` + label(lx - 80, 340 - len - 56, t, c, 160, 'center')
+                 : `<div class="abs" style="left:${lx}px; top:500px; width:1px; height:${len}px; background:rgba(201,187,250,.3)"></div>` + label(lx - 80, 500 + len + 10, t, c, 160, 'center');
+    x += w; });
+  h += `<div class="abs" style="left:102px; top:720px; width:1000px; font-size:24px; font-weight:300; color:#8A8DAA">The screen is mostly quiet night. Colour appears only where the body sends a signal.</div>`;
+  put('C2', h); })();
+
+// 3 light trails
+(() => { let svg = '<svg class="abs" style="left:0; top:0; overflow:visible" width="1920" height="900">', h = head; const list = P.slice(2).reverse().concat([P[1], P[0]]).reverse();
+  list.forEach(([t, c], i) => { const y = 760 - i * 62, dark = c === '#050816' || c === '#0B0E1F';
+    svg += `<path d="M 102 ${y + 40} Q 900 ${y - 40} 1560 ${y}" fill="none" stroke="${dark ? 'rgba(201,187,250,.25)' : c}" stroke-width="${dark ? 1.5 : 3}" stroke-linecap="round" style="${dark ? '' : `filter:drop-shadow(0 0 8px ${c})`}"/>`;
+    h += label(1600, y - 22, t, c, 220); });
+  put('C3', h + svg + '</svg>'); })();
+
+// 4 words in their colour
+(() => { let h = head + `<div class="abs" style="left:102px; top:200px; width:1716px; display:flex; flex-wrap:wrap; column-gap:64px; row-gap:34px; align-items:baseline">` +
+  P.map(([t, c]) => { const dark = c === '#050816' || c === '#0B0E1F'; return `<span style="font-weight:300; font-size:84px; line-height:1; color:${c}; ${dark ? '-webkit-text-stroke:1px rgba(201,187,250,.35)' : `text-shadow:0 0 30px ${c}55`}">${t}<span class="hex" style="font-size:18px; margin-left:16px; vertical-align:super">${c}</span></span>`; }).join('') + '</div>';
+  put('C4', h); })();
+
+// 5 atmosphere
+(() => { const L = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑300', '#FBD3F1']];
+  const top = 180, H = 620, step = H / L.length; let stops = L.map(([t, c], i) => `${c} ${(i + .5) / L.length * 100}%`).join(', ');
+  let h = head + `<div class="abs" style="left:102px; top:${top}px; width:1716px; height:${H}px; border-radius:28px; background:linear-gradient(180deg, ${stops}); box-shadow:inset 0 0 0 1px rgba(201,187,250,.12)"></div>`;
+  L.forEach(([t, c], i) => { const y = top + (i + .5) * step; const dark = i < 4;
+    h += `<div class="abs" style="left:1500px; top:${y}px; width:240px; height:1px; background:${dark ? 'rgba(201,187,250,.35)' : 'rgba(5,8,22,.35)'}"></div><div class="abs" style="left:1500px; top:${y - 44}px"><span style="font-size:17px; color:${dark ? '#D9D5F2' : '#0B0E22'}">${t}</span> <span style="font-size:15px; color:${dark ? '#8A8DAA' : 'rgba(11,14,34,.6)'}">${c}</span></div>`; });
+  h += `<div class="abs" style="left:140px; top:${top + H - 60}px; font-size:15px; letter-spacing:.14em; text-transform:uppercase; color:rgba(11,14,34,.55)">green‑400 #6EE7B7 · physical signal, used only in the biorhythm chart</div>`;
+  put('C5', h); })();
+
+// 6 glass panels lit from inside
+(() => { const n = P.length, gap = 26, w = (1716 - gap * (n - 1)) / n; let h = head;
+  P.forEach(([t, c], i) => { const x = 102 + i * (w + gap);
+    h += `<div class="abs" style="left:${x}px; top:200px; width:${w}px; height:560px; border-radius:28px; overflow:hidden; background:linear-gradient(160deg, rgba(255,255,255,.08), rgba(168,156,248,.04) 45%, rgba(255,255,255,.02)); box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 0 1px rgba(201,187,250,.14), 0 30px 60px rgba(0,0,0,.4)">
+      <div style="position:absolute; left:-30%; right:-30%; bottom:-25%; height:95%; background:radial-gradient(ellipse at 50% 100%, ${c} 0%, ${c}bb 25%, ${c}44 50%, ${c}00 72%)"></div>
+      <div style="position:absolute; left:20px; top:22px"><div class="tok" style="font-size:16px">${t}</div><div class="hex" style="font-size:13px">${c}</div></div></div>`; });
+  put('C6', h); })();
+</script>
+</body></html>

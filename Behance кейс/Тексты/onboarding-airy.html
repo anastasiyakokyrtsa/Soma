@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Onboarding — airy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Block 11 "Onboarding", O1 reworked after her note: fewer screens, lots of space (Aura reference), one short paragraph and one short line.
+     The mood picker is the detached glass element (like Aura's "Enter code" card). Phones may run off the edges. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .ph { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .p { position:absolute; font-weight:300; font-size:28px; line-height:1.5; color:#8A8DAA; }
+  .s { position:absolute; font-weight:300; font-size:24px; line-height:1.5; color:#6E7390; }
+  .glass { position:absolute; border-radius:30px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 40px 80px rgba(0,0,0,.45); }
+  .glass img { display:block; width:100%; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A1 · Four screens and one card.</b> Welcome, support, sleep and style; the mood picker floats on glass over the support screen. One paragraph, one short line, the style screen runs off the right edge.</div>
+<div class="frame" id="A1" style="height:1900px; margin-bottom:-515px"></div>
+
+<div class="opt"><b>A2 · Three screens and one card.</b> Even more air: welcome, sleep and style, the mood picker on glass in the middle of the block.</div>
+<div class="frame" id="A2" style="height:1800px; margin-bottom:-487px"></div>
+
+<div class="opt"><b>A3 · Mirrored.</b> Same four screens, the composition turned: the paragraph on the left under the headline, phones rising to the right, one running off the top.</div>
+<div class="frame" id="A3" style="height:1850px; margin-bottom:-501px"></div>
+
+</div>
+<script>
+const TH = '../Мокапы/thin/', PT = '../Мокапы/parts/';
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="label">11 / Onboarding</div><h2 class="h1">A first meeting<br><em>that asks very little</em></h2>`;
+const P = nb('Soma asks only what it needs for a first reading, one question per screen. Feelings are picked as shapes, sleep is set on a dial.');
+const S = nb('Every step can be skipped and filled in later.');
+const ph = (f, x, y, w = 330) => `<img class="ph" src="${TH}ph-ob-${f}.png" style="left:${x}px; top:${y}px; width:${w}px">`;
+const card = (x, y, w) => `<div class="glass" style="left:${x}px; top:${y}px; width:${w}px; padding:${w * .05}px ${w * .03}px ${w * .02}px"><img src="${PT}mood-onboarding.png"></div>`;
+
+put('A1', head + ph('about', 150, 720) + `<div class="p" style="left:620px; top:600px; width:420px">${P}</div>` +
+  ph('support', 1300, 300) + card(1060, 760, 380) + ph('sleep', 720, 1140) + `<div class="s" style="left:1110px; top:1560px; width:340px">${S}</div>` + ph('style', 1680, 1220));
+
+put('A2', head + ph('about', 180, 700) + `<div class="p" style="left:1258px; top:262px; width:520px">${P}</div>` +
+  card(700, 820, 440) + ph('sleep', 1300, 620) + `<div class="s" style="left:760px; top:1340px; width:360px">${S}</div>` + ph('style', 1660, 1180));
+
+put('A3', head + `<div class="p" style="left:102px; top:520px; width:440px">${P}</div>` + ph('about', 200, 960) +
+  ph('support', 760, 760) + card(1080, 1180, 380) + ph('sleep', 1340, -80) + `<div class="s" style="left:640px; top:1580px; width:360px">${S}</div>` + ph('style', 1560, 1160));
+</script>
+</body></html>

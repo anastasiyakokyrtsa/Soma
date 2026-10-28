@@ -1,0 +1,165 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Soma case — Project at a glance options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&family=Onest:wght@200;300;400&display=swap" rel="stylesheet">
+<!-- Five ways to present "Project at a glance": ~200 hours · 40 screens · 3 ways in · 1 app built in code,
+     plus the Discover / Design / Build process. 1920-wide frames at Behance's ~73%. -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --head:#B9B7CF; --lav:#A89CF8; --ink:#E4E1F2; --muted:#8A8DAA; --cap:#4F5373; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 90px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 12px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; }
+  .glow { position:absolute; border-radius:50%; filter:blur(140px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:120px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .t { position:absolute; }
+  .num { font-weight:200; color:var(--ink); line-height:.9; letter-spacing:-.02em; }
+  .unit { font-size:22px; color:var(--muted); letter-spacing:.02em; }
+  .sub { font-size:16px; color:var(--cap); letter-spacing:.04em; margin-top:6px; }
+  .airy { font-weight:200; letter-spacing:.5em; text-transform:uppercase; }
+  .caps { font-size:15px; letter-spacing:.3em; text-transform:uppercase; color:var(--cap); }
+  .items { font-size:24px; line-height:1.75; color:var(--body); font-weight:300; }
+  .grad { background:linear-gradient(90deg,#FFC6F1 0%,#A89CF8 60%,#8B7CF6 100%); -webkit-background-clip:text; color:transparent; }
+  svg { position:absolute; left:0; top:0; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Numbers + biorhythm wave.</b> The reference idea, translated into Soma: the process line is one soft wave in the app’s chart colours, passing through three glowing nodes. Numbers in thin Nunito with the unit set beside them.</div>
+<div class="frame" style="height:1080px" id="f1">
+  <div class="glow" style="width:1100px;height:700px;left:1100px;top:-200px;background:rgba(76,65,176,.18)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt"><b>2 · Observation log.</b> Editorial and asymmetric: the four numbers stacked on the left like entries in a log, divided by hairlines; the process as a vertical timeline on the right. Reads like a spec sheet, not a dashboard.</div>
+<div class="frame" style="height:1560px" id="f3">
+  <div class="glow" style="width:1000px;height:900px;left:-300px;top:300px;background:rgba(76,65,176,.16)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt" style="margin-top:70px; color:#e4e2ee; font-size:20px">New ideas</div>
+
+<div class="opt"><b>D · Glass numbers.</b> The numbers are set huge in the same glass treatment as SOMA on the cover: translucent body, a fine light edge, a soft shadow. They sit slightly staggered, like objects at different depths. Labels in airy capitals; the process is one quiet line underneath.</div>
+<div class="frame" style="height:1300px" id="fd">
+  <div class="glow" style="width:1300px;height:700px;left:300px;top:150px;background:rgba(99,85,214,.14)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt"><b>E · Slow wave baseline.</b> Four very thin numbers whose baselines rise and fall gently, as if resting on an invisible wave. Hairlines between them. Almost a table, but it breathes. Process in airy capitals with a dash between the stages.</div>
+<div class="frame" style="height:1160px" id="fe">
+  <div class="glow" style="width:1100px;height:700px;left:1000px;top:-150px;background:rgba(76,65,176,.16)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt"><b>F · Numbers on the orbit.</b> The tilted orbit from the Introduction returns, now carrying the four facts as its stations around a quiet centre. One motif repeated through the case makes it feel designed as a system. The process sits below as three small columns.</div>
+<div class="frame" style="height:1420px" id="ff">
+  <div class="glow" style="width:1300px;height:600px;left:300px;top:400px;background:rgba(99,85,214,.14)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt"><b>G · Museum label.</b> Editorial and calm: one large light line on the left; on the right the facts set like a gallery label, small capitals and thin numbers on fine rules. Very little, very precise. The process becomes the last rows of the same label.</div>
+<div class="frame" style="height:1200px" id="fg">
+  <div class="glow" style="width:1000px;height:800px;left:-300px;top:300px;background:rgba(76,65,176,.16)"></div>
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+<div class="opt"><b>H · Constellation.</b> The four facts are stars joined by faint lines into a constellation, each with its number beside it. The three stages are a second, dimmer constellation below. Echoes the persona map and the app’s star field without decoration.</div>
+<div class="frame" style="height:1440px" id="fh">
+  <div class="label">02 / Project at a glance</div>
+</div>
+
+</div>
+<script>
+const NUMS = [['~200', 'hours', ''], ['40', 'screens', ''], ['3', 'ways in', 'science · astrology · synthesis'], ['1', 'app built in code', 'React Native · iOS & Android']];
+const STEPS = [['Discover', 'Personas\nJob stories\nCustomer journey map'], ['Design', 'Wireframes\nMoodboard & visual language\nUI kit'], ['Build', 'App in code\nScenario audit\nIterations']];
+const add = (id, html) => document.getElementById(id).insertAdjacentHTML('beforeend', html);
+const items = s => s.split('\n').join('<br>');
+const defs = `<defs><radialGradient id="h"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".8"/><stop offset="1" stop-color="#8B7CF6" stop-opacity="0"/></radialGradient>
+  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1920" y2="0"><stop offset="0" stop-color="#FFC6F1"/><stop offset=".55" stop-color="#A89CF8"/><stop offset="1" stop-color="#8B7CF6"/></linearGradient></defs>`;
+const node = (x, y, r = 6, g = 22) => `<circle cx="${x}" cy="${y}" r="${g}" fill="url(#h)"/><circle cx="${x}" cy="${y}" r="${r}" fill="#EDE8FF"/>`;
+const L = 102, W = 1728;
+
+// 1 — numbers + wave
+{ const xs = [0, 1, 2, 3].map(i => L + i * W / 4);
+  NUMS.forEach(([n, u, s], i) => add('f1', `<div class="t" style="left:${xs[i]}px; top:230px"><div style="display:flex; align-items:flex-end; gap:16px"><div class="num" style="font-size:124px">${n}</div><div class="unit" style="padding-bottom:12px; max-width:140px; line-height:1.25">${u}</div></div>${s ? `<div class="sub">${s}</div>` : ''}</div>`));
+  const y = 720, sx = [L + 6, L + W / 3 + 6, L + 2 * W / 3 + 6];
+  let d = ''; for (let x = -40; x <= 1960; x += 6) d += (d ? ' L ' : 'M ') + x + ' ' + (y + 46 * Math.sin((x - sx[0]) / (W / 3) * Math.PI)).toFixed(1);
+  add('f1', `<svg width="1920" height="1080">${defs}<path d="${d}" fill="none" stroke="url(#g)" stroke-opacity=".22" stroke-width="10" style="filter:blur(8px)"/><path d="${d}" fill="none" stroke="url(#g)" stroke-opacity=".75" stroke-width="1.6"/><line x1="0" y1="${y}" x2="1920" y2="${y}" stroke="#C9BBFA" stroke-opacity=".12"/>${sx.map(x => node(x, y)).join('')}</svg>`);
+  STEPS.forEach(([t, it], i) => add('f1', `<div class="t" style="left:${sx[i] - 6}px; top:${y - 130}px; font-size:34px; color:var(--ink); font-weight:300">${t}</div><div class="t items" style="left:${sx[i] - 6}px; top:${y + 90}px">${items(it)}</div>`));
+}
+
+
+// 3 — observation log
+{ NUMS.forEach(([n, u, s], i) => { const y = 260 + i * 290;
+    add('f3', `<div class="t" style="left:${L}px; top:${y}px; width:760px; height:1px; background:rgba(201,187,250,.14)"></div>
+      <div class="t caps" style="left:${L}px; top:${y + 30}px">0${i + 1}</div>
+      <div class="t num" style="left:${L + 90}px; top:${y + 40}px; font-size:150px">${n}</div>
+      <div class="t" style="left:${L + 470}px; top:${y + 90}px"><div style="font-size:30px; color:var(--ink); font-weight:300">${u}</div>${s ? `<div class="sub" style="margin-top:10px">${s}</div>` : ''}</div>`); });
+  add('f3', `<div class="t" style="left:${L}px; top:${260 + 4 * 290}px; width:760px; height:1px; background:rgba(201,187,250,.14)"></div>`);
+  const x = 1120;
+  add('f3', `<svg width="1920" height="1560">${defs}<line x1="${x}" y1="300" x2="${x}" y2="1340" stroke="url(#g)" stroke-opacity=".4"/>${[320, 700, 1080].map(y => node(x, y)).join('')}</svg><div class="t caps" style="left:${x + 60}px; top:250px">Process</div>`);
+  STEPS.forEach(([t, it], i) => add('f3', `<div class="t" style="left:${x + 60}px; top:${300 + i * 380}px"><div style="font-size:38px; color:var(--ink); font-weight:300">${t}</div><div class="items" style="margin-top:16px">${items(it)}</div></div>`));
+}
+
+
+
+// D — glass numbers
+{ const glass = fs => `font-family:Onest; font-weight:500; font-size:${fs}px; line-height:.9; letter-spacing:-.01em; color:rgba(235,230,255,.13); -webkit-text-stroke:1.2px rgba(230,224,255,.6); text-shadow:0 18px 40px rgba(0,0,0,.5), 0 0 40px rgba(168,156,248,.25)`;
+  const pos = [[L, 230, 200], [L + 520, 300, 200], [L + 1010, 240, 200], [L + 1380, 310, 200]];
+  NUMS.forEach(([n, u, sb], i) => { const [x, y, fs] = pos[i];
+    add('fd', `<div class="t" style="left:${x}px; top:${y}px"><div style="${glass(fs)}">${n}</div><div class="airy" style="font-size:17px; color:#C9BBFA; margin-top:26px">${u}</div>${sb ? `<div class="sub">${sb}</div>` : ''}</div>`); });
+  add('fd', `<svg width="1920" height="1300">${defs}<line x1="${L}" y1="830" x2="${L + W}" y2="830" stroke="url(#g)" stroke-opacity=".35"/>${[0, 1, 2].map(i => node(L + i * W / 3 + 6, 830, 4, 14)).join('')}</svg>`);
+  STEPS.forEach(([t, it], i) => add('fd', `<div class="t" style="left:${L + i * W / 3}px; top:880px"><div class="airy" style="font-size:24px; color:var(--ink)">${t}</div><div class="items" style="margin-top:18px; font-size:22px">${items(it)}</div></div>`));
+}
+
+// E — slow wave baseline
+{ const off = [0, 50, 18, 66];
+  NUMS.forEach(([n, u, sb], i) => { const x = L + i * W / 4;
+    if (i) add('fe', `<div class="t" style="left:${x - 40}px; top:270px; width:1px; height:330px; background:linear-gradient(180deg,transparent,rgba(201,187,250,.18),transparent)"></div>`);
+    add('fe', `<div class="t" style="left:${x}px; top:${260 + off[i]}px"><div class="airy" style="font-size:15px; color:#8A8DAA">${u}</div><div class="num" style="font-size:150px; margin-top:22px; font-weight:200">${n}</div>${sb ? `<div class="sub" style="margin-top:14px">${sb}</div>` : ''}</div>`); });
+  add('fe', `<div class="t airy" style="left:${L}px; top:800px; font-size:24px; color:var(--ink)">Discover <span style="color:#4F5373; letter-spacing:0">&nbsp;—&nbsp;</span> Design <span style="color:#4F5373; letter-spacing:0">&nbsp;—&nbsp;</span> Build</div>`);
+  STEPS.forEach(([t, it], i) => add('fe', `<div class="t items" style="left:${L + i * W / 3}px; top:880px; font-size:22px">${it.split('\n').join(' · ')}</div>`));
+}
+
+// F — numbers on the orbit
+{ const cx = 960, cy = 640, rx = 620, ry = 160, P = a => [cx + rx * Math.cos(a), cy + ry * Math.sin(a)], d = x => x * Math.PI / 180;
+  const ang = [d(200), d(-40), d(40), d(140)], pts = ang.map(P);
+  let far = '', near = '';
+  for (let k = 0; k <= 200; k++) { const a = Math.PI + Math.PI * k / 200, [x, y] = P(a); far += (k ? ' L ' : 'M ') + x.toFixed(1) + ' ' + y.toFixed(1); }
+  for (let k = 0; k <= 200; k++) { const a = Math.PI * k / 200, [x, y] = P(a); near += (k ? ' L ' : 'M ') + x.toFixed(1) + ' ' + y.toFixed(1); }
+  add('ff', `<svg width="1920" height="1420">${defs}<path d="${far}" fill="none" stroke="#C9BBFA" stroke-opacity=".16" stroke-width="1.2"/><path d="${near}" fill="none" stroke="url(#g)" stroke-opacity=".6" stroke-width="1.5"/>
+     <circle cx="${cx}" cy="${cy}" r="120" fill="url(#h)" opacity=".25"/><circle cx="${cx}" cy="${cy}" r="3.5" fill="#EDE8FF" opacity=".8"/>${pts.map(p => node(...p, 5, 18)).join('')}</svg>`);
+  const lay = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+  NUMS.forEach(([n, u, sb], i) => { const [x, y] = pts[i], [sx, sy] = lay[i];
+    const left = sx < 0 ? x - 30 : x + 30, top = sy < 0 ? y - 200 : y + 30;
+    add('ff', `<div class="t" style="left:${left}px; top:${top}px; transform:translateX(${sx < 0 ? '-100%' : '0'}); text-align:${sx < 0 ? 'right' : 'left'}"><div class="num" style="font-size:110px">${n}</div><div class="airy" style="font-size:15px; color:#C9BBFA; margin-top:16px; ${sx < 0 ? 'margin-right:-.5em' : ''}">${u}</div></div>`); });
+  STEPS.forEach(([t, it], i) => add('ff', `<div class="t" style="left:${L + i * W / 3}px; top:1080px"><div class="airy" style="font-size:22px; color:var(--ink)">${t}</div><div class="items" style="margin-top:14px; font-size:22px">${it.split('\n').join(' · ')}</div></div>`));
+}
+
+// G — museum label
+{ add('fg', `<div class="t" style="left:${L}px; top:230px; width:700px; font-weight:200; font-size:72px; line-height:1.18; color:var(--head)">From a first question to an <span class="grad" style="font-weight:300">app in code</span>.</div>`);
+  const X = 1040, w = 784; let y = 240;
+  const row = (k, v, sub) => { add('fg', `<div class="t" style="left:${X}px; top:${y}px; width:${w}px; height:1px; background:rgba(201,187,250,.14)"></div>
+     <div class="t caps" style="left:${X}px; top:${y + 26}px">${k}</div>
+     <div class="t" style="left:${X + 300}px; top:${y + 14}px; font-weight:200; font-size:40px; color:var(--ink)">${v}</div>${sub ? `<div class="t sub" style="left:${X + 300}px; top:${y + 70}px">${sub}</div>` : ''}`); y += sub ? 110 : 90; };
+  row('Time', '~200 hours'); row('Screens', '40'); row('Ways in', '3', 'science · astrology · synthesis'); row('Built with', 'React Native', 'iOS & Android, one codebase');
+  y += 30; STEPS.forEach(([t, it]) => row(t, '', it.split('\n').join(' · ')) && 0);
+  add('fg', `<div class="t" style="left:${X}px; top:${y}px; width:${w}px; height:1px; background:rgba(201,187,250,.14)"></div>`);
+}
+
+// H — constellation
+{ const P = [[L + 120, 380], [L + 620, 300], [L + 1060, 470], [L + 1420, 340]];
+  const S = [[L + 260, 900], [L + 860, 980], [L + 1440, 880]];
+  let svg = defs; P.slice(1).forEach((p, i) => svg += `<line x1="${P[i][0]}" y1="${P[i][1]}" x2="${p[0]}" y2="${p[1]}" stroke="#C9BBFA" stroke-opacity=".22"/>`);
+  S.slice(1).forEach((p, i) => svg += `<line x1="${S[i][0]}" y1="${S[i][1]}" x2="${p[0]}" y2="${p[1]}" stroke="#C9BBFA" stroke-opacity=".12" stroke-dasharray="0"/>`);
+  svg += P.map(p => node(...p, 5, 20)).join('') + S.map(p => node(...p, 3, 12, .7)).join('');
+  add('fh', `<svg width="1920" height="1440">${svg}</svg>`);
+  NUMS.forEach(([n, u, sb], i) => { const [x, y] = P[i];
+    add('fh', `<div class="t" style="left:${x + 30}px; top:${y - 40}px"><div class="num" style="font-size:96px">${n}</div><div class="airy" style="font-size:15px; color:#C9BBFA; margin-top:14px">${u}</div>${sb ? `<div class="sub">${sb}</div>` : ''}</div>`); });
+  STEPS.forEach(([t, it], i) => { const [x, y] = S[i];
+    add('fh', `<div class="t" style="left:${x + 26}px; top:${y - 14}px"><div class="airy" style="font-size:20px; color:#B9B7CF">${t}</div><div class="items" style="margin-top:12px; font-size:21px">${items(it)}</div></div>`); });
+}
+
+document.querySelectorAll('.frame').forEach(f => f.style.marginBottom = `-${Math.round(parseInt(f.style.height) * (1 - .7292))}px`);
+</script>
+</body></html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Cover + intro seam — glass cards around the phone bottom</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&family=Onest:wght@400;500&display=swap" rel="stylesheet">
+<!-- Three placements of three glass cards (mood scale, energy ring, quote) around the straight cover phone.
+     Background = the current Figma cover render; cards are HTML on top. Far cards are a bit smaller/dimmer for depth. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1500px; position:relative; overflow:hidden; background:#050816 url('seam-bg.png') 0 -900px/1920px 2400px no-repeat; transform:scale(.7292); transform-origin:top left; margin-bottom:-406px; }
+  .seam { position:absolute; left:0; right:0; top:500px; border-top:1px dashed rgba(255,255,255,.12); }
+  .seam span { position:absolute; right:12px; top:4px; font-size:14px; color:rgba(255,255,255,.3); }
+  .glass { position:absolute; border-radius:30px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 40px 80px rgba(0,0,0,.45); transform-origin:top left; }
+  .far { opacity:.85; }
+  .eyebrow { font-size:13px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:#A89CF8; }
+  .mood { padding:24px 26px 22px; width:460px; }
+  .mood .q { font-family:Onest; font-weight:500; font-size:21px; color:#fff; }
+  .mood .row { display:flex; justify-content:space-between; margin-top:18px; }
+  .mood .it { width:72px; text-align:center; }
+  .mood .shape { width:62px; height:62px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .mood .shape img { width:58px; height:58px; }
+  .mood .on .shape { box-shadow:0 0 0 1.5px rgba(168,156,248,.9), 0 0 22px rgba(168,156,248,.35); background:rgba(139,124,246,.12); }
+  .mood .lb { font-size:13px; color:#8A8DAA; margin-top:8px; }
+  .mood .on .lb { color:#E4E1F2; }
+  .energy { padding:22px 24px 24px; width:300px; text-align:center; }
+  .energy .ring { position:relative; width:170px; height:170px; margin:16px auto 0; }
+  .energy .ring svg { position:absolute; inset:0; transform:rotate(-90deg); }
+  .energy .val { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .energy .num { font-family:Onest; font-weight:500; font-size:46px; color:#fff; line-height:1; }
+  .energy .num span { font-size:24px; }
+  .energy .cap { font-size:14px; color:#B9B7CF; margin-top:6px; }
+  .quote { padding:26px 30px 24px; width:400px; }
+  .quote .qt { font-weight:300; font-size:22px; line-height:1.45; color:#E4E1F2; }
+  .quote .qm { font-family:Onest; font-size:54px; line-height:.6; color:#A89CF8; height:26px; }
+  .quote .au { margin-top:16px; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:#8A8DAA; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Balanced triangle.</b> The cards live around the lower half of the phone, where the empty space is (dashed line = the seam between cover and Introduction). Mood scale overlaps the phone’s left edge; energy sits further out on the right; the quote lower right, furthest.</div>
+<div class="frame" id="v1"><div class="seam"><span>cover / introduction</span></div></div>
+
+<div class="opt"><b>2 · Energy in front.</b> The energy ring overlaps the phone’s right edge; mood scale higher on the left, further away; the quote lower left.</div>
+<div class="frame" id="v2"><div class="seam"><span>cover / introduction</span></div></div>
+
+<div class="opt"><b>3 · Cascade.</b> Quote overlaps the phone on the right; energy steps further right and higher; mood scale alone lower left.</div>
+<div class="frame" id="v3"><div class="seam"><span>cover / introduction</span></div></div>
+
+</div>
+<script>
+const M = '../../app/assets/mood/picture-mood-scala-';
+const mood = (x, y, s = 1, extra = '') => `<div class="glass mood ${extra}" style="left:${x}px; top:${y}px; transform:scale(${s})">
+  <div class="q">How are you today?</div><div class="row">
+  ${[['very-bad', 'Awful'], ['bad', 'Bad'], ['neutral', 'Okay'], ['good', 'Good'], ['very-good', 'Great']].map(([f, l]) => `<div class="it ${l === 'Good' ? 'on' : ''}"><div class="shape"><img src="${M}${f}.png"></div><div class="lb">${l}</div></div>`).join('')}</div></div>`;
+const energy = (x, y, s = 1, extra = '') => { const r = 74, c = 2 * Math.PI * r, v = .42;
+  return `<div class="glass energy ${extra}" style="left:${x}px; top:${y}px; transform:scale(${s})"><div class="eyebrow">Energy today</div>
+  <div class="ring"><svg width="170" height="170"><defs><linearGradient id="rr${x}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8B7CF6"/><stop offset=".47" stop-color="#FFC6F1"/><stop offset=".5" stop-color="#FFE3F6"/><stop offset=".53" stop-color="#FFC6F1"/><stop offset="1" stop-color="#8B7CF6"/></linearGradient></defs>
+    <circle cx="85" cy="85" r="${r}" fill="none" stroke="rgba(139,124,246,.16)" stroke-width="9"/>
+    <circle cx="85" cy="85" r="${r}" fill="none" stroke="url(#rr${x})" stroke-width="9.5" stroke-linecap="round" stroke-dasharray="${c * v} ${c}" style="filter:drop-shadow(0 0 8px rgba(255,198,241,.45))"/></svg>
+  <div class="val"><div class="num">42<span>%</span></div><div class="cap">Low resource</div></div></div></div>`; };
+const quote = (x, y, s = 1, extra = '') => `<div class="glass quote ${extra}" style="left:${x}px; top:${y}px; transform:scale(${s})"><div class="qm">“</div>
+  <div class="qt">It does not matter how slowly you go, as&nbsp;long as you do&nbsp;not&nbsp;stop.</div><div class="au">Confucius</div></div>`;
+const put = (id, html) => document.getElementById(id).insertAdjacentHTML('beforeend', html);
+
+// view y = page y − 900. Phone: x 660–1260, bottom at view y 1096. Seam at view y 500.
+put('v1', mood(330, 640, 1) + energy(1360, 470, .82, 'far') + quote(1320, 900, .8, 'far'));
+put('v2', energy(1150, 600, 1) + mood(170, 470, .8, 'far') + quote(300, 880, .85));
+put('v3', quote(1120, 640, .95) + energy(1470, 430, .78, 'far') + mood(190, 820, .86));
+</script>
+</body></html>

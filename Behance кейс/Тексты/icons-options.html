@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Icons and elements — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 10 "Icons & elements". Real assets only: UI Kit/assets/icons-clean (gradient + nav icons), app mood shapes,
+     onboarding art (astrolabe), moon/sun cutouts, tea herbs, captured app parts (Мокапы/parts). -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .abs { position:absolute; } img { display:block; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .sm { font-size:16px; color:#8A8DAA; }
+  .glass { border-radius:28px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 30px 60px rgba(0,0,0,.45); }
+  .ico { filter:drop-shadow(0 0 5px rgba(139,124,246,.9)); }
+  .dot { position:absolute; border-radius:50%; background:#fff; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · A sky of icons.</b> The gradient icons scattered like stars across the block, a few larger and brighter, most small and quiet, with the app’s star dust between them. Only a handful labelled. The mood shapes rise in one line underneath, from Awful to Great.</div>
+<div class="frame" id="V1" style="height:1500px; margin-bottom:-406px"></div>
+
+<div class="opt"><b>2 · A quiet grid and three objects.</b> On the left a calm grid of icons on a hairline grid; on the right three hand-made images of the app (astrolabe, moon, the tea herbs) shown large on the dark, like objects in a museum, each with a tiny caption.</div>
+<div class="frame" id="V2" style="height:1450px; margin-bottom:-392px"></div>
+
+<div class="opt"><b>3 · Silence and signal, again.</b> Icons in pairs, quiet outline and lit active state, the same idea the case tells everywhere. A slim row of nav pairs and a row of gradient icons, with lots of air; the real bottom bar sits below as the place they live.</div>
+<div class="frame" id="V3" style="height:1350px; margin-bottom:-365px"></div>
+
+<div class="opt"><b>4 · Floating elements.</b> The real interface pieces float at different depths like in Aura: the mood picker, the resource ring, the quote card, the moon, a herb, a few icons on glass chips. No grid, the block feels like the app’s inner space.</div>
+<div class="frame" id="V4" style="height:1600px; margin-bottom:-433px"></div>
+
+<div class="opt"><b>5 · One hero, then details.</b> The five mood shapes very large across the block, the most recognisable element of the app, each with its word. Below, small and quiet, a single row of icons and two illustrations as supporting cast.</div>
+<div class="frame" id="V5" style="height:1450px; margin-bottom:-392px"></div>
+
+</div>
+<script>
+const I = '../../UI Kit/assets/icons-clean/', A = '../../app/assets/', PT = '../Мокапы/parts/';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h = 'Small signs,<br><em>drawn with light</em>') => `<div class="label">10 / Icons & elements</div><h2 class="h1">${h}</h2>`;
+const GRAD = ['lotus', 'moon-symbol', 'sleep', 'sun', 'pulse', 'brain', 'meditation', 'sea-waves', 'water', 'idea', 'large-tree', 'windy-weather', 'weightlifting', 'decentralized-network', 'trust', 'pegasus', 'camping-kettle', 'spoon', 'delivery-time', 'broom'];
+const NAV = ['home', 'care', 'journal', 'analytics-tab', 'profile'];
+const MOOD = [['very-bad', 'Awful'], ['bad', 'Bad'], ['neutral', 'Okay'], ['good', 'Good'], ['very-good', 'Great']];
+const icon = (n, x, y, s, o = 1, glow = true) => `<img class="abs ${glow ? 'ico' : ''}" src="${I}${n}.svg" style="left:${x}px; top:${y}px; width:${s}px; height:${s}px; object-fit:contain; opacity:${o}">`;
+const stars = (n, seed, y0, h) => { let s = seed; const r = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); let d = '';
+  for (let i = 0; i < n; i++) { const z = 1.2 + r() * 1.2; d += `<div class="dot" style="left:${(r() * 1920).toFixed(0)}px; top:${(y0 + r() * h).toFixed(0)}px; width:${z}px; height:${z}px; opacity:${(.15 + r() * .4).toFixed(2)}"></div>`; } return d; };
+
+// 1 · sky of icons
+(() => { let s = 11; const r = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); let h = head() + stars(140, 4, 520, 900);
+  const cells = []; for (let row = 0; row < 3; row++) for (let col = 0; col < 7; col++) cells.push([180 + col * 240 + (row % 2) * 110, 560 + row * 170]);
+  GRAD.forEach((n, i) => { const [cx, cy] = cells[i]; const big = [0, 1, 6, 11].includes(i); const sz = big ? 84 : 46 + r() * 14; h += icon(n, cx + (r() - .5) * 60, cy + (r() - .5) * 50, sz, big ? 1 : .75);
+    if (big) h += `<div class="abs sm" style="left:${cx - 20}px; top:${cy + sz + 18}px; width:${sz + 120}px">${n.replace(/-/g, ' ')}</div>`; });
+  MOOD.forEach(([f, w], i) => { const x = 180 + i * 330; h += `<img class="abs" src="${A}mood/picture-mood-scala-${f}.png" style="left:${x}px; top:1150px; width:150px"><div class="abs sm" style="left:${x}px; top:1320px; width:150px; text-align:center">${w}</div>`; });
+  put('V1', h); })();
+
+// 2 · grid + objects
+(() => { let h = head(); const cols = 5, cs = 150, x0 = 102, y0 = 580;
+  h += `<div class="abs" style="left:${x0}px; top:${y0}px; width:${cols * cs}px; height:${4 * cs}px; background-image:linear-gradient(rgba(201,187,250,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(201,187,250,.08) 1px, transparent 1px); background-size:${cs}px ${cs}px; border-right:1px solid rgba(201,187,250,.08); border-bottom:1px solid rgba(201,187,250,.08)"></div>`;
+  GRAD.forEach((n, i) => { const c = i % cols, rr = Math.floor(i / cols); h += icon(n, x0 + c * cs + cs / 2 - 26, y0 + rr * cs + cs / 2 - 26, 52); });
+  const objs = [[`${A}onboarding/astrolabe.png`, 1000, 560, 380, 'Astrolabe · onboarding'], [`${A}illustrations/moon-cutout.png`, 1420, 600, 320, 'Moon · Home card'], [`${A}illustrations/tea-ritual.png`, 1240, 960, 220, 'Herbs · tea ritual']];
+  objs.forEach(([src, x, y, w, c]) => { h += `<img class="abs" src="${src}" style="left:${x}px; top:${y}px; width:${w}px"><div class="abs cap" style="left:${x}px; top:${y + (src.includes('tea') ? w * 1672 / 941 : w) + 14}px; text-transform:none; letter-spacing:.04em; font-size:15px">${c}</div>`; });
+  put('V2', h); })();
+
+// 3 · pairs
+(() => { let h = head('Quiet by default,<br><em>lit when active</em>'); const y = 620;
+  h += `<div class="abs cap" style="left:102px; top:${y - 50}px">Navigation · default and active</div>`;
+  NAV.forEach((n, i) => { const x = 102 + i * 340; h += icon(n, x, y, 64, .55, false) + icon(n + '-alt', x + 110, y, 64, 1, true) + `<div class="abs sm" style="left:${x}px; top:${y + 90}px">${n.replace('-tab', '')}</div>`; });
+  const y2 = 900; h += `<div class="abs cap" style="left:102px; top:${y2 - 50}px">Signals · gradient icons</div>`;
+  GRAD.slice(0, 12).forEach((n, i) => { h += icon(n, 102 + i * 145, y2, 56); });
+  h += `<img class="abs" src="../Мокапы/screens/care-en.png" style="left:1218px; top:1060px; width:600px; height:120px; object-fit:cover; object-position:50% 100%; border-radius:0 0 28px 28px; opacity:.95">`;
+  h += `<div class="abs sm" style="left:102px; top:1110px; width:900px">In the app they live in the bottom bar and on the practice cards.</div>`;
+  put('V3', h); })();
+
+// 4 · floating elements
+(() => { let h = head() + stars(120, 7, 480, 1100);
+  const fl = [[`${PT}mood-onboarding.png`, 110, 600, 520, .95], [`${PT}resource-ring.png`, 700, 560, 360, 1], [`${PT}quote-card.png`, 1180, 520, 600, .9], [`${A}illustrations/moon-cutout.png`, 1080, 1040, 260, .95], [`${PT}camomille-hi.png`, 720, 1030, 120, 1]];
+  fl.forEach(([src, x, y, w, o]) => { h += `<img class="abs" src="${src}" style="left:${x}px; top:${y}px; width:${w}px; opacity:${o}">`; });
+  [['lotus', 160, 1220], ['sleep', 360, 1290], ['moon-symbol', 1500, 1180], ['pulse', 1660, 1300], ['sea-waves', 480, 1150]].forEach(([n, x, y]) => { h += `<div class="glass abs" style="left:${x}px; top:${y}px; width:120px; height:120px; display:flex; align-items:center; justify-content:center; border-radius:32px"></div>` + icon(n, x + 32, y + 32, 56); });
+  put('V4', h); })();
+
+// 5 · hero mood shapes
+(() => { let h = head('Five shapes<br><em>for how you feel</em>');
+  MOOD.forEach(([f, w], i) => { const x = 102 + i * 360; h += `<img class="abs" src="${A}mood/picture-mood-scala-${f}.png" style="left:${x}px; top:560px; width:280px"><div class="abs" style="left:${x}px; top:870px; width:280px; text-align:center; font-size:26px; font-weight:300; color:${f === 'good' ? '#F2F0FA' : '#8A8DAA'}">${w}</div>`; });
+  h += `<div class="abs" style="left:102px; top:1000px; width:1716px; height:1px; background:rgba(201,187,250,.12)"></div>`;
+  GRAD.slice(0, 10).forEach((n, i) => { h += icon(n, 102 + i * 110, 1080, 48, .85); });
+  h += `<img class="abs" src="${A}illustrations/moon-cutout.png" style="left:1380px; top:1050px; width:180px"><img class="abs" src="${A}onboarding/astrolabe.png" style="left:1600px; top:1040px; width:200px; opacity:.9">`;
+  put('V5', h); })();
+</script>
+</body></html>

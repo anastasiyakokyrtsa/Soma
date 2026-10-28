@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Onboarding — A1 edited</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Block 11 "Onboarding", A1 edited: 125px from the headline to the first element (case rule), only phones (no glass card),
+     nothing cropped (all inside 102–1818), five screens, three short texts in #6E7390 at a smaller size. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .ph { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .t { position:absolute; font-weight:300; font-size:22px; line-height:1.55; color:#6E7390; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>B1 · Staggered.</b> Five phones in four loose columns at different heights, three short texts in the gaps.</div>
+<div class="frame" id="B1" style="height:2180px; margin-bottom:-590px"></div>
+
+<div class="opt"><b>B2 · Two rows, freer.</b> Three phones above, two below and shifted, texts between the rows.</div>
+<div class="frame" id="B2" style="height:2200px; margin-bottom:-596px"></div>
+
+</div>
+<script>
+const TH = '../Мокапы/thin/';
+// short words glued to the next; the last three words kept together, so no line ends with 1–2 orphan words
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2\u00a0').replace(/\s(\S+)\s(\S+)$/, '\u00a0$1\u00a0$2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="label">11 / Onboarding</div><h2 class="h1">A first meeting<br><em>that asks very little</em></h2>`;
+const T1 = nb('Soma asks only what it needs for a first reading, one question per screen.');
+const T2 = nb('Feelings are picked as shapes, sleep is set on a dial. Nothing to type.');
+const T3 = nb('Every step can be skipped and filled in later.');
+const W = 320, H = W * 850 / 405, TOP = 548; // headline ends at 423 → +125
+const ph = (f, x, y) => `<img class="ph" src="${TH}ph-ob-${f}.png" style="left:${x}px; top:${y}px; width:${W}px">`;
+const t = (s, x, y, w = 340) => `<div class="t" style="left:${x}px; top:${y}px; width:${w}px">${s}</div>`;
+
+put('B1', head +
+  t(T1, 102, TOP, 430) + ph('about', 140, TOP + 200) +
+  ph('support', 600, TOP + 80) + t(T2, 600, TOP + 80 + H + 50, 320) +
+  ph('mood', 1040, TOP) + ph('style', 1040, TOP + H + 120) +
+  ph('sleep', 1498, TOP + 320) + t(T3, 1498, TOP + 320 + H + 50, 320));
+
+put('B2', head +
+  ph('about', 102, TOP) + ph('support', 800, TOP + 60) + ph('sleep', 1498, TOP) +
+  t(T1, 470, TOP + 260, 300) + t(T3, 1170, TOP + 360, 300) +
+  ph('mood', 450, TOP + H + 140) + t(T2, 102, TOP + H + 240, 300) + ph('style', 1150, TOP + H + 200));
+</script>
+</body></html>

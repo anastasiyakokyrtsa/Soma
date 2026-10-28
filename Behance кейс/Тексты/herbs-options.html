@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Herbs — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- The tea herbs under the icon tiles of block 10. Real illustrations from app/assets/tea (originals in UI Kit/assets/tea). -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .abs { position:absolute; } img { display:block; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .nm { font-size:20px; color:#C9C6DC; } .lat { font-size:15px; font-style:italic; color:#6E7390; margin-top:4px; }
+  .tile { position:absolute; border-radius:32px; overflow:hidden; background:radial-gradient(120% 90% at 50% 120%, rgba(139,124,246,.10), rgba(139,124,246,0) 60%), #070A1A; box-shadow:inset 0 0 0 1px rgba(201,187,250,.10); }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>H1 · A quiet row.</b> Six herbs standing on one invisible line, same height, names under each. The simplest.</div>
+<div class="frame" id="H1" style="height:640px; margin-bottom:-173px"></div>
+
+<div class="opt"><b>H2 · In the same tiles.</b> Tall tiles in the icons’ style, one herb in each, name in the corner. The whole block reads as one system.</div>
+<div class="frame" id="H2" style="height:720px; margin-bottom:-195px"></div>
+
+<div class="opt"><b>H3 · Herbarium.</b> Like pressed plants on a page: each herb with its English and Latin name, thin hairline under the name, more air between them.</div>
+<div class="frame" id="H3" style="height:700px; margin-bottom:-190px"></div>
+
+<div class="opt"><b>H4 · One large, five small.</b> The evening-calm bouquet large on the left as the hero; the five single herbs smaller in a row on the right.</div>
+<div class="frame" id="H4" style="height:760px; margin-bottom:-206px"></div>
+
+<div class="opt"><b>H5 · A meadow.</b> The herbs at different heights, slightly overlapping, rising from one soft horizon line, like a small meadow at night. Names tiny under the line.</div>
+<div class="frame" id="H5" style="height:640px; margin-bottom:-173px"></div>
+
+</div>
+<script>
+const T = '../../app/assets/tea/';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const H = [['intro', 'Evening calm', 'a calming blend'], ['camomille', 'Chamomile', 'Matricaria chamomilla'], ['melissa', 'Lemon balm', 'Melissa officinalis'], ['lavender', 'Lavender', 'Lavandula angustifolia'], ['valeriana', 'Valerian', 'Valeriana officinalis'], ['linden', 'Linden', 'Tilia cordata']];
+const col = (n, gap = 26) => (1716 - gap * (n - 1)) / n;
+const cap = t => `<div class="abs cap" style="left:102px; top:60px">${t}</div>`;
+
+// H1
+(() => { const w = col(6); put('H1', cap('Illustrations · tea ritual') + H.map(([f, n], i) => `<div class="abs" style="left:${102 + i * (w + 26)}px; top:120px; width:${w}px; height:360px; display:flex; align-items:flex-end; justify-content:center"><img src="${T}${f}.png" style="max-height:340px; max-width:${w - 40}px"></div><div class="abs nm" style="left:${102 + i * (w + 26)}px; top:504px; width:${w}px; text-align:center">${n}</div>`).join('')); })();
+
+// H2
+(() => { const w = col(6); put('H2', cap('Illustrations · tea ritual') + H.map(([f, n], i) => `<div class="tile" style="left:${102 + i * (w + 26)}px; top:120px; width:${w}px; height:520px"><div style="position:absolute; inset:40px 20px 70px; display:flex; align-items:flex-end; justify-content:center"><img src="${T}${f}.png" style="max-height:100%; max-width:100%"></div><div style="position:absolute; left:24px; bottom:24px; font-size:16px; color:#8A8DAA">${n}</div></div>`).join('')); })();
+
+// H3
+(() => { const w = col(6, 60); put('H3', cap('Herbarium · tea ritual') + H.map(([f, n, l], i) => { const x = 102 + i * (w + 60); return `<div class="abs" style="left:${x}px; top:110px; width:${w}px; height:380px; display:flex; align-items:flex-end; justify-content:center"><img src="${T}${f}.png" style="max-height:360px; max-width:${w}px"></div><div class="abs" style="left:${x}px; top:512px; width:${w}px; height:1px; background:rgba(201,187,250,.18)"></div><div class="abs" style="left:${x}px; top:530px; width:${w}px"><div class="nm">${n}</div><div class="lat">${l}</div></div>`; }).join('')); })();
+
+// H4
+(() => { let h = cap('Illustrations · tea ritual') + `<div class="abs" style="left:102px; top:110px; width:420px; height:520px; display:flex; align-items:flex-end; justify-content:center"><img src="${T}intro.png" style="max-height:520px"></div><div class="abs nm" style="left:102px; top:650px; width:420px; text-align:center">Evening calm</div>`;
+  const rest = H.slice(1), w = (1716 - 520 - 26 * 4) / 5; rest.forEach(([f, n], i) => { const x = 622 + i * (w + 26); h += `<div class="abs" style="left:${x}px; top:330px; width:${w}px; height:300px; display:flex; align-items:flex-end; justify-content:center"><img src="${T}${f}.png" style="max-height:280px; max-width:${w - 30}px"></div><div class="abs nm" style="left:${x}px; top:650px; width:${w}px; text-align:center; font-size:18px">${n}</div>`; });
+  put('H4', h); })();
+
+// H5
+(() => { const base = 520; const pos = [[120, 420], [400, 330], [600, 400], [830, 360], [1060, 300], [1290, 380], [1520, 330]]; const order = ['camomille', 'lavender', 'intro', 'melissa', 'valeriana', 'linden', 'lavender'];
+  let h = cap('Illustrations · tea ritual') + `<div class="abs" style="left:102px; top:${base}px; width:1716px; height:1px; background:linear-gradient(90deg, rgba(201,187,250,0), rgba(201,187,250,.3) 15%, rgba(201,187,250,.3) 85%, rgba(201,187,250,0))"></div>`;
+  order.forEach((f, i) => { const [x, ht] = pos[i]; h += `<img class="abs" src="${T}${f}.png" style="left:${x}px; top:${base - ht}px; height:${ht}px">`; });
+  h += `<div class="abs" style="left:102px; top:${base + 30}px; width:1716px; text-align:center; font-size:16px; color:#6E7390; letter-spacing:.04em">Chamomile · Lavender · Evening calm · Lemon balm · Valerian · Linden</div>`;
+  put('H5', h); })();
+</script>
+</body></html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Icons — tiles</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 10 "Icons & elements", clean tile grid (her reference): quiet dark tiles, hairline border, a faint light from below, one icon centred.
+     Real icons from UI Kit/assets/icons-clean. Gradient icons shown WITHOUT glow. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .lead { position:absolute; left:1258px; top:261px; width:560px; margin:0; font-weight:300; font-size:26px; line-height:1.5; color:#6E7390; }
+  .abs { position:absolute; }
+  .tile { position:absolute; border-radius:32px; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    background:radial-gradient(120% 90% at 50% 120%, rgba(139,124,246,.10), rgba(139,124,246,0) 60%), #070A1A;
+    box-shadow:inset 0 0 0 1px rgba(201,187,250,.10); }
+  .tile img { width:64px; height:64px; object-fit:contain; }
+  .tile .t { position:absolute; left:22px; bottom:18px; font-size:15px; color:#6E7390; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · Two calm rows.</b> Like your reference: fourteen tiles in two rows across the full width. Top row the gradient icons, bottom row the white interface icons.</div>
+<div class="frame" id="A" style="height:1820px; margin-bottom:-493px"></div>
+
+<div class="opt"><b>B · Default and active.</b> The same tiles; the navigation row shows each icon twice, quiet and active, side by side. The gradient row above.</div>
+<div class="frame" id="B" style="height:1180px; margin-bottom:-320px"></div>
+
+<div class="opt"><b>C · Icons and mood shapes.</b> One row of seven gradient icons, then five larger tiles with the mood shapes, the app’s most recognisable element, in the same quiet frame.</div>
+<div class="frame" id="C" style="height:1320px; margin-bottom:-357px"></div>
+
+<div class="opt"><b>D · With names.</b> Three rows of six tiles, each with a small name in the corner, like a tidy specimen sheet.</div>
+<div class="frame" id="D" style="height:1440px; margin-bottom:-390px"></div>
+
+</div>
+<script>
+const I = '../../UI Kit/assets/icons-clean/', M = '../../app/assets/mood/';
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="label">10 / Icons & elements</div><h2 class="h1">Small signs,<br><em>drawn with light</em></h2>
+  <p class="lead">${nb('A small set of soft, rounded icons. Gradients mark what the body tells you; navigation stays quiet until you touch it.')}</p>`;
+const GRAD = ['lotus', 'moon-symbol', 'sleep', 'sun', 'pulse', 'brain', 'meditation', 'sea-waves', 'water', 'idea', 'large-tree', 'windy-weather', 'trust', 'camping-kettle'];
+const NAV = ['home', 'care', 'journal', 'analytics-tab', 'calendar-14', 'favorite', 'audio'];
+const tile = (x, y, s, src, { name, img = 64 } = {}) => `<div class="tile" style="left:${x}px; top:${y}px; width:${s}px; height:${s}px"><img src="${src}" style="width:${img}px; height:${img}px">${name ? `<span class="t">${name}</span>` : ''}</div>`;
+const row = (y, n, list, f, opts) => { const gap = 26, s = (1716 - gap * (n - 1)) / n; return list.slice(0, n).map((v, i) => tile(102 + i * (s + gap), y, s, f(v), opts && opts(v))).join(''); };
+const Y0 = 548;
+
+// herbs under the icons: the app's tea illustrations, same 7-column rhythm, names under each
+const HERBS = [['intro', 'Evening calm'], ['camomille', 'Chamomile'], ['melissa', 'Lemon balm'], ['lavender', 'Lavender'], ['valeriana', 'Valerian'], ['linden', 'Linden']];
+const herbs = (y) => { const gap = 26, s = (1716 - gap * 5) / 6; return HERBS.map(([f, n], i) => `<div class="abs" style="left:${102 + i * (s + gap)}px; top:${y}px; width:${s}px; height:360px; display:flex; align-items:flex-end; justify-content:center"><img src="../../app/assets/tea/${f}.png" style="max-height:330px; max-width:${s - 40}px"></div><div class="abs" style="left:${102 + i * (s + gap)}px; top:${y + 384}px; width:${s}px; text-align:center; font-size:18px; color:#8A8DAA">${n}</div>`).join(''); };
+const TOP = ['lotus', 'sun', 'meditation', 'trust', 'circle', 'large-tree', 'decentralized-network'];
+put('A', head + row(Y0, 7, TOP, n => `${I}${n}.svg`) + row(Y0 + 271, 7, NAV, n => `${I}${n}.svg`) + `<div class="abs cap" style="left:102px; top:${Y0 + 271 + 245 + 120}px">Illustrations · tea ritual</div>` + herbs(Y0 + 271 + 245 + 170));
+
+(() => { const gap = 26, s = (1716 - gap * 6) / 7; let h = head + row(Y0, 7, GRAD, n => `${I}${n}.svg`);
+  const pairs = ['home', 'care', 'journal'].flatMap(n => [n, n + '-alt']).concat(['analytics-tab-alt']);
+  h += pairs.map((n, i) => tile(102 + i * (s + gap), Y0 + s + gap, s, `${I}${n}.svg`)).join('');
+  put('B', h); })();
+
+(() => { let h = head + row(Y0, 7, GRAD, n => `${I}${n}.svg`); const gap = 26, s7 = (1716 - gap * 6) / 7, s5 = (1716 - gap * 4) / 5;
+  const MOOD = [['very-bad', 'Awful'], ['bad', 'Bad'], ['neutral', 'Okay'], ['good', 'Good'], ['very-good', 'Great']];
+  h += MOOD.map(([f, w], i) => tile(102 + i * (s5 + gap), Y0 + s7 + gap, s5, `${M}picture-mood-scala-${f}.png`, { name: w, img: 150 })).join('');
+  put('C', h); })();
+
+(() => { const gap = 26, n = 6, s = (1716 - gap * (n - 1)) / n; const list = GRAD.slice(0, 12).concat(['home', 'care', 'journal', 'analytics-tab', 'go-back', 'close']);
+  let h = head; list.forEach((v, i) => { const c = i % n, r = Math.floor(i / n); h += tile(102 + c * (s + gap), Y0 + r * (s + gap), s, `${I}${v}.svg`, { name: v.replace(/-tab|-symbol/g, '').replace(/-/g, ' '), img: 60 }); });
+  put('D', h); })();
+</script>
+</body></html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Colours and type — round 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600&family=Onest:wght@600;700&display=swap" rel="stylesheet">
+<!-- Block 09 round 2: minimal, airy, cosmic. Font names presented large with floating weight labels (her reference),
+     app phrases always written in full, colours as quiet points of light. Real tokens only (UI Kit + app/theme). -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .abs { position:absolute; }
+  .onest { font-family:'Onest',sans-serif; }
+  .pill { position:absolute; padding:12px 24px; border-radius:999px; font-size:22px; color:#E4E1F2; white-space:nowrap;
+    background:linear-gradient(160deg, rgba(255,255,255,.10), rgba(168,156,248,.06) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.18), 0 20px 40px rgba(0,0,0,.4); }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .hex { font-size:15px; color:#6E7390; letter-spacing:.04em; }
+  .tok { font-size:17px; color:#C9C6DC; }
+  .star { position:absolute; border-radius:50%; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Names with floating weights.</b> Your reference, in our language: “Onest” and “Nunito Sans” set very large, the weights they use float around them as small glass pills. Colours below as nine points of light on one hairline.</div>
+<div class="frame" id="V1" style="height:1800px; margin-bottom:-487px"></div>
+
+<div class="opt"><b>2 · Weights as stars.</b> Same large names, but instead of pills each weight is a tiny star with a hairline to the letter it belongs to, like a constellation label. Colours scattered as stars of different sizes, each with its token.</div>
+<div class="frame" id="V2" style="height:2050px; margin-bottom:-555px"></div>
+
+<div class="opt"><b>3 · A cascade of real phrases.</b> No specimen sheet: real lines from the app, each written in full, falling from the largest style to the smallest with lots of air. Tiny style names on the left. Colours as one thin gradient line with ticks.</div>
+<div class="frame" id="V3" style="height:1900px; margin-bottom:-514px"></div>
+
+<div class="opt"><b>4 · Each name in its own weights.</b> “Onest” repeated in its two weights, “Nunito Sans” in its four, in a quiet row, each word labelled underneath. Colours as soft overlapping lights, like distant planets.</div>
+<div class="frame" id="V4" style="height:1950px; margin-bottom:-528px"></div>
+
+<div class="opt"><b>5 · Colours on an orbit.</b> The palette placed on one thin ellipse (the orbit from the Introduction), darkest at the far side, brightest in front. Font names with floating pills above it.</div>
+<div class="frame" id="V5" style="height:2050px; margin-bottom:-555px"></div>
+
+<div class="opt"><b>6 · Two quiet columns.</b> Left: type, the name large, weights in pills, two full app phrases. Right: colours as a short vertical list of glowing points with names. The most restrained.</div>
+<div class="frame" id="V6" style="height:1500px; margin-bottom:-406px"></div>
+
+</div>
+<script>
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h = 'Deep space for calm,<br><em>soft light for signals</em>') => `<div class="label">09 / Colours & typography</div><h2 class="h1">${h}</h2>`;
+const PAL = [['bg‑0', '#050816'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑400', '#F3A6E0'], ['green‑400', '#6EE7B7'], ['text‑primary', '#FFFFFF']];
+const dot = (c, d) => c === '#050816' ? `width:${d}px; height:${d}px; background:#050816; box-shadow:inset 0 0 0 1px rgba(201,187,250,.35)` : `width:${d}px; height:${d}px; background:${c}; box-shadow:0 0 ${d * .9}px ${c}88`;
+const names = (y, { onestX = 102, nunitoX = 102 } = {}) => `
+  <div class="abs onest" style="left:${onestX}px; top:${y}px; font-weight:700; font-size:260px; line-height:1; color:#F2F0FA; letter-spacing:-.01em">Onest</div>
+  <div class="abs" style="left:${nunitoX}px; top:${y + 360}px; font-weight:300; font-size:260px; line-height:1; color:#F2F0FA; letter-spacing:-.01em">Nunito Sans</div>`;
+const pills = (y) => `
+  <div class="pill" style="left:80px; top:${y - 40}px">SemiBold</div><div class="pill" style="left:640px; top:${y + 250}px">Bold</div>
+  <div class="cap abs" style="left:900px; top:${y + 110}px">Screen and section headlines</div>
+  <div class="pill" style="left:330px; top:${y + 335}px">Light</div><div class="pill" style="left:880px; top:${y + 320}px">Regular</div>
+  <div class="pill" style="left:1240px; top:${y + 610}px">Medium</div><div class="pill" style="left:560px; top:${y + 615}px">SemiBold</div>
+  <div class="cap abs" style="left:1500px; top:${y + 480}px">Everything else</div>`;
+const lineDots = (y, x0 = 102, x1 = 1818) => { const step = (x1 - x0) / (PAL.length - 1);
+  return `<div class="abs" style="left:${x0}px; width:${x1 - x0}px; top:${y}px; height:1px; background:linear-gradient(90deg, rgba(201,187,250,.05), rgba(201,187,250,.3) 20%, rgba(201,187,250,.3) 80%, rgba(201,187,250,.05))"></div>` +
+    PAL.map(([n, c], i) => { const x = x0 + i * step, d = 18; return `<div class="star" style="left:${x - d / 2}px; top:${y - d / 2}px; ${dot(c, d)}"></div><div class="abs" style="left:${x - 70}px; width:140px; top:${y + 34}px; text-align:center"><div class="tok">${n}</div><div class="hex">${c}</div></div>`; }).join(''); };
+
+// 1
+put('V1', head() + names(620) + pills(620) + lineDots(1500));
+
+// 2 · weights as stars with hairlines
+(() => { const y = 620; const lab = [[ 'SemiBold', 160, y - 60, 230, y + 40], ['Bold', 820, y - 70, 760, y + 30], ['Light', 140, y + 680, 240, y + 560], ['Regular', 560, y + 300, 520, y + 420], ['Medium', 1100, y + 300, 1080, y + 410], ['SemiBold', 1500, y + 690, 1440, y + 580]];
+  let svg = '<svg class="abs" style="left:0; top:0" width="1920" height="2050">';
+  let h = head() + names(y);
+  for (const [t, lx, ly, px, py] of lab) { svg += `<line x1="${lx + 6}" y1="${ly + 6}" x2="${px}" y2="${py}" stroke="#C9BBFA" stroke-opacity=".35"/><circle cx="${px}" cy="${py}" r="3" fill="#F2F0FA"/>`;
+    h += `<div class="star" style="left:${lx}px; top:${ly}px; width:12px; height:12px; background:#F2F0FA; box-shadow:0 0 14px #C9BBFA"></div><div class="abs" style="left:${lx + 24}px; top:${ly - 8}px; font-size:22px; color:#C9C6DC">${t}</div>`; }
+  const pos = [[180, 1640, 46], [470, 1760, 30], [720, 1620, 26], [980, 1720, 22], [1210, 1600, 18], [1400, 1780, 15], [1590, 1650, 12], [1730, 1760, 10], [1300, 1880, 8]];
+  PAL.forEach(([n, c], i) => { const [x, yy, d] = pos[i]; h += `<div class="star" style="left:${x}px; top:${yy}px; ${dot(c, d)}"></div><div class="abs" style="left:${x + d + 14}px; top:${yy + d / 2 - 20}px"><div class="tok">${n}</div><div class="hex">${c}</div></div>`; });
+  put('V2', h + svg + '</svg>'); })();
+
+// 3 · cascade of full phrases
+(() => { const L = [
+    ['Display · Nunito Sans Light 48', 'font-weight:300; font-size:96px', 'Listen to your rhythm'],
+    ['H2 · Onest Bold 26', "font-family:'Onest'; font-weight:700; font-size:62px", 'Good morning, Anastasia'],
+    ['H3 · Onest SemiBold 22', "font-family:'Onest'; font-weight:600; font-size:50px", 'What helps now'],
+    ['Body L · Nunito Sans Medium 18', 'font-weight:500; font-size:38px', 'Allow yourself a gentle recovery'],
+    ['Body M · Nunito Sans 14', 'font-weight:400; font-size:30px; color:#A6ABC6', 'It doesn’t mean the day will be hard.'],
+    ['Caption · Nunito Sans SemiBold 12', 'font-weight:600; font-size:24px; letter-spacing:.08em; text-transform:uppercase; color:#A89CF8', 'Low resource'],
+  ];
+  let y = 620, h = head();
+  for (const [spec, css, text] of L) { h += `<div class="abs cap" style="left:102px; top:${y + 14}px; width:330px; text-transform:none; letter-spacing:.04em; font-size:16px">${spec}</div><div class="abs" style="left:500px; top:${y}px; color:#F2F0FA; white-space:nowrap; ${css}">${text}</div>`; y += 150; }
+  h += `<div class="abs cap" style="left:500px; top:${y - 10}px; text-transform:none; letter-spacing:.04em; font-size:16px; color:#454A63">Sizes shown at 2× · Onest only for screen and section headlines</div>`;
+  const gy = 1660, cols = PAL.slice(1, 8);
+  h += `<div class="abs" style="left:102px; width:1716px; top:${gy}px; height:2px; background:linear-gradient(90deg,#050816,#4C41B0 15%,#6355D6 30%,#8B7CF6 45%,#A89CF8 58%,#C9BBFA 70%,#F3A6E0 84%,#6EE7B7 100%)"></div>`;
+  [['bg‑0', '#050816', 0], ['violet‑700', '#4C41B0', .15], ['violet‑600', '#6355D6', .3], ['violet‑400', '#8B7CF6', .45], ['violet‑300', '#A89CF8', .58], ['violet‑200', '#C9BBFA', .70], ['pink‑400', '#F3A6E0', .84], ['green‑400', '#6EE7B7', 1]].forEach(([n, c, p]) => { const x = 102 + p * 1716;
+    h += `<div class="abs" style="left:${x}px; top:${gy - 14}px; width:1px; height:30px; background:rgba(201,187,250,.4)"></div><div class="abs" style="left:${x - 70}px; width:140px; top:${gy + 30}px; text-align:center"><div class="tok">${n}</div><div class="hex">${c}</div></div>`; });
+  put('V3', h); })();
+
+// 4 · each name in its weights + overlapping lights
+(() => { let h = head();
+  const row = (y, fam, list, size) => list.map(([w, n], i) => `<div class="abs" style="left:${102 + i * (1716 / list.length)}px; top:${y}px"><div style="font-family:${fam}; font-weight:${w}; font-size:${size}px; color:#F2F0FA; line-height:1">${fam.includes('Onest') ? 'Onest' : 'Nunito'}</div><div class="cap" style="margin-top:22px">${n} ${w}</div></div>`).join('');
+  h += row(620, "'Onest'", [[600, 'SemiBold'], [700, 'Bold']], 170) + `<div class="abs cap" style="left:102px; top:870px; width:900px; text-transform:none; letter-spacing:.02em; font-size:20px; line-height:1.5; color:#8A8DAA">Onest gives screen and section titles a clear voice.</div>`;
+  h += row(960, "'Nunito Sans'", [[300, 'Light'], [400, 'Regular'], [500, 'Medium'], [600, 'SemiBold']], 110) + `<div class="abs cap" style="left:102px; top:1150px; text-transform:none; letter-spacing:.02em; font-size:20px; color:#8A8DAA">Nunito Sans carries everything else, calm and soft.</div>`;
+  const L = [['#4C41B0', 340, 360, 1540], ['#6355D6', 270, 620, 1560], ['#8B7CF6', 220, 840, 1580], ['#A89CF8', 170, 1030, 1600], ['#C9BBFA', 130, 1190, 1620], ['#F3A6E0', 96, 1320, 1640], ['#6EE7B7', 70, 1430, 1650]];
+  L.forEach(([c, d, x, y]) => { h += `<div class="star" style="left:${x - d / 2}px; top:${y - d / 2 + 60}px; width:${d}px; height:${d}px; background:radial-gradient(circle at 40% 35%, ${c}, ${c}cc 60%, ${c}00 72%); mix-blend-mode:screen; opacity:.9"></div>`; });
+  PAL.slice(1, 8).forEach(([n, c], i) => { h += `<div class="abs" style="left:${L[i][2] - 60}px; top:${L[i][3] + 60 + L[i][1] / 2 + 24}px; width:120px; text-align:center"><div class="tok" style="font-size:15px">${n}</div><div class="hex" style="font-size:13px">${c}</div></div>`; });
+  put('V4', h); })();
+
+// 5 · colours on an orbit
+(() => { let h = head() + names(560) + pills(560); const cx = 960, cy = 1720, rx = 820, ry = 150;
+  h += `<svg class="abs" style="left:0; top:0" width="1920" height="2050"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#C9BBFA" stroke-opacity=".25"/></svg>`;
+  const angs = [-90, -50, -15, 15, 50, 90, 130, 165, 200].map(a => a * Math.PI / 180);
+  PAL.forEach(([n, c], i) => { const a = Math.PI / 2 - (i / (PAL.length - 1)) * Math.PI * 1.6 - .5; const x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry; const d = 12 + (y - (cy - ry)) / (2 * ry) * 26;
+    h += `<div class="star" style="left:${x - d / 2}px; top:${y - d / 2}px; ${dot(c, d)}"></div><div class="abs" style="left:${x - 70}px; width:140px; top:${y + d / 2 + 12}px; text-align:center"><div class="tok" style="font-size:15px">${n}</div><div class="hex" style="font-size:13px">${c}</div></div>`; });
+  put('V5', h); })();
+
+// 6 · two quiet columns
+put('V6', head() + `
+  <div class="abs onest" style="left:102px; top:580px; font-weight:700; font-size:180px; line-height:1; color:#F2F0FA">Onest</div>
+  <div class="pill" style="left:620px; top:560px">SemiBold</div><div class="pill" style="left:640px; top:690px">Bold</div>
+  <div class="abs" style="left:102px; top:850px; font-weight:300; font-size:180px; line-height:1; color:#F2F0FA">Nunito Sans</div>
+  <div class="pill" style="left:110px; top:1060px">Light</div><div class="pill" style="left:250px; top:1060px">Regular</div><div class="pill" style="left:420px; top:1060px">Medium</div><div class="pill" style="left:600px; top:1060px">SemiBold</div>
+  <div class="abs onest" style="left:102px; top:1200px; font-weight:700; font-size:40px; color:#F2F0FA">Good morning, Anastasia</div>
+  <div class="abs" style="left:102px; top:1262px; font-weight:400; font-size:26px; color:#A6ABC6">Allow yourself a gentle recovery</div>
+  <div class="abs" style="left:1420px; top:580px; width:400px">${PAL.map(([n, c]) => `<div style="display:flex; align-items:center; gap:26px; height:84px"><span class="star" style="position:relative; flex:none; ${dot(c, 22)}"></span><span class="tok" style="flex:1; font-size:20px">${n}</span><span class="hex">${c}</span></div>`).join('')}</div>`);
+</script>
+</body></html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Three ways in — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 07 "Three ways in". Real screens only: Choose your approach, Home (biorhythms), Home (biorhythms + Moon activity).
+     Branch content from the Figma user flow (59:39). Only the science-based path is designed in depth; the case says so. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .light { position:absolute; border-radius:50%; filter:blur(120px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .lead { position:absolute; left:102px; top:451px; width:1000px; margin:0; font-weight:300; font-size:30px; line-height:1.5; color:#6E7390; }
+  .eyebrow { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .t3 { font-weight:300; font-size:34px; line-height:1.15; color:#F2F0FA; }
+  .sub { font-size:18px; line-height:1.45; color:#8A8DAA; }
+  .glass { border-radius:28px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 30px 60px rgba(0,0,0,.45); }
+  .chip { display:inline-block; padding:10px 16px; margin:0 8px 10px 0; border-radius:999px; font-size:17px; color:#D9D5F2; background:rgba(168,156,248,.08); box-shadow:inset 0 0 0 1px rgba(201,187,250,.18); }
+  .chip.dim { color:#8A8DAA; background:transparent; box-shadow:inset 0 0 0 1px rgba(201,187,250,.12); }
+  .tag { display:inline-block; padding:7px 14px; border-radius:999px; font-size:13px; letter-spacing:.12em; text-transform:uppercase; }
+  .tag.on { color:#0B0E22; background:#A89CF8; }
+  .tag.next { color:#A89CF8; box-shadow:inset 0 0 0 1px rgba(168,156,248,.4); }
+  .phone { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.55)); }
+  .k { font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; margin:22px 0 12px; }
+  .station { position:absolute; font-size:19px; color:#B9B7CF; }
+  .station i { position:absolute; left:-26px; top:7px; width:10px; height:10px; border-radius:50%; background:#C9BBFA; box-shadow:0 0 12px rgba(201,187,250,.7); }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · The fork.</b> The onboarding drawn as one route: a shared start, the real “Choose your approach” screen at the fork, then three lanes. Each lane lists what the profile asks and what Home shows. The science lane is lit and ends in the real Home; the other two are dashed and marked “Mapped, next”.</div>
+<div class="frame" id="A" style="height:2130px; margin-bottom:-577px"></div>
+
+<div class="opt"><b>B · Two orbits.</b> Science and astrology as two overlapping orbits (the case’s orbit language from the Introduction); the synthesis lives where they overlap. Inside each orbit, the modules Home would show. The real choose screen stands beside it.</div>
+<div class="frame" id="B" style="height:1760px; margin-bottom:-477px"></div>
+
+<div class="opt"><b>C · Three lenses.</b> Three tall glass columns, one per language, in the same family as the Research panels. Each says what it asks and what Home shows. Science holds the real Home running off the bottom; Astrology and Synthesis are honest about coming next.</div>
+<div class="frame" id="C" style="height:1900px; margin-bottom:-514px"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const P = '../Мокапы/thin/';
+const L = (x, y, w, h, c, o) => `<div class="light" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:${c}; opacity:${o}"></div>`;
+const V = '#6355D6', PV = '#B45FC4', DI = '#3B2F9A', LV = '#A89CF8';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const HEAD = `<div class="label">07 / Three ways in</div><h2 class="h1">One observatory, spoken<br>in <em>the language you trust</em></h2>
+  <p class="lead">${nb('People trust different explanations, so the first real choice in Soma is the language. Everything after it, from the profile questions to Home, speaks that language.')}</p>`;
+const LANES = {
+  sci: { name: 'Science‑based', sub: 'Body, sleep and environmental factors', asks: ['Sleep schedule', 'Cycle, if relevant', 'How you feel now', 'What to improve'], home: ['Biorhythms today', 'Energy of the day', 'Top 3 recommendations', 'Breathing practices', 'Research articles'] },
+  ast: { name: 'Astrological', sub: 'Cycles, symbols and astrological interpretations', asks: ['Birth date, time and place'], home: ['Moon phase energy', 'Moon and solar activity', 'Planetary transits', 'Natal forecast', 'Tarot and oracle', 'Daily affirmation'] },
+  syn: { name: 'Synthesis of both', sub: 'Combines both approaches', asks: ['Both profiles, step by step'], home: ['Biorhythms with lunar and solar cycles', 'One shared reading of the day'] },
+};
+const chips = (arr, dim) => arr.map(s => `<span class="chip${dim ? ' dim' : ''}">${nb(s)}</span>`).join('');
+
+// A · the fork
+(() => {
+  const forkX = 780, forkY = 1110;
+  const lanes = [['sci', 800, true], ['ast', 1330, false], ['syn', 1730, false]];
+  let svg = `<svg style="position:absolute; left:0; top:0" width="1920" height="2130"><defs><linearGradient id="ga" x1="0" x2="1"><stop offset="0" stop-color="#8B7CF6"/><stop offset="1" stop-color="#FFC6F1"/></linearGradient></defs>
+    <path d="M 112 ${forkY} L ${forkX - 170} ${forkY}" stroke="#C9BBFA" stroke-opacity=".5" stroke-width="2" fill="none"/>`;
+  for (const [k, y, on] of lanes) svg += `<path d="M ${forkX + 170} ${forkY} C ${forkX + 300} ${forkY}, ${forkX + 260} ${y}, ${forkX + 420} ${y} L 1840 ${y}" stroke="${on ? 'url(#ga)' : '#C9BBFA'}" stroke-opacity="${on ? 1 : .35}" stroke-width="${on ? 2.5 : 1.5}" ${on ? '' : 'stroke-dasharray="6 9"'} fill="none"/>`;
+  svg += '</svg>';
+  const start = ['Sign up', 'About Soma', 'Name'].map((s, i) => `<div class="station" style="left:${150 + i * 150}px; top:${forkY - 50}px"><i></i>${s}</div>`).join('');
+  const lane = ([k, y, on]) => { const d = LANES[k]; return `<div style="position:absolute; left:${forkX + 450}px; top:${y - 108}px; width:600px">
+      <div style="display:flex; align-items:center; gap:14px"><span class="t3" style="font-size:30px">${d.name}</span><span class="tag ${on ? 'on' : 'next'}">${on ? 'Designed' : 'Mapped, next'}</span></div>
+      <div class="sub" style="margin-top:6px">${d.sub}</div></div>
+    <div style="position:absolute; left:${forkX + 450}px; top:${y + 24}px; width:${on ? 400 : 620}px"><div class="k" style="margin-top:0">Asks</div>${chips(d.asks, !on)}<div class="k">Home shows</div>${chips(d.home, !on)}</div>`; };
+  put('A', L(1200, 600, 1000, 800, DI, .45) + L(-300, 1200, 1000, 700, PV, .25) + HEAD + svg + start +
+    `<img class="phone" src="${P}phone-choose.png" style="left:${forkX - 165}px; top:${forkY - 345}px; width:330px">` + lanes.map(lane).join('') +
+    `<img class="phone" src="${P}phone-home-biorhythms.png" style="left:1660px; top:700px; width:300px; transform:rotate(4deg)">`);
+})();
+
+// B · two orbits
+(() => {
+  const cy = 1190, r = 410, cx1 = 882, cx2 = 1408; // phone 102–402 · orbits 472–1818: equal 102px side margins
+  const svg = `<svg style="position:absolute; left:0; top:0" width="1920" height="1800"><defs>
+      <radialGradient id="gs"><stop offset="0" stop-color="#6355D6" stop-opacity=".22"/><stop offset="1" stop-color="#6355D6" stop-opacity="0"/></radialGradient>
+      <linearGradient id="gr" x1="0" x2="1"><stop offset="0" stop-color="#8B7CF6"/><stop offset="1" stop-color="#FFC6F1"/></linearGradient></defs>
+    <circle cx="${cx1}" cy="${cy}" r="${r}" fill="url(#gs)"/><circle cx="${cx1}" cy="${cy}" r="${r}" fill="none" stroke="url(#gr)" stroke-width="2"/>
+    <circle cx="${cx2}" cy="${cy}" r="${r}" fill="none" stroke="#C9BBFA" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="6 9"/></svg>`;
+  const block = (x, y, w, d, on, align = 'left') => `<div style="position:absolute; left:${x}px; top:${y}px; width:${w}px; text-align:${align}; transform:translate(-50%, -50%)">
+      <span class="tag ${on ? 'on' : 'next'}">${on ? 'Designed' : 'Mapped, next'}</span><div class="t3" style="margin-top:14px">${d.name}</div><div class="sub" style="margin-top:6px">${d.sub}</div>
+      <div style="margin-top:22px">${chips(d.home, !on)}</div></div>`;
+  put('B', L(700, 800, 900, 800, V, .3) + L(1400, 1300, 700, 600, PV, .22) + HEAD + svg +
+    `<img class="phone" src="${P}phone-choose.png" style="left:102px; top:${cy - 315}px; width:300px">` +
+    block((cx1 - r + cx2 - r) / 2, cy, 400, LANES.sci, true) + block((cx1 + r + cx2 + r) / 2, cy, 400, LANES.ast, false) +
+    `<div style="position:absolute; left:${(cx1 + cx2) / 2}px; top:${cy}px; width:220px; text-align:center; transform:translate(-50%, -50%)">
+       <div class="eyebrow">Overlap</div><div class="t3" style="font-size:26px; margin-top:8px">${nb('Synthesis of both')}</div><div class="sub" style="margin-top:8px; font-size:16px">Biorhythms read together<br>with lunar and solar cycles</div></div>`);
+})();
+
+// C · three lenses
+(() => {
+  const colW = 540, gap = 30, x0 = 102, top = 680, h = 1220;
+  const col = (i, k, on, img) => { const d = LANES[k]; const x = x0 + i * (colW + gap); return `<div class="glass" style="position:absolute; left:${x}px; top:${top}px; width:${colW}px; height:${h}px; overflow:hidden; border-radius:36px">
+      <div style="padding:44px 44px 0">
+        <div style="display:flex; align-items:center; justify-content:space-between"><span class="eyebrow">0${i + 1}</span><span class="tag ${on ? 'on' : 'next'}">${on ? 'Designed' : 'Mapped, next'}</span></div>
+        <div class="t3" style="margin-top:18px">${d.name}</div><div class="sub" style="margin-top:6px">${d.sub}</div>
+        <div class="k">Asks</div>${chips(d.asks, !on)}<div class="k">Home shows</div>${chips(d.home, !on)}</div>
+      ${img ? `<img src="${P}${img}" style="position:absolute; left:${(colW - 360) / 2}px; top:${on ? 700 : 640}px; width:360px; filter:drop-shadow(0 30px 50px rgba(0,0,0,.5))">` : `<div style="position:absolute; left:${(colW - 360) / 2}px; top:640px; width:360px; height:760px; border-radius:58px; box-shadow:inset 0 0 0 1.5px rgba(201,187,250,.18); display:flex; align-items:center; justify-content:center"><span class="sub" style="text-align:center; width:220px">${nb('Screens come next, after the science path')}</span></div>`}
+    </div>`; };
+  put('C', L(1100, 500, 1000, 800, DI, .45) + L(-300, 1300, 1000, 700, V, .25) + HEAD +
+    `<img class="phone" src="${P}phone-choose.png" style="left:1480px; top:80px; width:260px; transform:rotate(5deg)">` +
+    col(0, 'sci', true, 'phone-home-biorhythms.png') + col(1, 'ast', false, null) + col(2, 'syn', false, null));
+})();
+</script>
+</body></html>

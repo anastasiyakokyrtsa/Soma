@@ -1,0 +1,8 @@
+{ "fonts": {"num": "../../../app/node_modules/@expo-google-fonts/nunito-sans/400Regular/NunitoSans_400Regular.ttf", "title": "../../../app/node_modules/@expo-google-fonts/nunito-sans/400Regular/NunitoSans_400Regular.ttf", "sub": "../../../app/node_modules/@expo-google-fonts/nunito-sans/300Light/NunitoSans_300Light.ttf"},
+  "size": {"num": 16, "title": 30, "sub": 22},
+  "steps": [
+   {"n": "01", "title": "A look at the day", "sub": "Biorhythms on Home", "x": 600, "y": 380, "align": "right", "start": 0, "end": 120},
+   {"n": "02", "title": "Today feels uneven", "sub": "Care suggests what helps", "x": 600, "y": 600, "align": "right", "start": 120, "end": 237},
+   {"n": "03", "title": "One calm breath", "sub": "In, hold, out, hold", "x": 1320, "y": 380, "align": "left", "start": 237, "end": 829},
+   {"n": "04", "title": "A small, warm finish", "sub": "Well done", "x": 1320, "y": 600, "align": "left", "start": 829, "end": 99999, "last": true}
+  ] }

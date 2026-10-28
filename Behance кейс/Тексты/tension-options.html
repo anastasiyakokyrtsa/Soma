@@ -1,0 +1,111 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Soma case — The tension options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Block 04 "The tension": three problem → decision pairs with screens. Six layouts.
+     1920-wide frames at Behance's ~73%. Screens 1 and 2 are still Russian (to be re-shot in English). -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --head:#B9B7CF; --lav:#A89CF8; --ink:#E4E1F2; --cap:#4F5373; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 90px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 12px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; }
+  .glow { position:absolute; border-radius:50%; filter:blur(160px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  h2 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  h2 em { font-style:normal; color:var(--lav); }
+  .t { position:absolute; }
+  .idx { font-size:15px; letter-spacing:.3em; color:var(--cap); }
+  .ptitle { font-weight:200; font-size:46px; line-height:1.2; color:#8A8DAA; }
+  .ptext { font-size:24px; line-height:1.55; color:var(--body); font-weight:300; }
+  .dcap { font-size:15px; letter-spacing:.3em; text-transform:uppercase; color:#C9BBFA; }
+  .dtext { font-size:26px; line-height:1.55; color:var(--ink); font-weight:300; }
+  .phone { position:absolute; border-radius:58px; padding:11px; background:linear-gradient(135deg,#55555d,#222228 40%,#46464e 60%,#202025); box-shadow:0 60px 120px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06); }
+  .phone .scr { border-radius:47px; overflow:hidden; background:#050816; }
+  .phone img { display:block; width:100%; }
+  .hair { position:absolute; height:1px; background:rgba(201,187,250,.14); }
+  .note { position:absolute; font-size:15px; color:var(--cap); letter-spacing:.06em; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · Zigzag.</b> Each tension is one airy row: a floating phone on one side, problem and decision on the other, alternating left and right. Phones tilt slightly in opposite directions so the page has a gentle rhythm.</div>
+<div class="frame" id="A" style="height:3300px"></div>
+
+<div class="opt"><b>B · Diagonal descent.</b> The three pairs step down from top left to bottom right like a slow fall through space. Each phone is partly cut by the frame edge, the text sits in the open air beside it. The most dynamic, still very spacious.</div>
+<div class="frame" id="B" style="height:3200px"></div>
+
+<div class="opt"><b>C · Three phones on an arc.</b> The screens float side by side on a soft arc (centre one higher), tilted outward like objects on an orbit. Below, the three tensions as quiet columns. Compact and gallery‑like.</div>
+<div class="frame" id="C" style="height:2460px"></div>
+
+<div class="opt"><b>D · Problem above, decision below.</b> A thin horizon line splits the block: the three problems sit above it, dim and grey; the decisions below it, bright. The phones float across the line, half in each zone, as the bridge between them.</div>
+<div class="frame" id="D" style="height:2160px"></div>
+
+<div class="opt"><b>E · Fixed headline, cascading pairs.</b> The headline stays large in the left column; on the right the pairs cascade down, each phone overlapping the next a little, like cards laid on a dark table.</div>
+<div class="frame" id="E" style="height:3000px"></div>
+
+<div class="opt"><b>F · Triptych rising from below.</b> Three tall columns, each with its tension at the top and a phone rising from the bottom edge, cropped, exactly like the phone on the cover. Ties the block to the cover and keeps it very airy.</div>
+<div class="frame" id="F" style="height:1960px"></div>
+
+</div>
+<script>
+const SCR = ['../assets/screens/ProfileSleepSchedule.png', '../assets/screens/ChooseApproach.png', '../Мокапы/screens/home-en.png'];
+const T = [
+  { title: 'Too much, too soon', problem: 'People want to see value before handing over personal data. Long onboarding forms feel like work with no reward in sight.', decision: 'Every profile step can be skipped. A first biorhythm reading appears during onboarding, before the profile is complete.' },
+  { title: 'Too clinical, or too esoteric', problem: 'Data dashboards feel cold and impersonal; astrology apps feel unfounded. Each one pushes away half of the audience.', decision: 'One question at the start, three languages to choose from: science‑based, astrological or a synthesis. The whole app then speaks the chosen one.' },
+  { title: 'A fragile moment', problem: 'People often open a wellbeing app when they already feel low. A harsh verdict or a promise that doesn’t come true can make things worse and break trust.', decision: 'Readings are framed as possibilities, not diagnoses. Every number has an ⓘ explaining what the model is and isn’t, and low days come with one small, gentle next step.' },
+];
+const head = `<div class="label">04 / The tension</div><h2>Three places where self‑tracking <em>usually</em> breaks</h2>`;
+const add = (id, html) => document.getElementById(id).insertAdjacentHTML('beforeend', html);
+const phone = (src, x, y, w, rot = 0) => `<div class="phone" style="left:${x}px; top:${y}px; width:${w}px; transform:rotate(${rot}deg)"><div class="scr"><img src="${src}"></div></div>`;
+const pair = (i, x, y, w, opts = {}) => `<div class="t" style="left:${x}px; top:${y}px; width:${w}px; ${opts.align ? `text-align:${opts.align}` : ''}">
+  <div class="idx">0${i + 1}</div><div class="ptitle" style="margin-top:18px">${T[i].title}</div>
+  <div class="ptext" style="margin-top:20px">${T[i].problem}</div>
+  <div class="dcap" style="margin-top:40px">Decision</div><div class="dtext" style="margin-top:14px">${T[i].decision}</div></div>`;
+const glow = (x, y, w, h, c, o) => `<div class="glow" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:rgba(${c},${o})"></div>`;
+
+// A zigzag
+add('A', glow(-300, 700, 1200, 900, '76,65,176', .14) + glow(1100, 1700, 1200, 900, '99,85,214', .12) + head);
+[0, 1, 2].forEach(i => { const y = 560 + i * 900, left = i % 2 === 0;
+  add('A', phone(SCR[i], left ? 260 : 1240, y, 400, left ? -5 : 5) + pair(i, left ? 860 : 102, y + 170, 760)); });
+
+// B diagonal descent with phones cut by the edges
+add('B', glow(800, 600, 1400, 900, '76,65,176', .14) + head);
+add('B', phone(SCR[0], 1380, 420, 440, 6) + pair(0, 102, 620, 700));
+add('B', phone(SCR[1], -120, 1260, 440, -6) + pair(1, 620, 1460, 700));
+add('B', phone(SCR[2], 1560, 2100, 440, 7) + pair(2, 960, 2300, 560));
+
+// C arc of three phones + columns
+add('C', glow(300, 500, 1300, 800, '99,85,214', .14) + head);
+[[180, 640, -9], [760, 520, 0], [1340, 640, 9]].forEach(([x, y, r], i) => add('C', phone(SCR[i], x, y, 400, r)));
+[0, 1, 2].forEach(i => add('C', pair(i, 102 + i * 600, 1560, 520)));
+
+// D horizon split
+add('D', glow(200, 900, 1500, 700, '99,85,214', .12) + head);
+const HY = 1260;
+add('D', `<div class="hair" style="left:102px; width:1716px; top:${HY}px; background:linear-gradient(90deg, rgba(255,198,241,.35), rgba(168,156,248,.35), rgba(139,124,246,.35))"></div>
+  <div class="t idx" style="left:102px; top:${HY - 50}px">PROBLEM</div><div class="t idx" style="left:102px; top:${HY + 28}px; color:#C9BBFA">DECISION</div>`);
+[0, 1, 2].forEach(i => { const x = 102 + i * 600;
+  add('D', phone(SCR[i], x + 290, HY - 330, 280, i === 1 ? 0 : i === 0 ? -4 : 4));
+  add('D', `<div class="t" style="left:${x}px; top:520px; width:280px"><div class="idx">0${i + 1}</div><div class="ptitle" style="margin-top:16px; font-size:40px">${T[i].title}</div><div class="ptext" style="margin-top:18px; font-size:22px">${T[i].problem}</div></div>
+    <div class="t" style="left:${x}px; top:${HY + 300}px; width:270px"><div class="dtext" style="font-size:23px">${T[i].decision}</div></div>`); });
+
+// E fixed headline + cascade
+add('E', glow(-300, 300, 1100, 900, '76,65,176', .14) + `<div class="label">04 / The tension</div>
+  <div class="t" style="left:102px; top:247px; width:620px; font-weight:300; font-size:72px; line-height:1.2; color:#A6ABC6">Three places where self‑tracking <span style="color:var(--lav)">usually</span> breaks</div>
+  <div class="t ptext" style="left:102px; top:620px; width:560px">And the design decisions that answer them, so the app stays calm, honest and easy to start with.</div>`);
+[0, 1, 2].forEach(i => { const y = 260 + i * 880;
+  add('E', phone(SCR[i], 820, y, 360, -3 + i * 3) + pair(i, 1290, y + 120, 530)); });
+
+// F triptych, phones rising from the bottom edge
+add('F', glow(200, 1100, 1500, 900, '99,85,214', .16) + head);
+[0, 1, 2].forEach(i => { const x = 102 + i * 600;
+  if (i) add('F', `<div class="t" style="left:${x - 40}px; top:520px; width:1px; height:1400px; background:linear-gradient(180deg, transparent, rgba(201,187,250,.16), transparent)"></div>`);
+  add('F', `<div class="t" style="left:${x}px; top:520px; width:500px"><div class="idx">0${i + 1}</div><div class="ptitle" style="margin-top:16px; font-size:40px">${T[i].title}</div>
+    <div class="ptext" style="margin-top:18px; font-size:22px">${T[i].problem}</div><div class="dcap" style="margin-top:30px">Decision</div><div class="dtext" style="margin-top:12px; font-size:23px">${T[i].decision}</div></div>`);
+  add('F', phone(SCR[i], x + 60, 1300, 380, 0)); });
+
+document.querySelectorAll('.frame').forEach(f => { f.insertAdjacentHTML('beforeend', `<div class="note" style="left:102px; top:${parseInt(f.style.height) - 100}px; ${f.id === 'F' ? 'display:none' : ''}">Screens 01 and 02 shown in Russian here; final case uses English re‑shoots</div>`);
+  f.style.marginBottom = `-${Math.round(parseInt(f.style.height) * (1 - .7292))}px`; });
+</script>
+</body></html>

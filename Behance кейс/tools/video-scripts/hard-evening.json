@@ -1,0 +1,65 @@
+{
+ "start": "Main → Home",
+ "fps": 30,
+ "dpr": 2,
+ "dict": [
+  "../../Перевод/home-full.json",
+  "../../Перевод/care.json",
+  "../../Перевод/breathing.json"
+ ],
+ "steps": [
+  {
+   "hold": 700
+  },
+  {
+   "scroll": [
+    "Biorhythms",
+    560,
+    2600
+   ]
+  },
+  {
+   "hold": 700
+  },
+  {
+   "tapXY": [
+    125,
+    800
+   ]
+  },
+  {
+   "hold": 1400
+  },
+  {
+   "scroll": [
+    "What helps now",
+    230,
+    1500
+   ]
+  },
+  {
+   "hold": 900
+  },
+  {
+   "tap": "Breathing"
+  },
+  {
+   "hold": 2600
+  },
+  {
+   "tap": "I’m ready"
+  },
+  {
+   "hold": 900
+  },
+  {
+   "tapXY": [
+    195,
+    518
+   ]
+  },
+  {
+   "hold": 16600
+  }
+ ]
+}

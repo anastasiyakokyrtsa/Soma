@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Wireframes — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 08 "Wireframes". Real wireframes from Figma page 73:877 (iterations 1–3) and the local Вайрфреймы/ exports,
+     shown as light lines on the dark case background (inverted, tinted lavender). Final screens are real app screenshots. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .eyebrow { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .cap { font-size:18px; line-height:1.45; color:#8A8DAA; margin-top:8px; }
+  .t3 { font-weight:300; font-size:30px; line-height:1.15; color:#F2F0FA; margin-top:10px; }
+  img { display:block; }
+  .shot { position:absolute; }
+  .glow { filter:drop-shadow(0 40px 60px rgba(0,0,0,.55)); }
+  .wf { border-radius:9%/4.2%; } /* clip the export's square corners outside the drawn phone outline */
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · One screen, four times.</b> “Choose your approach” through every round: three wireframe iterations and the final screen, in one quiet row on a thin line. A short note under each says what changed. The most minimal and the easiest to read.</div>
+<div class="frame" id="A" style="height:1640px; margin-bottom:-444px"></div>
+
+<div class="opt"><b>B · Structure lights up.</b> The final wireframe flow as one long strip running off both edges. Towards the right, wireframes give way to the real screens, so the row literally goes from grey lines to light (the Inner cosmos idea: silence, then signals).</div>
+<div class="frame" id="B" style="height:1380px; margin-bottom:-374px"></div>
+
+<div class="opt"><b>C · Three pairs.</b> Three key moments (approach, date of birth, Home), each as a pair: the last wireframe behind, the final screen in front, slightly offset. Before and after without explaining.</div>
+<div class="frame" id="C" style="height:1700px; margin-bottom:-460px"></div>
+
+<div class="opt"><b>D · The whole map.</b> All 38 wireframes of the last iteration as a wall turned 6° (the same move as the Research panels), running off every edge. One real screen sits on top of it, lit.</div>
+<div class="frame" id="D" style="height:1600px; margin-bottom:-433px"></div>
+
+</div>
+<script>
+const W = '../Мокапы/wireframes/', TH = '../Мокапы/thin/';
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = h => `<div class="label">08 / Wireframes</div><h2 class="h1">${h}</h2>`;
+const H1 = 'Three rounds of structure,<br><em>then the light</em>';
+const FLOW = ['1_WF_Start_screen', '3_WF_About_app', '6_WF_Name', '10_WF_Choose_an_approach', '17_WF_Profile_-_Date_of_birth', '20_WF_Profile_-_Mood', '23_WF_Home', '24_WF_How_to_do_better', '25_WF_Breathing_session_-_Info', '26_WF_Breathing_session', '29_WF_Tea_cathegories', '31_WF_Calming_teas_-_Camomille', '37_WF_Analytics'];
+const ALL = Array.from({ length: 38 }, (_, i) => i + 1);
+const NAMES = { 1: 'Start_screen', 2: 'Start_screen', 3: 'About_app', 4: 'About_app', 5: 'About_app', 6: 'Name', 7: 'Email', 8: 'Gender', 9: 'How_to_support', 10: 'Choose_an_approach', 11: 'Choose_an_approach', 12: 'Visual_style', 13: 'Visual_style', 14: 'Personalization', 15: 'Personalization', 16: 'Profile_-_Start', 17: 'Profile_-_Date_of_birth', 18: 'Profile_-_Sleep_Schedule', 19: 'Profile_-_Menstrual_cycle', 20: 'Profile_-_Mood', 21: 'Personalization', 22: 'Personalization', 23: 'Home', 24: 'How_to_do_better', 25: 'Breathing_session_-_Info', 26: 'Breathing_session', 27: 'Breathing_session', 28: 'Breathing_session_-_End', 29: 'Tea_cathegories', 30: 'Calming_teas', 31: 'Calming_teas_-_Camomille', 32: 'Calming_teas_-_Melissa', 33: 'Calming_teas_-_Lavender', 34: 'Calming_teas_-_Valeriana', 35: 'Calming_teas_-_Linden', 36: 'Article_-_Water', 37: 'Analytics', 38: 'Analytics_-_Biorhythm' };
+const wf = n => `${W}${n}_WF_${NAMES[n]}-dark.png`;
+
+// A · one screen, four times
+(() => {
+  const steps = [
+    [`${W}choose-1-dark.png`, 'Iteration 1', 'Structure', 'A two-step progress bar and three choices as plain accordions.'],
+    [`${W}choose-2-dark.png`, 'Iteration 2', 'Flow', 'The step now sits in a six-step onboarding with segmented progress.'],
+    [`${W}choose-3-dark.png`, 'Iteration 3', 'Voice', 'Warmer, simpler copy: how would you like to observe yourself?'],
+    [`${TH}phone-choose.png`, 'Final', 'Light', 'Glass cards, one clear selected state, the calm violet of the system.'],
+  ];
+  const w = 330, gap = (1716 - 4 * w) / 3, top = 560;
+  let h = head(H1) + `<svg style="position:absolute; left:0; top:0" width="1920" height="1640"><line x1="${102 + w / 2}" y1="${top + 760}" x2="${102 + 3 * (w + gap) + w / 2}" y2="${top + 760}" stroke="#C9BBFA" stroke-opacity=".25"/>${steps.map((_, i) => `<circle cx="${102 + i * (w + gap) + w / 2}" cy="${top + 760}" r="${i === 3 ? 6 : 4}" fill="${i === 3 ? '#E4E1F2' : '#8A8DAA'}"/>`).join('')}</svg>`;
+  steps.forEach(([src, n, t, c], i) => { const x = 102 + i * (w + gap); h += `<img class="shot ${i === 3 ? 'glow' : 'wf'}" src="${src}" style="left:${x}px; top:${top}px; width:${w}px; height:${i === 3 ? w * 850 / 405 : w * 933 / 428}px; ${i === 3 ? '' : 'opacity:.92'}">
+    <div style="position:absolute; left:${x}px; top:${top + 800}px; width:${w}px"><div class="eyebrow" style="${i === 3 ? '' : 'color:#6E7390'}">${n}</div><div class="t3">${t}</div><div class="cap">${nb(c)}</div></div>`; });
+  put('A', h);
+})();
+
+// B · structure lights up
+(() => {
+  const w = 240, gap = 28, top = 560;
+  const finals = { '10_WF_Choose_an_approach': 'phone-choose.png', '17_WF_Profile_-_Date_of_birth': 'phone-dob.png', '23_WF_Home': 'phone-home.png', '26_WF_Breathing_session': null, '31_WF_Calming_teas_-_Camomille': 'phone-tea.png' };
+  const seq = FLOW.slice(1, 6).map(f => ({ src: `${W}${f}-dark.png`, real: false })).concat([{ src: `${TH}phone-home-biorhythms.png`, real: true }, { src: `${TH}phone-tea.png`, real: true }, { src: `${TH}phone-home.png`, real: true }]);
+  let h = head(H1);
+  const x0 = -110;
+  seq.forEach((s, i) => { const x = x0 + i * (w + gap); const fade = s.real ? 1 : Math.max(.35, 1 - (4 - i) * .14);
+    h += `<img class="shot ${s.real ? 'glow' : 'wf'}" src="${s.src}" style="left:${x}px; top:${top}px; width:${w}px; height:${s.real ? w * 850 / 405 : w * 933 / 428}px; opacity:${s.real ? 1 : fade * .9}">`; });
+  h += `<div style="position:absolute; left:102px; top:${top + 610}px; width:1716px; display:flex; justify-content:space-between"><div><div class="eyebrow" style="color:#6E7390">Iteration 3 wireframes</div></div><div><div class="eyebrow">Final screens</div></div></div>`;
+  put('B', h);
+})();
+
+// C · three pairs
+(() => {
+  const pairs = [[`${W}choose-3-dark.png`, `${TH}phone-choose.png`, 'Choose your approach'], [`${W}dob-3-dark.png`, `${TH}phone-dob.png`, 'Date of birth'], [`${W}home-3-dark.png`, `${TH}phone-home.png`, 'Home']];
+  const colW = 520, gap = (1716 - 3 * colW) / 2, top = 580, wfW = 300, fW = 300;
+  let h = head(H1);
+  pairs.forEach(([a, b, t], i) => { const x = 102 + i * (colW + gap);
+    h += `<img class="shot wf" src="${a}" style="left:${x}px; top:${top}px; width:${wfW}px; height:${wfW * 933 / 428}px; opacity:.85">
+      <img class="shot glow" src="${b}" style="left:${x + colW - fW}px; top:${top + 120}px; width:${fW}px; height:${fW * 850 / 405}px">
+      <div style="position:absolute; left:${x}px; top:${top + 820}px"><div class="eyebrow">0${i + 1}</div><div class="t3" style="font-size:28px">${t}</div><div class="cap">Wireframe → final</div></div>`; });
+  put('C', h);
+})();
+
+// D · the whole map
+(() => {
+  const w = 220, gap = 26, cols = 10;
+  const cells = ALL.map(n => `<img class="wf" src="${wf(n)}" style="width:${w}px; height:${w * 933 / 428}px; opacity:.8">`).join('');
+  put('D', `<div style="position:absolute; left:-60px; top:380px; transform:rotate(6deg); transform-origin:0 0; display:grid; grid-template-columns:repeat(${cols}, ${w}px); gap:${gap}px">${cells}${cells}</div>
+    <div style="position:absolute; inset:0; background:linear-gradient(180deg, #050816 0%, rgba(5,8,22,.92) 22%, rgba(5,8,22,.35) 45%, rgba(5,8,22,.2) 70%, rgba(5,8,22,.85) 100%)"></div>` + head(H1) +
+    `<img class="shot glow" src="${TH}phone-home-biorhythms.png" style="left:1340px; top:560px; width:360px">
+     <div style="position:absolute; left:102px; top:${560}px; width:520px"><div class="eyebrow">38 screens · 3 iterations</div><div class="cap" style="font-size:22px; margin-top:14px">${nb('Every screen was laid out in grey first, then rewritten in the Inner cosmos voice, and only then given colour and light.')}</div></div>`);
+})();
+</script>
+</body></html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Onboarding — freer layouts</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Block 11 "Onboarding": five phones placed freely but on purpose, four short texts each tied to its screen.
+     Rules kept: 125px under the headline, only phones, nothing cropped (102–1818), text #6E7390 22px. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .ph { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .t { position:absolute; font-weight:300; font-size:22px; line-height:1.55; color:#6E7390; }
+  .t b { display:block; font-weight:400; color:#A6ABC6; margin-bottom:4px; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>C1 · Off-beat rhythm.</b> Same-size phones, each at its own height so no two tops line up; the text sits right where its screen begins or ends.</div>
+<div class="frame" id="C1" style="height:2520px; margin-bottom:-682px"></div>
+
+<div class="opt"><b>C2 · Around a larger mood screen.</b> The mood step a little larger and closer, the other four at a calm size around it; texts tucked into the gaps next to their screens.</div>
+<div class="frame" id="C2" style="height:2260px; margin-bottom:-612px"></div>
+
+<div class="opt"><b>C3 · Off-beat, gently turned.</b> C1 with each phone turned a few degrees, alternately left and right, like cards laid on a table.</div>
+<div class="frame" id="C3" style="height:2540px; margin-bottom:-688px"></div>
+
+</div>
+<script>
+const TH = '../Мокапы/thin/';
+// short words glued to the next; last three words kept together (no 1–2 word orphan lines)
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)\s(\S+)$/, ' $1 $2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="label">11 / Onboarding</div><h2 class="h1">A first meeting<br><em>that asks very little</em></h2>`;
+const TX = {
+  about: ['Tone first', 'Three short slides say what Soma is before it asks anything.'],
+  support: ['Start with what feels heaviest', 'Two or three choices are enough to shape the first tips.'],
+  mood: ['Easier to feel than to name', 'Five shapes, from a sharp burst to a soft bloom.'],
+  sleep: ['One drag, no keyboard', 'Sleep is set on a dial instead of typed in.'],
+  style: ['Your own sky', 'Four looks, each previewed before you apply it.'],
+  setup: ['A short pause', 'Setting up feels like a small ritual, not a wait.'],
+};
+const R = 850 / 405;
+const ph = (f, x, y, w = 320, rot = 0) => `<img class="ph" src="${TH}ph-ob-${f}.png" style="left:${x}px; top:${y}px; width:${w}px; ${rot ? `transform:rotate(${rot}deg)` : ''}">`;
+const t = (k, x, y, w = 320) => `<div class="t" style="left:${x}px; top:${y}px; width:${w}px"><b>${nb(TX[k][0])}</b>${nb(TX[k][1])}</div>`;
+
+// C1 / C3 share positions
+const L1 = [['support', 560, 548], ['sleep', 1498, 640], ['about', 102, 780], ['mood', 1030, 900], ['style', 560, 1460], ['setup', 1498, 1540]];
+const T1 = [['support', 920, 560, 300], ['sleep', 1498, 640 + 320 * R + 44, 320], ['about', 102, 780 + 320 * R + 44, 320], ['mood', 1030, 900 + 320 * R + 44, 320], ['style', 920, 1880, 300], ['setup', 1498, 1540 + 320 * R + 44, 320]];
+put('C1', head + L1.map(([f, x, y]) => ph(f, x, y)).join('') + T1.map(a => t(...a)).join(''));
+const rot = [-3, 3.5, 2.5, -2.5, 3, -2];
+put('C3', head + L1.map(([f, x, y], i) => ph(f, x, y + 10, 320, rot[i])).join('') + T1.map(([k, x, y, w]) => t(k, x, y + 30, w)).join(''));
+
+// C2 · around a larger mood screen
+put('C2', head +
+  ph('about', 102, 640, 300) + t('about', 102, 640 + 300 * R + 40, 300) +
+  t('support', 480, 760, 300) + ph('support', 480, 980, 300) +
+  ph('mood', 870, 548, 380) + t('mood', 870, 548 + 380 * R + 40, 380) +
+  ph('style', 1360, 700, 300) +
+  t('sleep', 1080, 1720, 300) + ph('sleep', 1440, 1440, 300));
+
+// sanity: list any overlapping boxes (phones and texts) in the page title
+document.fonts.ready.then(() => { const bad = [];
+  for (const f of document.querySelectorAll('.frame')) { const els = [...f.querySelectorAll('.ph, .t')].map(e => e.getBoundingClientRect());
+    for (let i = 0; i < els.length; i++) for (let j = i + 1; j < els.length; j++) { const a = els[i], b = els[j]; if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) bad.push(f.id + ':' + i + '/' + j); }
+    const fr = f.getBoundingClientRect(); els.forEach((e, i) => { if (e.bottom > fr.bottom || e.right > fr.right) bad.push(f.id + ':out' + i); }); }
+  document.title = 'overlaps ' + JSON.stringify(bad); });
+</script>
+</body></html>

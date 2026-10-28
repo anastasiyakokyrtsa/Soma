@@ -1,0 +1,59 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Colours — simple</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 09 colour part, the simple way: plain swatches, sized by role, name + hex, lots of air. Real tokens. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:900px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-244px; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .sw { border-radius:24px; }
+  .dk { box-shadow:inset 0 0 0 1px rgba(201,187,250,.16); }
+  .n { font-size:20px; color:#E4E1F2; margin-top:18px; }
+  .h { font-size:16px; color:#6E7390; letter-spacing:.04em; margin-top:2px; }
+  .role { font-size:16px; color:#8A8DAA; margin-top:2px; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>S1 · Three groups, sized by role.</b> Base (big), accents (medium), signals (small). Plain rounded swatches, name, hex and one word on what it is for.</div>
+<div class="frame" id="S1"></div>
+
+<div class="opt"><b>S2 · One row, widths by weight.</b> Swatches in one line, the background widest, signals narrowest. Name and hex under each.</div>
+<div class="frame" id="S2"></div>
+
+<div class="opt"><b>S3 · Tall cards.</b> Equal tall cards, the only detail a soft fade at the top into the night (the touch you liked in the beams). Name and hex under each.</div>
+<div class="frame" id="S3"></div>
+
+</div>
+<script>
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const dark = c => c === '#050816' || c === '#0B0E1F';
+const meta = (n, c, role) => `<div class="n">${n}</div><div class="h">${c}</div>${role ? `<div class="role">${role}</div>` : ''}`;
+const sw = (x, y, w, h, n, c, role) => `<div class="abs" style="left:${x}px; top:${y}px; width:${w}px"><div class="sw ${dark(c) ? 'dk' : ''}" style="height:${h}px; background:${c}"></div>${meta(n, c, role)}</div>`;
+
+// S1
+(() => { const top = 200, gap = 24; let h = `<div class="abs cap" style="left:102px; top:120px">Base</div><div class="abs cap" style="left:762px; top:120px">Accents</div><div class="abs cap" style="left:1490px; top:120px">Signals</div>`;
+  h += sw(102, top, 300, 440, 'bg‑0', '#050816', 'Night background') + sw(426, top, 300, 440, 'card', '#0B0E1F', 'Cards');
+  const acc = [['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6', 'Buttons'], ['violet‑300', '#A89CF8', 'Accents'], ['violet‑200', '#C9BBFA']];
+  acc.forEach(([n, c, r], i) => { h += sw(762 + i * (150 + gap), top + 120, 150, 320, n, c, r); });
+  [['pink‑300', '#FBD3F1', 'Emotional'], ['green‑400', '#6EE7B7', 'Physical']].forEach(([n, c, r], i) => { h += sw(1490 + i * (152 + gap), top + 220, 152, 220, n, c, r); });
+  put('S1', h); })();
+
+// S2
+(() => { const P = [['bg‑0', '#050816', 5], ['card', '#0B0E1F', 3], ['violet‑700', '#4C41B0', 1.6], ['violet‑600', '#6355D6', 1.6], ['violet‑400', '#8B7CF6', 1.6], ['violet‑300', '#A89CF8', 1.3], ['violet‑200', '#C9BBFA', 1.1], ['pink‑300', '#FBD3F1', .9], ['green‑400', '#6EE7B7', .9]];
+  const gap = 14, total = 1716 - gap * (P.length - 1), sum = P.reduce((a, p) => a + p[2], 0); let x = 102, h = '';
+  P.forEach(([n, c, k]) => { const w = total * k / sum; h += sw(x, 220, w, 420, n, c); x += w + gap; });
+  put('S2', h); })();
+
+// S3
+(() => { const P = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑300', '#FBD3F1'], ['green‑400', '#6EE7B7']];
+  const gap = 20, w = (1716 - gap * 8) / 9; let h = '';
+  P.forEach(([n, c], i) => { const x = 102 + i * (w + gap);
+    h += `<div class="abs" style="left:${x}px; top:160px; width:${w}px"><div class="sw ${dark(c) ? 'dk' : ''}" style="height:500px; background:linear-gradient(180deg, ${c}00 0%, ${c} 45%)"></div>${meta(n, c)}</div>`; });
+  put('S3', h); })();
+</script>
+</body></html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Elements moodboard — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Under the icon tiles of block 10: a moodboard of the app's own images at different depths (near = large and bright,
+     far = small, dim, slightly soft). Real assets: herbs (originals), onboarding art ×3, astrolabe, tea categories ×5. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1150px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-311px; }
+  .it { position:absolute; display:block; }
+  .cap { position:absolute; left:102px; top:60px; font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>M1 · Three depths on a diagonal.</b> Near images large and at full brightness, middle ones smaller and dimmed, far ones tiny, dim and a little soft. They drift along one diagonal from top left to bottom right, so the chaos has a direction.</div>
+<div class="frame" id="M1"></div>
+
+<div class="opt"><b>M2 · On an orbit.</b> The images sit on one invisible tilted ellipse, like objects circling a planet: in front large and bright, behind small and fading. The case’s orbit motif again.</div>
+<div class="frame" id="M2"></div>
+
+<div class="opt"><b>M3 · The astrolabe at the centre.</b> The astrolabe large and bright in the middle; the other images around it in two loose rings, dimmer and smaller the further out they are.</div>
+<div class="frame" id="M3"></div>
+
+<div class="opt"><b>M4 · A drifting grid.</b> A hidden six-column grid holds everything, but each image floats at its own height and depth inside its column; every other one recedes. Calm, but alive.</div>
+<div class="frame" id="M4"></div>
+
+<div class="opt"><b>M5 · A band of light.</b> All images gathered in one horizontal band through the middle, overlapping; the centre is bright and close, both ends sink into the dark.</div>
+<div class="frame" id="M5"></div>
+
+</div>
+<script>
+const P = '../Мокапы/parts/herbs-tiles/', A = '../../app/assets/';
+const IMG = {
+  intro: [P + 'intro.png', .53], camomille: [P + 'camomille.png', .48], melissa: [P + 'melissa.png', .45], lavender: [P + 'lavender.png', .28], valeriana: [P + 'valeriana.png', .35], linden: [P + 'linden.png', .37],
+  about1: [A + 'onboarding/about-1.png', 1], about2: [A + 'onboarding/about-2.png', 1], about3: [A + 'onboarding/about-3.png', 1], astrolabe: [A + 'onboarding/astrolabe.png', 1],
+  calm: [A + 'tea/category-calming.png', 1], focus: [A + 'tea/category-focus.png', 1], intuitive: [A + 'tea/category-intuitive-choice.png', .97], energy: [A + 'tea/category-soft-energy.png', 1.07], warmth: [A + 'tea/category-warmth.png', 1],
+};
+// depth: 0 near (bright), 1 mid, 2 far
+const look = d => [`opacity:1`, `opacity:.55; filter:saturate(.8)`, `opacity:.28; filter:blur(1.5px) saturate(.7)`][d];
+// [key, centre x, centre y, height, depth]
+const draw = (id, items) => { const f = document.getElementById(id); let h = '<div class="cap">Inner cosmos · images from the app</div>';
+  items.sort((a, b) => b[4] - a[4]).forEach(([k, cx, cy, ht, d]) => { const [src, ratio] = IMG[k]; const w = ht * ratio;
+    h += `<img class="it" src="${src}" style="left:${cx - w / 2}px; top:${cy - ht / 2}px; width:${w}px; height:${ht}px; ${look(d)}">`; });
+  f.insertAdjacentHTML('beforeend', h); };
+
+draw('M1', [
+  ['about2', 260, 300, 300, 0], ['intro', 620, 520, 520, 0], ['astrolabe', 1180, 640, 380, 0], ['camomille', 1580, 820, 420, 0],
+  ['calm', 470, 220, 190, 1], ['lavender', 900, 330, 330, 1], ['energy', 960, 860, 200, 1], ['melissa', 1420, 400, 340, 1], ['about3', 1760, 560, 220, 1],
+  ['focus', 120, 640, 150, 2], ['valeriana', 330, 820, 260, 2], ['warmth', 1240, 230, 140, 2], ['linden', 1770, 230, 230, 2], ['about1', 760, 980, 170, 2], ['intuitive', 1880, 1000, 120, 2]]);
+
+(() => { const keys = ['astrolabe', 'camomille', 'about2', 'calm', 'lavender', 'about1', 'focus', 'melissa', 'energy', 'valeriana', 'about3', 'warmth', 'linden', 'intuitive', 'intro'];
+  const cx = 960, cy = 600, rx = 820, ry = 300, items = [];
+  keys.forEach((k, i) => { const a = (i / keys.length) * Math.PI * 2 + Math.PI / 2; const x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry; const front = (Math.sin(a) + 1) / 2; // 1 = front (bottom)
+    const tall = IMG[k][1] < .6; const ht = (tall ? 230 : 150) + front * (tall ? 260 : 170); items.push([k, x, y, ht, front > .66 ? 0 : front > .33 ? 1 : 2]); });
+  draw('M2', items); })();
+
+draw('M3', [
+  ['astrolabe', 960, 600, 520, 0],
+  ['camomille', 560, 560, 400, 0], ['intro', 1380, 600, 440, 0], ['about2', 740, 260, 210, 1], ['calm', 1200, 250, 200, 1], ['lavender', 1660, 420, 320, 1], ['energy', 690, 930, 190, 1], ['melissa', 260, 470, 320, 1], ['focus', 1250, 960, 180, 1],
+  ['about1', 120, 230, 160, 2], ['warmth', 400, 950, 140, 2], ['valeriana', 1810, 830, 250, 2], ['about3', 1600, 160, 150, 2], ['linden', 960, 1020, 200, 2], ['intuitive', 300, 190, 120, 2]]);
+
+(() => { const keys = [['intro', 0], ['calm', 1], ['camomille', 0], ['about2', 1], ['melissa', 0], ['focus', 1], ['astrolabe', 0], ['lavender', 1], ['energy', 0], ['valeriana', 1], ['about1', 0], ['linden', 1]];
+  const colW = 1716 / 6, ys = [[360, 820], [300, 760], [420, 860]], items = [];
+  keys.forEach(([k, d], i) => { const c = i % 6, row = Math.floor(i / 6), tall = IMG[k][1] < .6; const ht = d ? (tall ? 300 : 170) : (tall ? 440 : 260);
+    items.push([k, 102 + colW * (c + .5) + (d ? 30 : -20), ys[c % 3][row], ht, d ? 1 : 0]); });
+  items.push(['about3', 1840, 160, 140, 2], ['warmth', 80, 1060, 130, 2], ['intuitive', 960, 120, 120, 2]);
+  draw('M4', items); })();
+
+(() => { const keys = ['warmth', 'linden', 'about1', 'focus', 'lavender', 'about2', 'camomille', 'astrolabe', 'intro', 'calm', 'melissa', 'about3', 'energy', 'valeriana', 'intuitive'];
+  const items = []; keys.forEach((k, i) => { const t = i / (keys.length - 1), x = 80 + t * 1760, dist = Math.abs(t - .5) * 2; const tall = IMG[k][1] < .6;
+    const ht = (tall ? 520 : 330) * (1 - dist * .55); const y = 600 + Math.sin(i * 1.7) * 120; items.push([k, x, y, ht, dist < .3 ? 0 : dist < .65 ? 1 : 2]); });
+  draw('M5', items); })();
+</script>
+</body></html>

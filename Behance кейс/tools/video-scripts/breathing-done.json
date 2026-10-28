@@ -1,0 +1,1 @@
+{ "start": "BreathingComplete", "fps": 30, "dpr": 2, "dict": ["../../Перевод/breathing.json"], "steps": [ { "hold": 3400 } ] }

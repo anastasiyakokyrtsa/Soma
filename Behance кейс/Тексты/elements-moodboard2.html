@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Elements moodboard — round 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Under the icon tiles of block 10. Some images on tiles (same tile style as the icons), some free. Depth = scale + muted exposure
+     (brightness, like the wireframe wall). NO blur anywhere. Real assets: herbs, onboarding ×3, astrolabe, tea categories ×5. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1200px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-325px; }
+  .tile { position:absolute; border-radius:32px; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(120% 90% at 50% 120%, rgba(139,124,246,.10), rgba(139,124,246,0) 60%), #070A1A; box-shadow:inset 0 0 0 1px rgba(201,187,250,.10); }
+  .tile img { max-width:82%; max-height:82%; }
+  .free { position:absolute; }
+  .cap { position:absolute; left:102px; top:60px; font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>R1 · Collage.</b> Tiles of different sizes in a loose asymmetric collage; near ones large and at full exposure, far ones smaller and muted. Herbs stand free between the tiles, a couple of them overlapping a tile edge.</div>
+<div class="frame" id="R1"></div>
+
+<div class="opt"><b>R2 · Front and back.</b> At the back, a quiet field of small muted tiles (like the wireframe wall); in front, three large bright tiles and free herbs crossing over them.</div>
+<div class="frame" id="R2"></div>
+
+<div class="opt"><b>R3 · On one line.</b> Tiles of varying sizes resting on one baseline, alternately bright and muted, with free herbs standing between them at their own heights.</div>
+<div class="frame" id="R3"></div>
+
+<div class="opt"><b>R4 · A diagonal drift.</b> Tiles and herbs drifting from top left to bottom right, growing and brightening as they come closer; small muted ones at the start, large bright ones at the end.</div>
+<div class="frame" id="R4"></div>
+
+</div>
+<script>
+const P = '../Мокапы/parts/herbs-tiles/', A = '../../app/assets/';
+const IMG = { intro: [P + 'intro.png', .53], camomille: [P + 'camomille.png', .48], melissa: [P + 'melissa.png', .45], lavender: [P + 'lavender.png', .28], valeriana: [P + 'valeriana.png', .35], linden: [P + 'linden.png', .37],
+  about1: [A + 'onboarding/about-1.png', 1], about2: [A + 'onboarding/about-2.png', 1], about3: [A + 'onboarding/about-3.png', 1], astrolabe: [A + 'onboarding/astrolabe.png', 1],
+  calm: [A + 'tea/category-calming.png', 1], focus: [A + 'tea/category-focus.png', 1], intuitive: [A + 'tea/category-intuitive-choice.png', .97], energy: [A + 'tea/category-soft-energy.png', 1.07], warmth: [A + 'tea/category-warmth.png', 1] };
+const ex = m => m >= 1 ? '' : `filter:brightness(${m})`; // muted exposure, never blur
+const tile = (k, x, y, w, h, m = 1) => `<div class="tile" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; ${ex(m)}"><img src="${IMG[k][0]}"></div>`;
+const free = (k, cx, bottom, h, m = 1) => { const w = h * IMG[k][1]; return `<img class="free" src="${IMG[k][0]}" style="left:${cx - w / 2}px; top:${bottom - h}px; width:${w}px; height:${h}px; ${ex(m)}">`; };
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', '<div class="cap">Inner cosmos · images from the app</div>' + h);
+
+// R1 collage
+put('R1', [
+  tile('about2', 102, 140, 520, 520), tile('calm', 650, 140, 260, 260, .55), tile('astrolabe', 938, 140, 420, 420), tile('focus', 1386, 140, 200, 200, .5), tile('about3', 1614, 140, 204, 204, .45),
+  tile('energy', 650, 428, 260, 232, .7), tile('warmth', 1386, 368, 432, 300, .6),
+  tile('about1', 102, 700, 340, 340, .55), tile('intuitive', 938, 600, 200, 200, .45), tile('focus', 1166, 600, 192, 192, .4),
+  free('camomille', 560, 1060, 420), free('intro', 1050, 1080, 440, .85), free('lavender', 1480, 1060, 380), free('melissa', 1720, 1090, 360, .55), free('valeriana', 780, 1100, 300, .5), free('linden', 1290, 1100, 260, .45),
+].join(''));
+
+// R2 front and back
+(() => { const keys = ['calm', 'focus', 'warmth', 'energy', 'intuitive', 'about1', 'about3', 'calm', 'focus', 'warmth', 'energy', 'intuitive']; let h = '';
+  const s = 180, g = 22, cols = 9; for (let i = 0; i < 9; i++) { const c = i % cols, r = Math.floor(i / cols); h += tile(keys[i % keys.length], 102 + c * (s + g) + (r % 2) * 60, 170 + r * (s + g) + 380 * 0, s, s, .4); }
+  for (let i = 0; i < 9; i++) h += tile(keys[(i + 3) % keys.length], 162 + i * (s + g), 170 + (s + g), s, s, .3);
+  h += tile('astrolabe', 300, 360, 460, 460) + tile('about2', 1180, 300, 400, 400) + tile('about3', 820, 560, 300, 300, .85);
+  h += free('intro', 760, 1120, 520) + free('camomille', 1640, 1120, 460) + free('lavender', 180, 1110, 400, .8) + free('melissa', 1120, 1140, 340, .7);
+  put('R2', h); })();
+
+// R3 one line
+(() => { const base = 900; const seq = [['t', 'about1', 240, .55], ['f', 'camomille', 420, 1], ['t', 'astrolabe', 360, 1], ['f', 'lavender', 340, .55], ['t', 'calm', 200, .5], ['f', 'intro', 470, 1], ['t', 'about2', 300, .6], ['f', 'melissa', 300, .55], ['t', 'warmth', 180, .45]];
+  let x = 102, h = `<div class="free" style="left:102px; top:${base}px; width:1716px; height:1px; background:rgba(201,187,250,.14)"></div>`;
+  const tw = seq.reduce((a, [t, k, s]) => a + (t === 't' ? s : s * IMG[k][1]), 0), gap = (1716 - tw) / (seq.length - 1);
+  for (const [t, k, s, m] of seq) { if (t === 't') { h += tile(k, x, base - s, s, s, m); x += s + gap; } else { const w = s * IMG[k][1]; h += free(k, x + w / 2, base, s, m); x += w + gap; } }
+  put('R3', h); })();
+
+// R4 diagonal drift
+(() => { const seq = [['t', 'focus', 130, .35], ['f', 'linden', 200, .4], ['t', 'warmth', 160, .45], ['t', 'about3', 190, .5], ['f', 'valeriana', 280, .55], ['t', 'calm', 230, .65], ['f', 'melissa', 340, .75], ['t', 'about1', 290, .8], ['t', 'astrolabe', 330, 1], ['f', 'camomille', 400, 1], ['t', 'about2', 360, 1], ['f', 'intro', 440, 1]];
+  let h = ''; seq.forEach(([t, k, s, m], i) => { const p = i / (seq.length - 1), cx = 160 + p * 1560, cy = 240 + Math.pow(p, 1.15) * 640;
+    h += t === 't' ? tile(k, cx - s / 2, cy - s / 2, s, s, m) : free(k, cx, cy + s / 2, s, m); });
+  put('R4', h); })();
+</script>
+</body></html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Soma case — The tension, zigzag with detail cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,600&family=Onest:wght@400;500&display=swap" rel="stylesheet">
+<!-- Option A (zigzag) with straight phones and a glass "magnifier" card per tension showing a relevant UI detail.
+     Three card placements. Card copy is translated from the app (content/biorhythmInsight.ts, biorhythmInfo.ts, ChooseApproach). -->
+<style>
+  :root { --bg:#050816; --body:#6E7390; --lav:#A89CF8; --ink:#E4E1F2; --cap:#4F5373; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 90px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 12px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:3500px; background:var(--bg); position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; margin-bottom:-948px; }
+  .glow { position:absolute; border-radius:50%; filter:blur(160px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  h2 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  h2 em { font-style:normal; color:var(--lav); }
+  .t { position:absolute; }
+  .idx { font-size:15px; letter-spacing:.3em; color:var(--cap); }
+  .ptitle { font-weight:200; font-size:46px; line-height:1.2; color:#8A8DAA; }
+  .ptext, .dtext, .gtext { text-wrap:pretty; }
+  .ptext { font-size:24px; line-height:1.55; color:var(--body); font-weight:300; }
+  .dcap { font-size:15px; letter-spacing:.3em; text-transform:uppercase; color:#C9BBFA; }
+  .dtext { font-size:24px; line-height:1.55; color:var(--ink); font-weight:300; }
+  /* thinner, more realistic iPhone: 2.5px titanium rim + black glass bezel */
+  .phone { position:absolute; border-radius:64px; padding:2.5px;
+    background:linear-gradient(135deg,#8a8a94 0%,#3a3a42 18%,#6d6d76 38%,#2c2c33 55%,#5c5c66 78%,#9a9aa3 100%);
+    box-shadow:0 60px 120px rgba(0,0,0,.55), 0 0 0 .5px rgba(255,255,255,.12); }
+  .phone .bezel { border-radius:61.5px; padding:9px; background:#000; box-shadow:inset 0 0 0 1px rgba(255,255,255,.05); }
+  .phone .scr { position:relative; border-radius:52.5px; overflow:hidden; background:#050816; }
+  .phone img { display:block; width:100%; }
+  .phone .island { position:absolute; top:3.1%; left:50%; transform:translateX(-50%); width:31%; height:4.3%; border-radius:999px; background:#000; }
+  .phone .sb { position:absolute; top:3.6%; left:0; right:0; height:4%; color:#fff; font:600 15px/1 -apple-system,'SF Pro Text',system-ui,sans-serif; }
+  .phone .sb .tm { position:absolute; left:13%; top:0; }
+  .phone .sb .ic { position:absolute; right:9%; top:0; display:flex; gap:5px; align-items:center; }
+  /* glass detail card */
+  .glass { position:absolute; border-radius:30px; padding:30px 32px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 40px 80px rgba(0,0,0,.45); }
+  .eyebrow { font-size:14px; letter-spacing:.24em; text-transform:uppercase; background:linear-gradient(90deg,#FFC6F1,#A89CF8 60%,#8B7CF6); -webkit-background-clip:text; color:transparent; }
+  .gtext { font-size:21px; line-height:1.5; color:#D9D6EA; font-weight:300; }
+  .opt-row { display:flex; gap:16px; align-items:flex-start; padding:16px 0; border-top:1px solid rgba(201,187,250,.1); }
+  .opt-row:first-of-type { border-top:0; }
+  .radio { flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid rgba(201,187,250,.5); margin-top:3px; }
+  .radio.on { border-color:#A89CF8; box-shadow:inset 0 0 0 5px #050816, inset 0 0 0 11px #A89CF8; }
+  .otitle { font-size:20px; color:#E4E1F2; font-weight:400; }
+  .osub { font-size:16px; color:#8A8DAA; margin-top:4px; line-height:1.4; }
+  .pill { position:absolute; border-radius:999px; padding:14px 26px; font-size:18px; color:#C9BBFA; background:rgba(168,156,248,.08); backdrop-filter:blur(16px); box-shadow:inset 0 0 0 1px rgba(201,187,250,.22); }
+  .info-ic { display:inline-flex; width:24px; height:24px; border-radius:50%; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:#050816; background:#A89CF8; margin-right:12px; vertical-align:-3px; }
+  .lead { position:absolute; height:1px; background:linear-gradient(90deg, rgba(201,187,250,.15), rgba(201,187,250,.65)); }
+  .dotm { position:absolute; width:10px; height:10px; border-radius:50%; background:#EDE8FF; box-shadow:0 0 14px 4px rgba(168,156,248,.6); }
+  .note { position:absolute; font-size:15px; color:var(--cap); letter-spacing:.06em; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A1 · Card overlaps the phone.</b> Straight phones, zigzag rows. The glass card sits over the inner edge of the phone, half on the screen and half in the air, like a detail lifted out of the interface.</div>
+<div class="frame" id="A1"></div>
+
+<div class="opt"><b>A2 · Magnifier with a pointer.</b> The card floats on its own between phone and text; a thin line with a glowing point connects it to the exact spot on the screen it zooms into.</div>
+<div class="frame" id="A2"></div>
+
+<div class="opt"><b>A3 · Card under the decision.</b> The phone stays clean; the detail card sits right under the decision text, as the proof of what it says. The calmest version.</div>
+<div class="frame" id="A3"></div>
+
+</div>
+<script>
+const SCR = ['../Мокапы/screens/date-of-birth-en.png', '../Мокапы/screens/home-en.png', '../Мокапы/screens/tea-ceremony-en.png'];
+const T = [
+  { title: 'Too much, too soon', problem: 'People want to see value before sharing personal data.<br>Long forms up front feel like work with no reward.', decision: 'Every profile step can be skipped. A first biorhythm reading appears during onboarding, before the profile is complete.' },
+  { title: 'Too clinical, or too esoteric', problem: 'Data dashboards feel cold and impersonal; astrology apps feel unfounded. Each one pushes away half of the audience.', decision: 'One question at the start, three languages to choose from: science‑based, astrological or a synthesis. The whole app then speaks the chosen one.' },
+  { title: 'A fragile moment', problem: 'People often open a wellbeing app when they already feel low. A harsh verdict or a promise that doesn’t come true can make things worse and break trust.', decision: 'Readings are framed as possibilities, not diagnoses. Every number has an ⓘ explaining what the model is and isn’t, and low days come with one small, gentle next step.' },
+];
+// detail cards (translated from the app)
+const CARD = [
+  w => `<div class="glass" style="width:${w}px; padding:34px 30px 32px; text-align:center">
+     <div style="position:relative; width:150px; height:150px; margin:0 auto; border-radius:50%;
+        box-shadow:0 0 50px 12px rgba(139,124,246,.16), 0 0 90px 26px rgba(255,198,241,.07), inset 0 0 60px 22px rgba(139,124,246,.18), inset 0 0 32px 8px rgba(255,198,241,.12);
+        overflow:hidden; display:flex; align-items:center; justify-content:center">
+       <img src="../../app/assets/onboarding/insight-bulb.png" style="width:112px; height:112px"></div>
+     <div style="margin-top:26px; font-size:14px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:#A89CF8">Your first insight</div>
+     <div style="margin-top:14px; font-size:20px; line-height:1.4; font-weight:500; color:#FFFFFF">According to the chart, your body has plenty of energy today.<br>A good day for a walk or a stretch; harder tasks can wait.</div></div>`,
+  // the three approaches as in the onboarding choice (radio cards), Synthesis selected = what this Home shows
+  w => `<div class="glass" style="width:${w}px; padding:24px 22px 22px">
+     <div class="eyebrow" style="margin:0 6px 14px">Your approach</div>
+     ${[['Science‑based', 'Body, sleep and environment', 0], ['Astrological', 'Cycles, symbols and interpretation', 0], ['Synthesis of both', 'Combines both approaches', 1]].map(([t, d, on]) => `
+       <div style="display:flex; gap:14px; align-items:center; padding:13px 16px; margin-top:8px; border-radius:18px; border:1px solid ${on ? 'rgba(168,156,248,.75)' : 'rgba(255,255,255,.14)'}; background:${on ? 'rgba(139,124,246,.14)' : 'transparent'}">
+         <div class="radio${on ? ' on' : ''}"></div><div><div class="otitle" style="font-size:18px">${t}</div><div class="osub" style="font-size:14px">${d}</div></div></div>`).join('')}</div>`,
+  // chamomile card from the tea ritual (TeaCeremonyScreen): herb illustration + its text
+  w => `<div class="glass" style="width:${w}px; padding:26px 26px 26px 150px">
+     <img src="../../app/assets/tea/camomille.png" style="position:absolute; left:14px; top:-70px; width:128px; height:263px; filter:drop-shadow(0 0 16px rgba(139,124,246,.45))">
+     <div><div style="font-family:Onest; font-weight:500; font-size:22px; color:#fff">Chamomile</div>
+       <div class="gtext" style="margin-top:10px; font-size:17px; line-height:1.5">A&nbsp;familiar evening ritual:<br>a&nbsp;soft taste, a&nbsp;light floral scent and the&nbsp;feeling that you can finally exhale.</div></div></div>`,
+];
+function insightWave(w) {
+  const H = 96, mid = 48, today = w * .55; let svg = '';
+  [['#5DC2A3', 23, -2.215], ['#FFC6F1', 28, -3.634], ['#8B7CF6', 33, -3.486]].forEach(([c, per, ph]) => {
+    let d = ''; for (let x = 0; x <= w; x += 4) d += (d ? ' L ' : 'M ') + x + ' ' + (mid - 36 * Math.sin((x / w) * Math.PI * 2 * (28 / per) * .9 + ph)).toFixed(1);
+    svg += `<path d="${d}" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity=".9"/>`;
+    const y = mid - 36 * Math.sin((today / w) * Math.PI * 2 * (28 / per) * .9 + ph);
+    svg += `<circle cx="${today}" cy="${y.toFixed(1)}" r="5" fill="${c}"/><circle cx="${today}" cy="${y.toFixed(1)}" r="12" fill="${c}" opacity=".18"/>`; });
+  return `<line x1="${today}" y1="0" x2="${today}" y2="${H}" stroke="#C9BBFA" stroke-opacity=".25" stroke-dasharray="3 5"/>` + svg;
+}
+function rings() {
+  const R = [['Physical', 98.7, ['#7DE8C4', '#4BA78D']], ['Emotional', 2.5, ['#FFCBF2', '#FBBDEC']], ['Intellectual', 3.2, ['#B6ABFF', '#7060E8']]];
+  return R.map(([l, v, [c1, c2]], i) => { const r = 27, c = 2 * Math.PI * r, part = Math.max(v / 100, .045);
+    return `<div style="text-align:center; width:96px"><svg width="70" height="70" viewBox="0 0 70 70" style="overflow:visible">
+      <defs><linearGradient id="rg${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>
+      <circle cx="35" cy="35" r="${r}" fill="none" stroke="#1C1F3A" stroke-width="6"/>
+      <circle cx="35" cy="35" r="${r}" fill="none" stroke="url(#rg${i})" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c * part} ${c}" transform="rotate(-90 35 35)" style="filter:drop-shadow(0 0 5px ${c1}88)"/>
+      <text x="35" y="40" text-anchor="middle" font-family="Nunito Sans" font-size="13" font-weight="600" fill="#fff">${v}%</text></svg>
+      <div style="font-size:13px; color:#B9B7CF; margin-top:6px">${l}</div></div>`; }).join('');
+}
+const head = `<div class="label">04 / The tension</div><h2>Three places where self‑tracking <em>usually</em> breaks</h2>`;
+const add = (id, html) => document.getElementById(id).insertAdjacentHTML('beforeend', html);
+const SB = `<div class="sb"><span class="tm">9:41</span><span class="ic">
+  <svg width="17" height="11" viewBox="0 0 18 12" fill="#fff"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+  <svg width="15" height="11" viewBox="0 0 16 12" fill="#fff"><path d="M8 2.3c2.4 0 4.6.9 6.3 2.5l1.2-1.2C13.5 1.6 10.9.6 8 .6S2.5 1.6.5 3.6l1.2 1.2C3.4 3.2 5.6 2.3 8 2.3zm0 3.4c1.5 0 2.8.5 3.9 1.4l1.2-1.2C11.7 4.6 9.9 4 8 4s-3.7.6-5.1 1.9l1.2 1.2C5.2 6.2 6.5 5.7 8 5.7zm0 3.3c.6 0 1.1.2 1.6.5L8 11.2 6.4 9.5c.5-.3 1-.5 1.6-.5z"/></svg>
+  <svg width="25" height="12" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="#fff"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="#fff" fill-opacity=".45"/></svg></span></div>`;
+// screens shot with the iPhone top inset get a status bar and Dynamic Island
+const phone = (src, x, y, w) => { const inset = src.includes('Мокапы/screens');
+  return `<div class="phone" style="left:${x}px; top:${y}px; width:${w}px"><div class="bezel"><div class="scr"><img src="${src}">${inset ? SB + '<div class="island"></div>' : ''}</div></div></div>`; };
+const pair = (i, x, y, w) => `<div class="t" style="left:${x}px; top:${y}px; width:${w}px">
+  <div class="idx">0${i + 1}</div><div class="ptitle" style="margin-top:18px">${T[i].title}</div>
+  <div class="ptext" style="margin-top:20px">${T[i].problem}</div>
+  <div class="dcap" style="margin-top:40px">Decision</div><div class="dtext" style="margin-top:14px">${T[i].decision}</div></div>`;
+const glow = (x, y, w, h, c, o) => `<div class="glow" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:rgba(${c},${o})"></div>`;
+const at = (html, x, y) => html.replace('<div class="glass" style="', `<div class="glass" style="left:${x}px; top:${y}px; `).replace('<div class="glass lens2" style="', `<div class="glass lens2" style="left:${x + 80}px; top:${y + 230}px; `);
+const PW = 400, rows = [560, 1460, 2360];
+
+['A1', 'A2', 'A3'].forEach(id => add(id, glow(-300, 700, 1200, 900, '76,65,176', .14) + glow(1100, 1700, 1200, 900, '99,85,214', .12) + head));
+
+// A1 — phone + card group and text sit close together (120px gap); each row is centred, so left and right margins match
+rows.forEach((y, i) => { const left = i % 2 === 0, TW = 640, GAP = 120, CW = 400;
+  const over = left ? PW - 110 + CW : PW + 330;          // width of phone + overhanging card
+  const total = over + GAP + TW, x0 = (1920 - total) / 2;
+  const px = left ? x0 : x0 + TW + GAP + 330;
+  add('A1', phone(SCR[i], px, y, PW) + pair(i, left ? x0 + over + GAP : x0, y + 140, TW));
+  add('A1', at(CARD[i](CW), left ? px + PW - 110 : px - 330, y + (i === 1 ? 300 : i === 0 ? 290 : 560))); });
+
+// A2 — floating magnifier card with a pointer to the screen
+rows.forEach((y, i) => { const left = i % 2 === 0, px = left ? 200 : 1320;
+  add('A2', phone(SCR[i], px, y, PW) + pair(i, left ? 1180 : 102, y + 140, 640));
+  const cx = left ? 690 : 830, cy = y + 260, target = [[px + 200, y + 330], [px + 200, y + 500], [px + 130, y + 650]][i];
+  add('A2', at(CARD[i](400), cx, cy));
+  const lx = left ? target[0] : cx + 400, rx = left ? cx : target[0];
+  add('A2', `<div class="lead" style="left:${Math.min(lx, rx)}px; top:${target[1]}px; width:${Math.abs(rx - lx)}px; ${left ? 'transform:scaleX(-1)' : ''}"></div><div class="dotm" style="left:${target[0] - 5}px; top:${target[1] - 5}px"></div>`); });
+
+// A3 — card under the decision text
+rows.forEach((y, i) => { const left = i % 2 === 0, px = left ? 300 : 1220;
+  add('A3', phone(SCR[i], px, y, PW) + pair(i, left ? 940 : 102, y + 60, 720));
+  add('A3', at(CARD[i](460), left ? 940 : 102, y + (i === 1 ? 470 : 500))); });
+
+document.querySelectorAll('.frame').forEach(f => f.insertAdjacentHTML('beforeend', `<div class="note" style="left:102px; top:3410px">Screens 01 and 02 shown in Russian here; final case uses English re‑shoots. Card copy translated from the app.</div>`));
+</script>
+</body></html>

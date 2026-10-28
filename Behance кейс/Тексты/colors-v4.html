@@ -1,0 +1,110 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Colours — round 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 09 colour part, round 4. Three families: fading light (not in a row, new shapes), short lines, atmosphere. Real tokens. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .grp { color:#e4e2ee; font-size:20px; margin:70px 0 0; }
+  .opt { color:#9a9aa6; font-size:15px; margin:30px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:900px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-244px; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .tok { font-size:18px; color:#D9D5F2; }
+  .hex { font-size:15px; color:#6E7390; letter-spacing:.04em; }
+</style></head><body><div class="wrap">
+
+<div class="grp">Fading light</div>
+<div class="opt"><b>A1 · Aurora curtains.</b> Soft curtains of light with a wavy upper edge, different heights, overlapping like an aurora; each fades up into the night. Labels at their feet.</div>
+<div class="frame" id="A1"></div>
+<div class="opt"><b>A2 · A staircase from silence to signal.</b> Thin sharp light bars fading upwards, stepping up diagonally from the darkest at the bottom left to the brightest at the top right.</div>
+<div class="frame" id="A2"></div>
+
+<div class="grp">Short lines</div>
+<div class="opt"><b>B1 · Meteors.</b> Each colour a short diagonal streak with a fading tail, all flying in parallel at different heights, the label at the bright head.</div>
+<div class="frame" id="B1"></div>
+<div class="opt"><b>B2 · Orbit fragments.</b> Short glowing arcs nested around one invisible centre, each a piece of an orbit, from the deep inner one to the bright outer one. Labels at the end of each arc.</div>
+<div class="frame" id="B2"></div>
+
+<div class="grp">Atmosphere</div>
+<div class="opt"><b>C1 · Layers of atmosphere</b> (the one you liked, unchanged).</div>
+<div class="frame" id="C1"></div>
+<div class="opt"><b>C2 · A planet’s edge.</b> The same layers bent into the curve of a planet’s horizon seen from space: night above, the violet atmosphere in thin bands, the faint pink glow at the very edge. Labels on the right.</div>
+<div class="frame" id="C2"></div>
+<div class="opt"><b>C3 · A tall sky.</b> The atmosphere as one tall narrow column, the proportion of a phone screen, with hairline labels to the side. Leaves the rest of the block quiet for the type.</div>
+<div class="frame" id="C3"></div>
+
+</div>
+<script>
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="abs cap" style="left:102px; top:100px">Colour</div>`;
+const label = (x, y, n, c, w = 160, align = 'left') => `<div class="abs" style="left:${x}px; top:${y}px; width:${w}px; text-align:${align}"><div class="tok">${n}</div><div class="hex">${c}</div></div>`;
+const P = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑300', '#FBD3F1'], ['green‑400', '#6EE7B7']];
+const dark = c => c === '#050816' || c === '#0B0E1F';
+
+// A1 aurora curtains
+(() => { const base = 720; const cur = [['violet‑700', '#4C41B0', 140, 300, 470], ['violet‑600', '#6355D6', 330, 260, 400], ['violet‑400', '#8B7CF6', 520, 230, 520], ['violet‑300', '#A89CF8', 740, 220, 360], ['violet‑200', '#C9BBFA', 930, 200, 440], ['pink‑300', '#FBD3F1', 1120, 210, 300], ['green‑400', '#6EE7B7', 1290, 220, 380]];
+  let h = head, defs = '', svg = '';
+  cur.forEach(([t, c, x, w, ht], i) => { const top = base - ht; const wave = `M ${x} ${base} L ${x} ${top + 40} C ${x + w * .25} ${top - 20}, ${x + w * .5} ${top + 70}, ${x + w * .75} ${top + 10} S ${x + w} ${top + 30}, ${x + w} ${top + 50} L ${x + w} ${base} Z`;
+    defs += `<linearGradient id="a${i}" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${c}" stop-opacity=".9"/><stop offset=".55" stop-color="${c}" stop-opacity=".35"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient>`;
+    svg += `<path d="${wave}" fill="url(#a${i})" style="mix-blend-mode:screen"/>`;
+    h += label(x + w / 2 - 80, base + 26, t, c, 160, 'center'); });
+  h += `<svg class="abs" style="left:0; top:0" width="1920" height="900"><defs>${defs}</defs>${svg}<line x1="102" y1="${base}" x2="1818" y2="${base}" stroke="#C9BBFA" stroke-opacity=".2"/></svg>`;
+  h += `<div class="abs" style="left:1560px; top:${base - 200}px; width:260px">${P.slice(0, 2).map(([t, c]) => `<div style="margin-bottom:18px"><div class="tok">${t}</div><div class="hex">${c}</div></div>`).join('')}<div class="hex" style="max-width:240px; line-height:1.5">the night the lights rise from</div></div>`;
+  put('A1', h); })();
+
+// A2 staircase
+(() => { let h = head; const list = P; const n = list.length;
+  list.forEach(([t, c], i) => { const x = 140 + i * 186, bottom = 800 - i * 40, ht = 150 + i * 26, w = 22;
+    h += `<div class="abs" style="left:${x}px; top:${bottom - ht}px; width:${w}px; height:${ht}px; background:linear-gradient(0deg, ${c}, ${c}00); ${dark(c) ? 'box-shadow:inset 0 0 0 1px rgba(201,187,250,.18)' : `filter:drop-shadow(0 0 14px ${c}66)`}"></div>
+      <div class="abs" style="left:${x - 30}px; top:${bottom}px; width:${w + 60}px; height:1px; background:rgba(201,187,250,.2)"></div>` + label(x + w + 18, bottom - 46, t, c); });
+  put('A2', h); })();
+
+// B1 meteors
+(() => { let svg = '<svg class="abs" style="left:0; top:0; overflow:visible" width="1920" height="900"><defs>', body = '', h = head;
+  const pos = [[220, 720], [420, 610], [660, 760], [820, 520], [1060, 660], [1240, 430], [1420, 590], [1560, 360], [1700, 500]];
+  P.forEach(([t, c], i) => { const [x, y] = pos[i], L = 260, dx = L * Math.cos(Math.PI / 5), dy = L * Math.sin(Math.PI / 5);
+    svg += `<linearGradient id="m${i}" x1="${x - dx}" y1="${y + dy}" x2="${x}" y2="${y}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${dark(c) ? '#C9BBFA' : c}" stop-opacity="0"/><stop offset="1" stop-color="${dark(c) ? '#C9BBFA' : c}" stop-opacity="${dark(c) ? .35 : 1}"/></linearGradient>`;
+    body += `<line x1="${x - dx}" y1="${y + dy}" x2="${x}" y2="${y}" stroke="url(#m${i})" stroke-width="${dark(c) ? 1.5 : 3}" stroke-linecap="round" style="${dark(c) ? '' : `filter:drop-shadow(0 0 6px ${c})`}"/>`;
+    h += label(x + 14, y - 48, t, c); });
+  put('B1', h + svg + '</defs>' + body + '</svg>'); })();
+
+// B2 orbit fragments
+(() => { const cx = 700, cy = 940; let svg = '<svg class="abs" style="left:0; top:0; overflow:visible" width="1920" height="900">', h = head;
+  P.forEach(([t, c], i) => { const r = 200 + i * 74, a0 = -Math.PI * .80, a1 = -Math.PI * .22;
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0), x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    svg += `<path d="M ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1}" fill="none" stroke="${dark(c) ? 'rgba(201,187,250,.3)' : c}" stroke-width="${dark(c) ? 1.5 : 3}" stroke-linecap="round" style="${dark(c) ? '' : `filter:drop-shadow(0 0 7px ${c})`}"/>`;
+    h += label(x1 + 18, y1 - 22, t, c); });
+  put('B2', h + svg + '</svg>'); })();
+
+// C1 atmosphere (unchanged)
+const ATM = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA'], ['pink‑300', '#FBD3F1']];
+(() => { const top = 180, H = 620, step = H / ATM.length; const stops = ATM.map(([t, c], i) => `${c} ${(i + .5) / ATM.length * 100}%`).join(', ');
+  let h = head + `<div class="abs" style="left:102px; top:${top}px; width:1716px; height:${H}px; border-radius:28px; background:linear-gradient(180deg, ${stops}); box-shadow:inset 0 0 0 1px rgba(201,187,250,.12)"></div>`;
+  ATM.forEach(([t, c], i) => { const y = top + (i + .5) * step, d = i < 4;
+    h += `<div class="abs" style="left:1500px; top:${y}px; width:240px; height:1px; background:${d ? 'rgba(201,187,250,.35)' : 'rgba(5,8,22,.35)'}"></div><div class="abs" style="left:1500px; top:${y - 44}px"><span style="font-size:17px; color:${d ? '#D9D5F2' : '#0B0E22'}">${t}</span> <span style="font-size:15px; color:${d ? '#8A8DAA' : 'rgba(11,14,34,.6)'}">${c}</span></div>`; });
+  h += `<div class="abs" style="left:140px; top:${top + H - 60}px; font-size:15px; letter-spacing:.14em; text-transform:uppercase; color:rgba(11,14,34,.55)">green‑400 #6EE7B7 · physical signal, used only in the biorhythm chart</div>`;
+  put('C1', h); })();
+
+// C2 planet edge
+(() => { const R = 750, cx = 600, cy = 560 + R; let h = head;
+  const bands = ATM.slice(2).reverse(); // pink edge outermost? we want: planet dark, thin glowing rim then fading out
+  const ring = [['pink‑300', '#FBD3F1', 0], ['violet‑200', '#C9BBFA', 30], ['violet‑300', '#A89CF8', 75], ['violet‑400', '#8B7CF6', 135], ['violet‑600', '#6355D6', 210], ['violet‑700', '#4C41B0', 300]];
+  const stops = ring.map(([t, c, d]) => `${c} ${R + d}px`).join(', ');
+  h += `<div class="abs" style="left:${cx - R - 300}px; top:${cy - R - 300}px; width:${2 * R + 600}px; height:${2 * R + 600}px; border-radius:50%; background:radial-gradient(circle at center, #050816 ${R - 2}px, ${stops}, #050816 ${R + 330}px)"></div>`;
+  h += `<div class="abs" style="left:${cx - R}px; top:${cy - R}px; width:${2 * R}px; height:${2 * R}px; border-radius:50%; background:#0B0E1F"></div>`;
+  let svgc = '<svg class="abs" style="left:0; top:0" width="1920" height="900">'; ring.forEach(([t, c, d], i) => { const by = cy - Math.sqrt(R * R - (1180 - cx) ** 2) - d - 2, ly = 330 + (5 - i) * 62; svgc += `<path d="M 1180 ${by} L 1560 ${ly + 12} L 1590 ${ly + 12}" fill="none" stroke="#C9BBFA" stroke-opacity=".4"/><circle cx="1180" cy="${by}" r="3" fill="#F2F0FA"/>`; h += label(1604, ly - 10, t, c); }); h += svgc + '</svg>';
+  h += label(1604, 780, 'card', '#0B0E1F') + label(1604, 200, 'bg‑0', '#050816');
+  put('C2', h); })();
+
+// C3 tall sky column
+(() => { const x = 1300, top = 140, W = 300, H = 640, step = H / ATM.length; const stops = ATM.map(([t, c], i) => `${c} ${(i + .5) / ATM.length * 100}%`).join(', ');
+  let h = head + `<div class="abs" style="left:${x}px; top:${top}px; width:${W}px; height:${H}px; border-radius:40px; background:linear-gradient(180deg, ${stops}); box-shadow:inset 0 0 0 1px rgba(201,187,250,.14)"></div>`;
+  ATM.forEach(([t, c], i) => { const y = top + (i + .5) * step; h += `<div class="abs" style="left:${x + W + 10}px; top:${y}px; width:60px; height:1px; background:rgba(201,187,250,.35)"></div>` + label(x + W + 84, y - 22, t, c); });
+  h += `<div class="abs" style="left:102px; top:300px; width:900px; font-size:28px; line-height:1.5; font-weight:300; color:#6E7390">(type part of the block sits here)</div>`;
+  put('C3', h); })();
+</script>
+</body></html>

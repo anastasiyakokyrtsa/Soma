@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Colours and type — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,500;6..12,600&family=Onest:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Block 09 "Colours & typography". Real tokens only: UI Kit/css/style.css :root and app/theme (colors.ts, typography.ts).
+     Onest = screen/section headlines; Nunito Sans = everything else. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .eyebrow { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .hex { font-size:15px; color:#8A8DAA; letter-spacing:.04em; }
+  .tok { font-size:17px; color:#E4E1F2; }
+  .grad { background:linear-gradient(90deg,#FFC6F1 25%,#A89CF8 70%,#8B7CF6 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .onest { font-family:'Onest',sans-serif; }
+  .glass { border-radius:28px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 30px 60px rgba(0,0,0,.45); }
+  .abs { position:absolute; }
+  .phone { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · Planets on a horizon.</b> Each colour is a small glowing sphere sitting on one thin horizon line, sized by how much the app uses it: the deep background is the biggest, the accents are tiny bright points. Type specimen below: Onest and Nunito Sans side by side.</div>
+<div class="frame" id="A" style="height:1650px; margin-bottom:-447px"></div>
+
+<div class="opt"><b>B · From silence to signal.</b> One continuous strip from the night background through the violet scale to the bright pink and green signals, cut into slim token columns. Under it, the type scale as a clean ladder of real styles.</div>
+<div class="frame" id="B" style="height:1650px; margin-bottom:-447px"></div>
+
+<div class="opt"><b>C · Taken apart.</b> The real Home screen in the middle; thin leader lines point to the colours and the type styles it is made of. The system shown where it lives, not as a chart.</div>
+<div class="frame" id="C" style="height:1650px; margin-bottom:-447px"></div>
+
+<div class="opt"><b>D · Type first.</b> A huge “Aa” in Onest with the heading gradient and a calm Nunito Sans paragraph; the editorial side of the system. Colours as one quiet row of dots at the bottom.</div>
+<div class="frame" id="D" style="height:1500px; margin-bottom:-406px"></div>
+
+<div class="opt"><b>E · Colours that mean something.</b> The three biorhythm curves drawn with their real glow colours, each labelled: physical green, emotional pink, intellectual violet. Next to them the base palette and the text levels. Tells why the accents exist.</div>
+<div class="frame" id="E" style="height:1600px; margin-bottom:-433px"></div>
+
+<div class="opt"><b>F · Concentric orbits.</b> The palette as rings around one point, from the darkest outside to the brightest signal at the centre, like looking into the app’s inner cosmos. Type on the left.</div>
+<div class="frame" id="F" style="height:1650px; margin-bottom:-447px"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const TH = '../Мокапы/thin/';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h = 'Deep space for calm,<br><em>soft light for signals</em>') => `<div class="label">09 / Colours & typography</div><h2 class="h1">${h}</h2>`;
+const BASE = [['bg‑0', '#050816'], ['card', '#0B0E1F'], ['violet‑700', '#4C41B0'], ['violet‑600', '#6355D6'], ['violet‑500', '#7B6FF0'], ['violet‑400', '#8B7CF6'], ['violet‑300', '#A89CF8'], ['violet‑200', '#C9BBFA']];
+const SIG = [['pink‑300', '#FBD3F1'], ['pink‑400', '#F3A6E0'], ['pink‑500', '#E285D1'], ['green‑300', '#B7F5D8'], ['green‑400', '#6EE7B7'], ['green‑500', '#4ADE9A'], ['red‑400', '#F0847F']];
+const TEXT = [['text‑primary', '#FFFFFF'], ['text‑secondary', '#A6ABC6'], ['text‑tertiary', '#6E7390'], ['text‑disabled', '#454A63']];
+const SCALE = [
+  ['Display', 'Nunito Sans Light · 48', 'font-weight:300; font-size:48px', 'Listen to your rhythm'],
+  ['H1', 'Nunito Sans · 32', 'font-weight:400; font-size:32px', 'Biorhythms today'],
+  ['H2', 'Onest Bold · 26', "font-family:'Onest'; font-weight:700; font-size:26px", 'Good morning, Anastasia'],
+  ['H3', 'Onest SemiBold · 22', "font-family:'Onest'; font-weight:600; font-size:22px", 'Moon activity'],
+  ['Body L', 'Nunito Sans Medium · 18', 'font-weight:500; font-size:18px', 'Allow yourself a gentle recovery'],
+  ['Body M', 'Nunito Sans · 14', 'font-weight:400; font-size:14px', 'Your emotional and intellectual biorhythms are both low today'],
+  ['Caption', 'Nunito Sans SemiBold · 12 · caps', 'font-weight:600; font-size:12px; letter-spacing:.08em; text-transform:uppercase', 'Low resource'],
+];
+const ladder = (x, y, w, gap = 70) => SCALE.map(([n, spec, css, sample], i) => `<div class="abs" style="left:${x}px; top:${y + i * gap}px; width:${w}px; display:flex; align-items:baseline; gap:30px; border-bottom:1px solid rgba(201,187,250,.08); padding-bottom:14px">
+   <span class="eyebrow" style="width:110px; flex:none">${n}</span><span style="flex:1; color:#F2F0FA; ${css}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${sample}</span><span class="hex" style="flex:none">${spec}</span></div>`).join('');
+const pair = (x, y) => `<div class="abs" style="left:${x}px; top:${y}px; display:flex; gap:120px">
+   <div><div class="eyebrow">Headlines</div><div class="onest grad" style="font-weight:700; font-size:150px; line-height:1.05; margin-top:14px">Aa</div><div class="tok" style="margin-top:10px; font-size:22px">Onest</div><div class="hex">SemiBold 600 · Bold 700</div></div>
+   <div><div class="eyebrow">Everything else</div><div style="font-weight:300; font-size:150px; line-height:1.05; margin-top:14px; color:#E4E1F2">Aa</div><div class="tok" style="margin-top:10px; font-size:22px">Nunito Sans</div><div class="hex">Light 300 · Regular 400 · Medium 500 · SemiBold 600</div></div></div>`;
+
+// A · planets on a horizon
+(() => { const all = [['bg‑0', '#050816', 170], ['violet‑700', '#4C41B0', 110], ['violet‑600', '#6355D6', 96], ['violet‑400', '#8B7CF6', 86], ['violet‑300', '#A89CF8', 70], ['violet‑200', '#C9BBFA', 54], ['pink‑400', '#F3A6E0', 40], ['green‑400', '#6EE7B7', 32], ['red‑400', '#F0847F', 22]];
+  const base = 860; let x = 160, h = head() + `<div class="abs" style="left:0; right:0; top:${base}px; height:1px; background:linear-gradient(90deg, rgba(201,187,250,0), rgba(201,187,250,.35) 15%, rgba(201,187,250,.35) 85%, rgba(201,187,250,0))"></div>`;
+  for (const [n, c, d] of all) { const glow = c === '#050816' ? 'box-shadow:inset 0 0 0 1px rgba(201,187,250,.35), 0 0 60px rgba(99,85,214,.25)' : `box-shadow:0 0 ${d * .6}px ${c}66, inset -${d * .12}px -${d * .12}px ${d * .3}px rgba(0,0,0,.35)`;
+    h += `<div class="abs" style="left:${x}px; top:${base - d}px; width:${d}px; height:${d}px; border-radius:50%; background:radial-gradient(circle at 35% 30%, ${c}, ${c} 55%, ${c}cc); ${glow}"></div>
+      <div class="abs" style="left:${x}px; top:${base + 28}px; width:${Math.max(d, 120)}px"><div class="tok">${n}</div><div class="hex">${c}</div></div>`; x += d + 90; }
+  put('A', h + pair(102, 1080) + `<div class="abs" style="left:1120px; top:1110px; width:700px">${TEXT.map(([n, c]) => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(201,187,250,.08); padding:16px 0"><span style="color:${c}; font-size:22px">${n}</span><span class="hex">${c}</span></div>`).join('')}</div>`); })();
+
+// B · silence to signal strip
+(() => { const cols = BASE.concat(SIG.slice(0, 6)); const w = 1716 / cols.length;
+  let h = head() + cols.map(([n, c], i) => `<div class="abs" style="left:${102 + i * w}px; top:560px; width:${w}px; height:300px; background:${c}; ${i === 0 ? 'box-shadow:inset 0 0 0 1px rgba(201,187,250,.18)' : ''}; ${i === 0 ? 'border-radius:28px 0 0 28px' : i === cols.length - 1 ? 'border-radius:0 28px 28px 0' : ''}"></div>
+     <div class="abs" style="left:${102 + i * w + 4}px; top:880px; width:${w - 8}px"><div class="tok" style="font-size:15px">${n}</div><div class="hex" style="font-size:13px">${c}</div></div>`).join('');
+  h += `<div class="abs eyebrow" style="left:102px; top:520px">Silence</div><div class="abs eyebrow" style="right:102px; top:520px">Signal</div>`;
+  put('B', h + ladder(102, 1010, 1716, 84)); })();
+
+// C · taken apart
+(() => { const px = 760, pw = 400, ph = pw * 850 / 405, py = 520;
+  const notes = [
+    ['L', 600, 'Heading gradient', '#FFC6F1 → #A89CF8 → #8B7CF6', 890, 631],
+    ['L', 760, 'H2 · Onest Bold 26', 'Screen titles and greetings', 832, 662],
+    ['L', 920, 'H3 · Onest SemiBold 22', 'Section titles', 845, 746],
+    ['L', 1180, 'Body M · Nunito Sans 14', 'Readings and explanations', 865, 1201],
+    ['R', 640, 'bg‑0 · #050816', 'Night background', 1015, 690],
+    ['R', 800, 'green‑400 · #6EE7B7', 'Physical rhythm', 973, 816],
+    ['R', 960, 'pink‑300 · #FBD3F1', 'Emotional rhythm', 1060, 900],
+    ['R', 1120, 'violet‑300 · #A89CF8', 'Intellectual rhythm, accents', 998, 978],
+    ['R', 1280, 'Chart glow', '0 0 6px #7DE8C4 · #FFD8F6 · #B6ABFF', 840, 1072],
+  ];
+  let svg = '<svg class="abs" style="left:0; top:0" width="1920" height="1650">';
+  let h = head();
+  for (const [side, y, t, s, tx, ty] of notes) { const x = side === 'L' ? 470 : 1450; svg += `<path d="M ${side === 'L' ? x + 20 : x - 20} ${y + 14} L ${tx} ${ty}" stroke="#C9BBFA" stroke-opacity=".35" fill="none"/><circle cx="${tx}" cy="${ty}" r="4" fill="#F2F0FA"/>`;
+    h += `<div class="abs" style="${side === 'L' ? `left:${x - 360}px; text-align:right` : `left:${x}px`}; top:${y}px; width:360px"><div class="tok">${t}</div><div class="hex">${s}</div></div>`; }
+  put('C', h + `<img class="phone" src="${TH}phone-home.png" style="left:${px}px; top:${py}px; width:${pw}px">` + svg + '</svg>'); })();
+
+// D · type first
+put('D', head('Two voices:<br><em>clear and calm</em>') + `<div class="abs onest grad" style="left:90px; top:520px; font-weight:700; font-size:460px; line-height:1">Aa</div>
+  <div class="abs" style="left:900px; top:600px; width:900px"><div class="eyebrow">Onest · headlines</div><div class="onest" style="font-weight:700; font-size:64px; color:#F2F0FA; margin-top:12px">Good morning, Anastasia</div>
+  <div class="eyebrow" style="margin-top:60px">Nunito Sans · everything else</div><div style="font-weight:400; font-size:28px; line-height:1.5; color:#A6ABC6; margin-top:12px">${nb('Your emotional and intellectual biorhythms are both low today, while your physical one is at its peak. It doesn’t mean the day will be hard.')}</div></div>
+  <div class="abs" style="left:102px; top:1240px; display:flex; gap:22px; align-items:center">${BASE.concat(SIG).map(([n, c]) => `<div title="${n}" style="width:44px; height:44px; border-radius:50%; background:${c}; box-shadow:${c === '#050816' || c === '#0B0E1F' ? 'inset 0 0 0 1px rgba(201,187,250,.3)' : `0 0 18px ${c}55`}"></div>`).join('')}<span class="hex" style="margin-left:20px">bg · violet 700–200 · pink · green · red</span></div>`);
+
+// E · colours that mean something
+(() => { const W = 980, H = 360, x0 = 102, y0 = 600; const curve = (ph, amp) => { let d = ''; for (let i = 0; i <= 100; i++) { const x = x0 + i / 100 * W, y = y0 + H / 2 - Math.sin(i / 100 * Math.PI * 2 + ph) * amp; d += (i ? ' L ' : 'M ') + x.toFixed(1) + ' ' + y.toFixed(1); } return d; };
+  const C3 = [['Physical', 'green‑400', '#6EE7B7', '#7DE8C4', 0.3], ['Emotional', 'pink‑300', '#FBD3F1', '#FFD8F6', 2.2], ['Intellectual', 'violet‑300', '#A89CF8', '#B6ABFF', 4.1]];
+  let svg = `<svg class="abs" style="left:0; top:0; overflow:visible" width="1920" height="1600"><line x1="${x0}" y1="${y0 + H / 2}" x2="${x0 + W}" y2="${y0 + H / 2}" stroke="#C9BBFA" stroke-opacity=".15"/>`;
+  C3.forEach(([n, t, c, g, ph]) => { svg += `<path d="${curve(ph, 150)}" fill="none" stroke="${c}" stroke-width="3" style="filter:drop-shadow(0 0 6px ${g})"/>`; });
+  svg += '</svg>';
+  let h = head() + svg + C3.map(([n, t, c, g], i) => `<div class="abs" style="left:${x0 + i * 330}px; top:1040px"><div style="display:flex; align-items:center; gap:12px"><span style="width:14px; height:14px; border-radius:50%; background:${c}; box-shadow:0 0 10px ${g}"></span><span class="tok" style="font-size:22px">${n}</span></div><div class="hex" style="margin-top:6px">${t} · ${c} · glow ${g}</div></div>`).join('');
+  h += `<div class="abs" style="left:1258px; top:600px; width:560px"><div class="eyebrow">Base</div>${BASE.map(([n, c]) => `<div style="display:flex; align-items:center; gap:16px; padding:10px 0; border-bottom:1px solid rgba(201,187,250,.08)"><span style="width:34px; height:34px; border-radius:10px; background:${c}; box-shadow:inset 0 0 0 1px rgba(201,187,250,.18)"></span><span class="tok" style="flex:1">${n}</span><span class="hex">${c}</span></div>`).join('')}
+    <div class="eyebrow" style="margin-top:34px">Text</div>${TEXT.map(([n, c]) => `<div style="display:flex; justify-content:space-between; padding:9px 0"><span style="color:${c}; font-size:19px">${n}</span><span class="hex">${c}</span></div>`).join('')}</div>`;
+  put('E', h); })();
+
+// F · concentric orbits
+(() => { const cx = 1250, cy = 1060; const rings = [['bg‑0', '#050816', 400], ['violet‑700', '#4C41B0', 345], ['violet‑600', '#6355D6', 292], ['violet‑500', '#7B6FF0', 242], ['violet‑400', '#8B7CF6', 196], ['violet‑300', '#A89CF8', 153], ['violet‑200', '#C9BBFA', 114], ['pink‑300', '#FBD3F1', 78], ['text‑primary', '#FFFFFF', 42]];
+  let h = head(); rings.forEach(([n, c, r], i) => { h += `<div class="abs" style="left:${cx - r}px; top:${cy - r}px; width:${2 * r}px; height:${2 * r}px; border-radius:50%; background:${c}; ${i === 0 ? 'box-shadow:inset 0 0 0 1px rgba(201,187,250,.25), 0 0 120px rgba(99,85,214,.18)' : ''}"></div>`; });
+  h += `<div class="abs" style="left:1690px; top:${cy - 9 * 52 / 2}px; width:180px">${rings.map(([n, c]) => `<div style="height:52px; display:flex; flex-direction:column; justify-content:center; border-bottom:1px solid rgba(201,187,250,.08)"><span class="tok" style="font-size:15px">${n}</span><span class="hex" style="font-size:13px">${c}</span></div>`).join('')}</div>`;
+  put('F', h + pair(102, 600) + ladder(102, 1020, 680, 64)); })();
+</script>
+</body></html>

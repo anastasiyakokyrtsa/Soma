@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Onboarding — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block 11 "Onboarding", in the spirit of her Aura reference: phones scattered at different heights, short text blocks floating
+     between them, one UI piece detached on glass. Real English screens shot from the app (Мокапы/thin/ph-ob-*.png). -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .abs { position:absolute; }
+  .ph { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .note { position:absolute; font-weight:300; font-size:24px; line-height:1.5; color:#8A8DAA; }
+  .note b { display:block; font-weight:400; color:#E4E1F2; font-size:26px; margin-bottom:8px; }
+  .num { font-size:14px; letter-spacing:.14em; color:#6E7390; margin-bottom:10px; }
+  .glass { position:absolute; border-radius:30px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 40px 80px rgba(0,0,0,.45); }
+  .glass img { display:block; width:100%; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>O1 · Aura-like, scattered.</b> Six phones at different heights in two loose rows, short notes floating between them, the mood picker detached on a glass card.</div>
+<div class="frame" id="O1" style="height:2420px; margin-bottom:-655px"></div>
+
+<div class="opt"><b>O2 · A gentle wave.</b> All six phones in one row that rises and falls like a breath; a short note under each, numbered 01–06.</div>
+<div class="frame" id="O2" style="height:1600px; margin-bottom:-433px"></div>
+
+<div class="opt"><b>O3 · One hero.</b> The mood step large and close in the centre; the other five smaller around it, notes beside them, the mood picker floating out of the hero screen.</div>
+<div class="frame" id="O3" style="height:2100px; margin-bottom:-569px"></div>
+
+<div class="opt"><b>O4 · Text left, phones right.</b> A calm text column on the left; on the right a staggered 3 × 2 grid of phones, each column shifted down, like Aura.</div>
+<div class="frame" id="O4" style="height:2200px; margin-bottom:-596px"></div>
+
+<div class="opt"><b>O5 · A staircase.</b> The six phones step down from left to right, the way the onboarding flows, each with a step number and one line under it.</div>
+<div class="frame" id="O5" style="height:2100px; margin-bottom:-569px"></div>
+
+</div>
+<script>
+const TH = '../Мокапы/thin/', PT = '../Мокапы/parts/';
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = `<div class="label">11 / Onboarding</div><h2 class="h1">A first meeting<br><em>that asks very little</em></h2>`;
+const LEAD = 'Soma asks only what it needs for a first reading, one question per screen. Every profile step can be skipped and filled in later.';
+const S = {
+  about: ['ph-ob-about.png', 'Tone first', 'Three short slides say what Soma is before it asks anything.'],
+  support: ['ph-ob-support.png', 'Start with what feels heaviest', 'Two or three choices are enough to shape the first tips.'],
+  sleep: ['ph-ob-sleep.png', 'One drag, no keyboard', 'Sleep is set on a dial instead of typed in.'],
+  mood: ['ph-ob-mood.png', 'Easier to feel than to name', 'Five shapes, from a sharp burst to a soft bloom.'],
+  style: ['ph-ob-style.png', 'Your own sky', 'Four looks, each previewed before you apply it.'],
+  setup: ['ph-ob-setup.png', 'A short pause', 'Setting up feels like a small ritual, not a wait.'],
+};
+const ORDER = ['about', 'support', 'sleep', 'mood', 'style', 'setup'];
+const phone = (k, x, y, w) => `<img class="ph" src="${TH}${S[k][0]}" style="left:${x}px; top:${y}px; width:${w}px">`;
+const note = (k, x, y, w = 360, n) => `<div class="note" style="left:${x}px; top:${y}px; width:${w}px">${n ? `<div class="num">${n}</div>` : ''}<b>${nb(S[k][1])}</b>${nb(S[k][2])}</div>`;
+const lead = (x, y, w = 560) => `<div class="note" style="left:${x}px; top:${y}px; width:${w}px; font-size:26px">${nb(LEAD)}</div>`;
+const moodCard = (x, y, w) => `<div class="glass" style="left:${x}px; top:${y}px; width:${w}px; padding:${w * .05}px ${w * .03}px ${w * .02}px"><img src="${PT}mood-onboarding.png"></div>`;
+const PW = 340, PH = PW * 850 / 405;
+
+// O1 · scattered
+put('O1', head + lead(1258, 262) +
+  phone('about', 102, 600, PW) + note('about', 102, 1350) + note('support', 520, 640, 340) + phone('support', 900, 560, PW) +
+  phone('sleep', 1478, 680, PW) + note('sleep', 1478, 1430, 340) +
+  phone('mood', 520, 1200, PW) + note('mood', 900, 1310, 380) + moodCard(900, 1450, 420) +
+  phone('setup', 102, 1540, PW) + note('setup', 480, 2000, 340) + phone('style', 1478, 1600, PW) + note('style', 900, 1960, 360));
+
+// O2 · wave
+(() => { const w = 260, gap = (1716 - 6 * w) / 5; let h = head + lead(1258, 262);
+  ORDER.forEach((k, i) => { const x = 102 + i * (w + gap), y = 600 + Math.sin(i / 5 * Math.PI) * -80 + (i % 2) * 60;
+    h += phone(k, x, y, w) + note(k, x, y + w * 850 / 405 + 40, w, '0' + (i + 1)); });
+  put('O2', h); })();
+
+// O3 · hero
+put('O3', head + lead(1258, 262) +
+  phone('about', 102, 620, 260) + note('about', 102, 1200, 290) + phone('support', 420, 740, 260) + note('support', 420, 1320, 300) +
+  phone('mood', 770, 560, 420) + moodCard(1130, 900, 440) + note('mood', 770, 1490, 380) + note('sleep', 1250, 640, 330) +
+  phone('sleep', 1620, 560, 240) + phone('style', 1620, 1300, 240) + note('style', 1250, 1440, 330) +
+  phone('setup', 420, 1530, 240) + note('setup', 102, 1560, 290));
+
+// O4 · text left, staggered grid right
+(() => { let h = head; const w = 300, gx = 760, cols = [0, 1, 2], gap = 60;
+  h += lead(102, 560, 520) + ORDER.map((k, i) => `<div class="note" style="left:102px; top:${820 + i * 150}px; width:520px"><div class="num">0${i + 1}</div><b style="font-size:24px">${nb(S[k][1])}</b>${nb(S[k][2])}</div>`).join('');
+  ORDER.forEach((k, i) => { const c = i % 3, r = Math.floor(i / 3); h += phone(k, gx + c * (w + gap), 560 + c * 140 + r * (w * 850 / 405 + 60), w); });
+  put('O4', h); })();
+
+// O5 · a staircase path
+(() => { let h = head + lead(1258, 262); const w = 260, step = (1716 - w) / 5;
+  ORDER.forEach((k, i) => { const x = 102 + i * step, y = 560 + i * 130; h += phone(k, x, y, w) + note(k, x, y + w * 850 / 405 + 36, w, '0' + (i + 1)); });
+  put('O5', h); })();
+</script>
+</body></html>

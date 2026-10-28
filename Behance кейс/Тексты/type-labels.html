@@ -1,0 +1,49 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Type labels — consistent</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&family=Onest:wght@700&display=swap" rel="stylesheet">
+<!-- Block 09 type part with one rule for every weight label: anchor dot 16px off the letter's ink (above the top or below the baseline),
+     hairline at 45°, always the same length, directions as in Figma, star + label at its end. Anchors measured from the real glyphs (canvas measureText). -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:30px 0 10px; line-height:1.55; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:960px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-260px; }
+  .word { position:absolute; left:102px; font-size:260px; line-height:1; color:#F2F0FA; letter-spacing:-.01em; white-space:nowrap; }
+  .bl { display:inline-block; width:0; height:0; vertical-align:baseline; }
+  .lab { position:absolute; font-size:22px; color:#C9C6DC; white-space:nowrap; }
+  .star { position:absolute; width:12px; height:12px; border-radius:50%; background:#F2F0FA; box-shadow:0 0 14px #C9BBFA; }
+</style></head><body><div class="wrap">
+<div class="opt"><b>One rule for every label.</b> Each hairline is the same length and the same 45° angle; each anchor sits exactly 16px off the letter (above its top or below its baseline). Two labels above each name where possible, the rest below.</div>
+<div class="frame" id="F">
+  <div class="word" id="w1" style="top:140px; font-family:'Onest'; font-weight:700">Onest<span class="bl"></span></div>
+  <div class="word" id="w2" style="top:520px; font-weight:300">Nunito Sans<span class="bl"></span></div>
+  <svg id="svg" style="position:absolute; left:0; top:0" width="1920" height="960"></svg>
+</div>
+</div>
+<script>
+const GAP = 16, LEN = 70; // anchor distance from ink, hairline length (each axis = LEN / √2)
+// [word id, char index, label, side, horizontal direction] — directions as in the Figma block (her call)
+const LABELS = [['w1', 0, 'SemiBold', 'up', -1], ['w1', 4, 'Bold', 'up', 1],
+                ['w2', 4, 'Regular', 'up', 1], ['w2', 7, 'Medium', 'up', 1], ['w2', 0, 'Light', 'down', -1], ['w2', 10, 'SemiBold', 'down', 1]];
+document.fonts.ready.then(() => {
+  const F = document.getElementById('F'), fr = F.getBoundingClientRect(), k = fr.width / 1920, svg = document.getElementById('svg');
+  const cv = document.createElement('canvas').getContext('2d'); const out = [];
+  for (const [id, idx, text, side, dir] of LABELS) {
+    const w = document.getElementById(id), cs = getComputedStyle(w); const node = w.firstChild;
+    const rg = document.createRange(); rg.setStart(node, idx); rg.setEnd(node, idx + 1); const r = rg.getBoundingClientRect();
+    const base = (w.querySelector('.bl').getBoundingClientRect().top - fr.top) / k;
+    cv.font = `${cs.fontWeight} 260px ${cs.fontFamily}`; const m = cv.measureText(node.data[idx]);
+    const ax = ((r.left + r.right) / 2 - fr.left) / k;
+    const ay = side === 'up' ? base - m.actualBoundingBoxAscent - GAP : base + m.actualBoundingBoxDescent + GAP;
+    const d = LEN / Math.SQRT2, sx = ax + dir * d, sy = side === 'up' ? ay - d : ay + d;
+    svg.insertAdjacentHTML('beforeend', `<line x1="${ax}" y1="${ay}" x2="${sx}" y2="${sy}" stroke="#C9BBFA" stroke-opacity=".35"/><circle cx="${ax}" cy="${ay}" r="3" fill="#F2F0FA"/>`);
+    F.insertAdjacentHTML('beforeend', `<div class="star" style="left:${sx - 6}px; top:${sy - 6}px"></div><div class="lab" style="left:${sx + 16}px; top:${sy - 15}px">${text}</div>`);
+    out.push({ id, text, ax: Math.round(ax), ay: Math.round(ay), sx: Math.round(sx), sy: Math.round(sy), base: Math.round(base) });
+  }
+  document.title = JSON.stringify(out);
+});
+</script>
+</body></html>

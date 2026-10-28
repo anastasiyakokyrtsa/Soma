@@ -1,0 +1,120 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Soma case — glance as a constellation</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- "Project at a glance" with the four facts as a constellation and the process as one straight horizontal line.
+     Five constellation shapes. 1920-wide frames at Behance's ~73%. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 90px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:40px 0 12px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1320px; background:#050816; position:relative; overflow:hidden; transform:scale(.7292); transform-origin:top left; margin-bottom:-357px; }
+  .glow { position:absolute; border-radius:50%; filter:blur(150px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:120px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .t { position:absolute; }
+  .num { font-weight:200; color:#E4E1F2; line-height:.9; letter-spacing:-.02em; }
+  .airy { font-weight:200; letter-spacing:.5em; text-transform:uppercase; }
+  .sub { font-size:16px; color:#4F5373; letter-spacing:.04em; margin-top:6px; }
+  .items { font-size:24px; line-height:1.75; color:#6E7390; font-weight:300; }
+  svg { position:absolute; left:0; top:0; }
+</style></head><body><div class="wrap">
+<div class="opt"><b>1 · Step badges.</b> The numbered circles from Personalization (filled violet, dark number inside), sitting on the line. Stars glow, stages are solid: two clearly different objects, both from the app.</div>
+<div class="frame" id="q1"><div class="label">02 / Project at a glance</div></div>
+
+<div class="opt"><b>2 · Icon rings.</b> The thin ring with a gradient icon inside, exactly like the Analytics cards: an idea for Discover, a network for Design, a pulse for Build.</div>
+<div class="frame" id="q2"><div class="label">02 / Project at a glance</div></div>
+
+<div class="opt"><b>3 · Step progress bar.</b> The line becomes the app’s onboarding progress bar: three rounded segments, filled violet with the soft glow of the breathing progress.</div>
+<div class="frame" id="q3"><div class="label">02 / Project at a glance</div></div>
+
+<div class="opt"><b>4 · Progress dots.</b> The onboarding pagination: a row of small dots along the line, with the elongated “active” pill marking each stage.</div>
+<div class="frame" id="q4"><div class="label">02 / Project at a glance</div></div>
+
+<div class="opt"><b>5 · Progress rings.</b> The sweeping ring from Personalization steps: one third, two thirds, then a full ring with a check for Build. Shows the process moving to completion.</div>
+<div class="frame" id="q5"><div class="label">02 / Project at a glance</div></div>
+
+</div>
+<script>
+const NUMS = [['~200', 'hours', ''], ['40', 'screens', ''], ['3', 'ways in', 'science · astrology · synthesis'], ['1', 'app built in code', 'React Native · iOS & Android']];
+const STEPS = [['Discover', 'Personas\nJob stories\nCustomer journey map'], ['Design', 'Wireframes\nMoodboard & visual language\nUI kit'], ['Build', 'App in code\nScenario audit\nIterations']];
+const L = 102, W = 1728, PY = 1060;
+const defs = `<defs><radialGradient id="h"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".85"/><stop offset="1" stop-color="#8B7CF6" stop-opacity="0"/></radialGradient>
+  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1920" y2="0"><stop offset="0" stop-color="#FFC6F1"/><stop offset=".55" stop-color="#A89CF8"/><stop offset="1" stop-color="#8B7CF6"/></linearGradient></defs>`;
+const star = (x, y, r = 5, g = 22, op = 1) => `<circle cx="${x}" cy="${y}" r="${g}" fill="url(#h)" opacity="${op}"/><circle cx="${x}" cy="${y}" r="${r}" fill="#EDE8FF" opacity="${op}"/>`;
+const add = (f, html) => f.insertAdjacentHTML('beforeend', html);
+let seed = 7; const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+function fact(f, [x, y], i, side = 'right', dy = -48) {
+  const [n, u, s] = NUMS[i], right = side === 'right';
+  add(f, `<div class="t" style="left:${right ? x + 34 : x - 34}px; top:${y + dy}px; transform:translateX(${right ? 0 : '-100%'}); text-align:${right ? 'left' : 'right'}; white-space:nowrap">
+    <div class="num" style="font-size:104px">${n}</div><div class="airy" style="font-size:15px; color:#C9BBFA; margin-top:16px; ${right ? '' : 'margin-right:-.5em'}">${u}</div>${s ? `<div class="sub">${s}</div>` : ''}</div>`);
+}
+function process(f) {
+  const xs = [0, 1, 2].map(i => L + 6 + i * W / 3);
+  add(f, `<svg width="1920" height="1500">${defs}<line x1="${L}" y1="${PY}" x2="${L + W}" y2="${PY}" stroke="url(#g)" stroke-opacity=".4" stroke-width="1.2"/>${xs.map(x => star(x, PY, 4, 14)).join('')}</svg>`);
+  STEPS.forEach(([t, it], i) => add(f, `<div class="t" style="left:${xs[i] - 6}px; top:${PY - 74}px; font-size:34px; color:#E4E1F2; font-weight:300">${t}</div>
+    <div class="t items" style="left:${xs[i] - 6}px; top:${PY + 40}px">${it.split('\n').join('<br>')}</div>`));
+}
+function lines(pts) { let s = ''; for (let i = 1; i < pts.length; i++) s += `<line x1="${pts[i - 1][0]}" y1="${pts[i - 1][1]}" x2="${pts[i][0]}" y2="${pts[i][1]}" stroke="#C9BBFA" stroke-opacity=".24"/>`; return s; }
+
+// real Cassiopeia (gnomonic projection, degrees), mirrored to how it looks in the sky: ε δ γ α β, left → right
+const CAS = [['eps', -6.02, 3.82], ['delta', -3.20, -0.10], ['gamma', 0.40, 0.22], ['alpha', 2.69, -3.87], ['beta', 6.50, -0.73]];
+function cassiopeia(f, rotDeg, tilt, cy) {
+  const a = rotDeg * Math.PI / 180, S = 118;
+  const pts = CAS.map(([k, x, y]) => {
+    let X = x * Math.cos(a) - y * Math.sin(a), Y = x * Math.sin(a) + y * Math.cos(a);
+    const depth = Y; // higher on the sky = further away
+    return { k, x: 960 + X * S, y: cy - Y * S * tilt, depth };
+  });
+  const dmax = Math.max(...pts.map(p => p.depth)), dmin = Math.min(...pts.map(p => p.depth));
+  const size = p => 1 - .28 * (p.depth - dmin) / (dmax - dmin);
+  let svg = defs + lines(pts.map(p => [p.x, p.y]));
+  const MAG = { alpha: 2.24, gamma: 2.15, beta: 2.27, delta: 2.68, eps: 3.37 };
+  pts.forEach(p => { const b = Math.pow(10, -0.4 * (MAG[p.k] - 2.15)), z = size(p) * (.55 + .6 * b);
+    svg += star(p.x, p.y, (p.k === 'gamma' ? 4.5 : 6) * z, 30 * z * b + 8, .55 + .45 * b); });
+  add(f, `<div class="glow" style="width:1400px;height:620px;left:260px;top:${cy - 330}px;background:rgba(99,85,214,.12)"></div><svg width="1920" height="1320">${svg}</svg>`);
+  return pts;
+}
+function processWide(f) {
+  const x0 = 102, x1 = 1818, xs = [222, 891, 1560];
+  add(f, `<svg width="1920" height="1320">${defs}<line x1="${x0}" y1="${PY}" x2="${x1}" y2="${PY}" stroke="url(#g)" stroke-opacity=".4" stroke-width="1.2"/>${xs.map(x => star(x, PY, 4, 14)).join('')}</svg>`);
+  STEPS.forEach(([t, it], i) => add(f, `<div class="t" style="left:${xs[i] - 6}px; top:${PY - 74}px; font-size:34px; color:#E4E1F2; font-weight:300">${t}</div>
+    <div class="t items" style="left:${xs[i] - 6}px; top:${PY + 40}px">${it.split('\n').join('<br>')}</div>`));
+}
+const facts = (f, pts, plan) => plan.forEach(([k, i, side, dy]) => { const p = pts.find(q => q.k === k); fact(f, [p.x, p.y], i, side, dy); });
+
+
+const ICONS = {"idea": {"viewBox": "-1.04 1.96 46.08 40.08", "d": ["M22 6.1875C15.9349 6.1875 11 11.1224 11 17.1875C11 21.3462 13.0553 23.6176 14.7074 25.4429C16.0927 26.9739 17.1875 28.1834 17.1875 30.25C17.1875 31.009 17.8035 31.625 18.5625 31.625H25.4375C26.1965 31.625 26.8125 31.009 26.8125 30.25C26.8125 28.1834 27.9073 26.9739 29.2926 25.4429C30.9447 23.6176 33 21.3462 33 17.1875C33 11.1224 28.0651 6.1875 22 6.1875ZM8.25 6.875C7.491 6.875 6.875 7.49031 6.875 8.25C6.875 9.00969 7.491 9.625 8.25 9.625C9.009 9.625 9.625 9.00969 9.625 8.25C9.625 7.49031 9.009 6.875 8.25 6.875ZM35.75 6.875C34.991 6.875 34.375 7.49031 34.375 8.25C34.375 9.00969 34.991 9.625 35.75 9.625C36.509 9.625 37.125 9.00969 37.125 8.25C37.125 7.49031 36.509 6.875 35.75 6.875ZM5.5 16.5C4.741 16.5 4.125 17.1153 4.125 17.875C4.125 18.6347 4.741 19.25 5.5 19.25C6.259 19.25 6.875 18.6347 6.875 17.875C6.875 17.1153 6.259 16.5 5.5 16.5ZM38.5 16.5C37.741 16.5 37.125 17.1153 37.125 17.875C37.125 18.6347 37.741 19.25 38.5 19.25C39.259 19.25 39.875 18.6347 39.875 17.875C39.875 17.1153 39.259 16.5 38.5 16.5ZM8.25 26.125C7.491 26.125 6.875 26.7403 6.875 27.5C6.875 28.2597 7.491 28.875 8.25 28.875C9.009 28.875 9.625 28.2597 9.625 27.5C9.625 26.7403 9.009 26.125 8.25 26.125ZM35.75 26.125C34.991 26.125 34.375 26.7403 34.375 27.5C34.375 28.2597 34.991 28.875 35.75 28.875C36.509 28.875 37.125 28.2597 37.125 27.5C37.125 26.7403 36.509 26.125 35.75 26.125ZM19.25 33C18.491 33 17.875 33.6153 17.875 34.375C17.875 35.1347 18.491 35.75 19.25 35.75H19.6313C20.1077 36.5685 20.9847 37.125 22 37.125C23.0153 37.125 23.8923 36.5685 24.3687 35.75H24.75C25.509 35.75 26.125 35.1347 26.125 34.375C26.125 33.6153 25.509 33 24.75 33H19.25Z"], "stroke": false}, "network": {"viewBox": "-0.32 0.00 44.64 44.00", "d": ["M22.0001 2.75C21.4758 2.75031 20.9577 2.86305 20.4807 3.08062C20.0036 3.2982 19.5788 3.61553 19.2349 4.01124C18.8909 4.40694 18.6358 4.8718 18.4868 5.37446C18.3378 5.87713 18.2983 6.40591 18.371 6.92513L10.7584 11.3187C10.1146 10.8158 9.32125 10.5423 8.50431 10.5417C7.53185 10.5417 6.59922 10.928 5.91159 11.6156C5.22396 12.3032 4.83765 13.2359 4.83765 14.2083C4.83765 15.1808 5.22396 16.1134 5.91159 16.8011C6.59922 17.4887 7.53185 17.875 8.50431 17.875C9.32085 17.8734 10.1135 17.5993 10.7566 17.0962L18.3728 21.4933C18.2607 22.3015 18.4213 23.124 18.8292 23.8306C19.2372 24.5372 19.8691 25.0875 20.6251 25.3945V34.187C20.3105 34.3151 20.0153 34.4862 19.7478 34.6955L12.1334 30.2983C12.2058 29.7793 12.1661 29.2507 12.017 28.7482C11.8678 28.2458 11.6127 27.7811 11.2688 27.3856C10.9248 26.9902 10.5001 26.673 10.0233 26.4555C9.54638 26.2381 9.02843 26.1253 8.50431 26.125C7.53185 26.125 6.59922 26.5113 5.91159 27.1989C5.22396 27.8866 4.83765 28.8192 4.83765 29.7917C4.83765 30.7641 5.22396 31.6968 5.91159 32.3844C6.59922 33.072 7.53185 33.4583 8.50431 33.4583C9.32085 33.4568 10.1135 33.1827 10.7566 32.6795L18.3728 37.0767C18.3004 37.5956 18.3401 38.124 18.4891 38.6264C18.6381 39.1287 18.8931 39.5932 19.2368 39.9887C19.5806 40.3841 20.0051 40.7014 20.4817 40.9189C20.9584 41.1365 21.4761 41.2494 22.0001 41.25C22.5244 41.2497 23.0425 41.1369 23.5195 40.9194C23.9965 40.7018 24.4213 40.3845 24.7653 39.9888C25.1092 39.5931 25.3643 39.1282 25.5133 38.6255C25.6624 38.1229 25.7019 37.5941 25.6292 37.0749L33.2418 32.6813C33.8856 33.1842 34.6789 33.4577 35.4958 33.4583C36.4683 33.4583 37.4009 33.072 38.0886 32.3844C38.7762 31.6968 39.1625 30.7641 39.1625 29.7917C39.1625 28.8192 38.7762 27.8866 38.0886 27.1989C37.4009 26.5113 36.4683 26.125 35.4958 26.125C34.9716 26.1253 34.4534 26.2381 33.9764 26.4556C33.4994 26.6732 33.0746 26.9905 32.7306 27.3862C32.3867 27.7819 32.1316 28.2468 31.9826 28.7495C31.8336 29.2521 31.7941 29.7809 31.8668 30.3001L24.2542 34.6937C23.9859 34.4855 23.6901 34.3156 23.3751 34.1888V25.3963C24.132 25.0895 24.7649 24.5387 25.1732 23.8313C25.5816 23.1239 25.742 22.3005 25.6292 21.4915L33.2418 17.098C33.8856 17.6009 34.6789 17.8743 35.4958 17.875C36.4683 17.875 37.4009 17.4887 38.0886 16.8011C38.7762 16.1134 39.1625 15.1808 39.1625 14.2083C39.1625 13.2359 38.7762 12.3032 38.0886 11.6156C37.4009 10.928 36.4683 10.5417 35.4958 10.5417C34.9716 10.542 34.4534 10.6547 33.9764 10.8723C33.4994 11.0899 33.0746 11.4072 32.7306 11.8029C32.3867 12.1986 32.1316 12.6635 31.9826 13.1661C31.8336 13.6688 31.7941 14.1976 31.8668 14.7168L24.2542 19.1104C23.6103 18.6075 22.817 18.334 22.0001 18.3333C21.1835 18.3349 20.3909 18.609 19.7478 19.1121L12.1334 14.715C12.1804 14.3783 12.1804 14.0366 12.1334 13.6999L19.746 9.30632C20.3898 9.80919 21.1831 10.0827 22.0001 10.0833C22.9725 10.0833 23.9052 9.69703 24.5928 9.00939C25.2804 8.32176 25.6667 7.38913 25.6667 6.41667C25.6667 5.44421 25.2804 4.51157 24.5928 3.82394C23.9052 3.13631 22.9725 2.75 22.0001 2.75Z"], "stroke": false}, "pulse": {"viewBox": "-3.60 0.00 51.20 44.00", "d": ["M21.98 2.93323C21.6708 2.93725 21.3708 3.03886 21.1229 3.22355C20.8749 3.40824 20.6916 3.66656 20.5992 3.96162L14.4375 23.6814L12.7302 19.7856V19.7827C11.5361 17.0569 7.48403 16.9519 6.15315 19.6137L5.69481 20.5332H2.93336C2.73901 20.5305 2.54605 20.5664 2.36569 20.6389C2.18534 20.7113 2.02119 20.8189 1.88278 20.9554C1.74437 21.0919 1.63446 21.2545 1.55945 21.4338C1.48443 21.6131 1.4458 21.8055 1.4458 21.9999C1.4458 22.1943 1.48443 22.3867 1.55945 22.566C1.63446 22.7453 1.74437 22.9079 1.88278 23.0444C2.02119 23.1809 2.18534 23.2885 2.36569 23.3609C2.54605 23.4334 2.73901 23.4693 2.93336 23.4666H6.60002C6.87242 23.4666 7.13943 23.3908 7.37116 23.2476C7.60288 23.1044 7.79016 22.8995 7.912 22.6559L8.77711 20.9257C9.08855 20.3028 9.76363 20.3206 10.0433 20.9601L13.3232 28.4538C13.4428 28.7278 13.6432 28.9587 13.8977 29.1156C14.1522 29.2725 14.4485 29.3479 14.747 29.3317C15.0455 29.3155 15.332 29.2084 15.568 29.0249C15.804 28.8414 15.9782 28.5902 16.0675 28.3048L21.1636 12.0025L23.4724 39.7231C23.4999 40.0505 23.6365 40.3593 23.8604 40.5999C24.0842 40.8404 24.3824 40.9989 24.7071 41.0497C25.0317 41.1006 25.3641 41.0409 25.6508 40.8804C25.9375 40.7198 26.162 40.4676 26.2883 40.1642L33.2435 23.4666H37.0649C37.3219 23.9117 37.6914 24.2815 38.1363 24.5389C38.5812 24.7964 39.086 24.9323 39.6 24.9332C40.378 24.9332 41.1241 24.6242 41.6742 24.0741C42.2243 23.524 42.5334 22.7779 42.5334 21.9999C42.5334 21.2219 42.2243 20.4758 41.6742 19.9257C41.1241 19.3756 40.378 19.0666 39.6 19.0666C39.0855 19.067 38.5802 19.2027 38.1347 19.4601C37.6892 19.7176 37.3193 20.0876 37.062 20.5332H32.2667C31.977 20.533 31.6937 20.6186 31.4525 20.7792C31.2114 20.9398 31.0232 21.1682 30.9117 21.4356L25.893 33.4783L23.461 4.27672C23.4298 3.907 23.2597 3.56282 22.9849 3.31352C22.7101 3.06422 22.351 2.92834 21.98 2.93323Z"], "stroke": false}};
+function processApp(f, style) {
+  const x0 = 102, x1 = 1818, xs = [222, 891, 1560], V4 = '#8B7CF6';
+  let svg = defs + `<defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC6F1"/><stop offset=".6" stop-color="#A89CF8"/><stop offset="1" stop-color="#8B7CF6"/></linearGradient>
+    <filter id="soft" x="-50%" y="-200%" width="200%" height="500%"><feGaussianBlur stdDeviation="4"/></filter></defs>`;
+  const base = (op = .3) => `<line x1="${x0}" y1="${PY}" x2="${x1}" y2="${PY}" stroke="url(#g)" stroke-opacity="${op}" stroke-width="1.2"/>`;
+  let titleDy = -74;
+  if (style === 'badges') { svg += base(); xs.forEach((x, i) => svg += `<circle cx="${x}" cy="${PY}" r="30" fill="${V4}" opacity=".18" filter="url(#soft)"/><circle cx="${x}" cy="${PY}" r="22" fill="${V4}"/><text x="${x}" y="${PY + 7.5}" text-anchor="middle" font-family="Nunito Sans" font-weight="600" font-size="20" fill="#050816">${i + 1}</text>`); titleDy = -96; }
+  if (style === 'icons') { svg += base(.22); const keys = ['idea', 'network', 'pulse'];
+    xs.forEach((x, i) => { const ic = ICONS[keys[i]], [vx, vy, vw, vh] = ic.viewBox.split(' ').map(Number), sz = 30, sc = sz / Math.max(vw, vh);
+      svg += `<circle cx="${x}" cy="${PY}" r="34" fill="#0A0D20" stroke="#A89CF8" stroke-width="1.2"/>
+        <g transform="translate(${x - vw * sc / 2 - vx * sc} ${PY - vh * sc / 2 - vy * sc}) scale(${sc})">${ic.d.map(d => `<path d="${d}" fill="url(#ig)"/>`).join('')}</g>`; }); titleDy = -112; }
+  if (style === 'bar') { const segs = [[x0, 857], [869, 1524], [1536, x1]];
+    segs.forEach(([a, b]) => svg += `<rect x="${a}" y="${PY - 2}" width="${b - a}" height="4" rx="2" fill="${V4}" opacity=".35" filter="url(#soft)"/><rect x="${a}" y="${PY - 2}" width="${b - a}" height="4" rx="2" fill="${V4}"/>`); }
+  if (style === 'dots') { for (let x = x0; x <= x1; x += 22) { if (xs.some(s => Math.abs(s - x) < 26)) continue; svg += `<circle cx="${x}" cy="${PY}" r="3.5" fill="#E0DBFF" opacity=".28"/>`; }
+    xs.forEach(x => svg += `<rect x="${x - 18}" y="${PY - 5}" width="36" height="10" rx="5" fill="${V4}" opacity=".4" filter="url(#soft)"/><rect x="${x - 18}" y="${PY - 5}" width="36" height="10" rx="5" fill="${V4}"/>`); }
+  if (style === 'rings') { svg += base(.22); xs.forEach((x, i) => { const r = 20, c = 2 * Math.PI * r, part = (i + 1) / 3;
+      svg += `<circle cx="${x}" cy="${PY}" r="${r}" fill="#050816" stroke="#E0DBFF" stroke-opacity=".18" stroke-width="3"/>
+        <circle cx="${x}" cy="${PY}" r="${r}" fill="none" stroke="${V4}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c * part} ${c}" transform="rotate(-90 ${x} ${PY})"/>` +
+        (i === 2 ? `<path d="M${x - 7} ${PY} l5 5 l9 -10" fill="none" stroke="#E4E1F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>` : `<text x="${x}" y="${PY + 6}" text-anchor="middle" font-family="Nunito Sans" font-size="16" fill="#C9BBFA">${i + 1}</text>`); }); titleDy = -96; }
+  add(f, `<svg width="1920" height="1320">${svg}</svg>`);
+  const segStart = [102, 869, 1536];
+  STEPS.forEach(([t, it], i) => { const x = style === 'bar' ? segStart[i] : xs[i] - (style === 'icons' ? 34 : style === 'badges' ? 22 : 6);
+    add(f, `<div class="t" style="left:${x}px; top:${PY + titleDy}px; font-size:34px; color:#E4E1F2; font-weight:300">${t}</div>
+      <div class="t items" style="left:${x}px; top:${PY + (style === 'icons' ? 60 : style === 'badges' || style === 'rings' ? 50 : 40)}px">${it.split('\n').join('<br>')}</div>`); });
+}
+[['q1', 'badges'], ['q2', 'icons'], ['q3', 'bar'], ['q4', 'dots'], ['q5', 'rings']].forEach(([id, st]) => {
+  const f = document.getElementById(id); const pts = cassiopeia(f, 12, .62, 520);
+  facts(f, pts, [['eps', 0, 'right', -40], ['delta', 1, 'right', -10], ['alpha', 2, 'left', -20], ['beta', 3, 'left', -175]]);
+  processApp(f, st); });
+</script>
+</body></html>

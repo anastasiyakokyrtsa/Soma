@@ -1,0 +1,91 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Research block — panels, flat tilt</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Variant A reworked: flat (orthographic) tilt with no perspective, one shared scale and type size for the cards
+     and the table, zoomed out a little so more fits. Job stories: Figma 59:1064. CJM: Figma 58:41. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; height:1560px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; margin-bottom:-422px; }
+  .light { position:absolute; border-radius:50%; filter:blur(110px); pointer-events:none; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .panel { position:absolute; top:552px; width:846px; height:1008px; border-radius:44px; overflow:hidden; background:linear-gradient(180deg,#0B0E22,#070A1A); box-shadow:inset 0 0 0 1px rgba(201,187,250,.08); }
+  .panel .head { position:absolute; left:72px; top:72px; width:640px; z-index:2; }
+  .t2 { font-weight:300; font-size:52px; line-height:1.2; color:#E4E1F2; margin:0; }
+  .desc { font-weight:300; font-size:26px; line-height:1.5; color:#8A8DAA; margin:18px 0 0; }
+  .glass { border-radius:28px; background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(168,156,248,.05) 45%, rgba(255,255,255,.03));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(201,187,250,.16), 0 30px 60px rgba(0,0,0,.45); }
+  /* one type scale for both pieces: eyebrow 14 · title 30 · body 18 */
+  .eyebrow { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .js { width:440px; padding:28px 30px 30px; }
+  .js h4 { margin:10px 0 0; font-weight:300; font-size:30px; line-height:1.15; color:#F2F0FA; }
+  .js p { margin:12px 0 0; font-size:18px; line-height:1.5; color:#A6ABC6; }
+  .js p b { color:#D9D5F2; font-weight:600; }
+  .grid { display:grid; grid-template-columns:repeat(3, 440px); gap:22px; align-items:stretch; }
+  .cjm { width:1640px; border-radius:28px; overflow:hidden; }
+  .cjm table { border-collapse:collapse; width:100%; table-layout:fixed; }
+  .cjm th, .cjm td { text-align:left; vertical-align:top; padding:30px 28px 34px; border-bottom:1px solid rgba(201,187,250,.10); border-right:1px solid rgba(201,187,250,.10); }
+  .cjm th { font-weight:400; background:rgba(255,255,255,.035); }
+  .cjm td { font-size:18px; line-height:1.5; color:#A6ABC6; }
+  .cjm td.st { font-weight:300; font-size:30px; line-height:1.15; color:#F2F0FA; }
+  .cjm td.st span { display:block; margin-bottom:10px; }
+  .cjm td.resp { color:#D9D5F2; font-weight:600; }
+  .cjm tr:last-child td { border-bottom:0; } .cjm td:last-child, .cjm th:last-child { border-right:0; }
+  /* flat tilt: CSS 3D without perspective() renders orthographically, so nothing grows toward the bottom */
+  .tilt { position:absolute; transform-origin:0 0; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A1 · Turned 6°.</b> Only a flat rotation, nothing squashed, so the type keeps its real proportions. Cards and table share one scale and one type size (title 30, text 18). Both run off the panel edges on every side, so you never see where they end.</div>
+<div class="frame" id="A1"></div>
+
+<div class="opt"><b>A2 · Turned 10°,</b> closer to Aura’s diagonal. Same flat rotation and same shared scale.</div>
+<div class="frame" id="A2"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)$/, ' $1');
+const STORIES = [
+  ['Philipp', 'Wind down after work', 'When I come home tense and irritable after a long, stressful day, <b>I want a pleasant way to calm down</b>, so I can look after myself and not burn out.'],
+  ['Alina', 'Gentle on low days', 'When I feel an emotional dip, <b>I want to see what moon phases or sleep changes might have played a part</b>, so I can support myself instead of blaming myself.'],
+  ['Irina', 'Pause before I snap', 'When I feel close to snapping, <b>I want to see if it is lack of sleep, tiredness or the season</b>, so I can stop in time and not take it out on others.'],
+  ['Timur', 'Decide on data', 'When I experiment with sleep and workload, <b>I want to see the results visually</b>, so I decide on data, not on feelings.'],
+  ['Philipp', 'Why so drained today?', 'When my energy drops and I can’t focus, <b>I want to see quickly what is affecting me</b>, so I can stop blaming myself and adjust the day.'],
+  ['Irina', 'Care without guilt', 'When I have no energy left and feel alone, <b>I want support and simple ways to recover</b>, so I can look after myself without guilt.'],
+  ['Alina', 'Balance the week', 'When I plan my classes and my own practice, <b>I want to know the higher and lower energy days</b>, so I can spread the load evenly.'],
+  ['Timur', 'Is it the sun?', 'When I read about things like solar flares, <b>I want to see if they relate to how I feel</b>, so I can be ready for the dips.'],
+  ['Philipp', 'Plan around low days', 'When a demanding stretch at work is coming, <b>I want to see possible low days in advance</b>, so I can spread the tasks and avoid burnout.'],
+  ['Irina', 'A nudge to pause', 'When I am caught up in endless tasks, <b>I want the app to suggest a short pause</b>, so I get a moment to stop and breathe.'],
+  ['Alina', 'A ritual, not a chore', 'When I open the app in the morning or evening, <b>I want a beautiful, calm space</b>, so caring for myself becomes a ritual.'],
+];
+const AGE = { Philipp: 'Philipp, 32', Alina: 'Alina, 26', Irina: 'Irina, 47', Timur: 'Timur, 20' };
+const card = ([who, t, p]) => `<div class="glass js"><div class="eyebrow">${AGE[who]}</div><h4>${nb(t)}</h4><p>${nb(p)}</p></div>`;
+const CJM = [
+  ['Home after a tense day', 'Calm down and lower the stress', 'Anxious, tense, tired', 'Can’t focus; busy apps feel like too much', 'A soft, unhurried onboarding'],
+  ['Onboarding', 'See quickly if it can really help', 'Curious, expectant', 'Fear of yet another shallow app', 'Show depth and flexibility early'],
+  ['Profile and current state', 'See how sleep and cycles relate to how they feel', 'Curious, hopeful', 'Too much data before any result', 'Skip now, fill in later; a first result right away'],
+  ['First results', 'Find what is behind the irritability', 'Interested, trusting', 'A bit of doubt about the claims', 'Sources in tooltips and short articles'],
+  ['Tries a practice', 'Feel calmer and fall asleep easily', 'Relieved, calm', 'Too busy, forgets to check in', 'Gentle, personal nudges'],
+];
+const COLS = [300, 330, 260, 380, 370];
+const table = () => `<div class="glass cjm"><table><colgroup>${COLS.map(w => `<col style="width:${w}px">`).join('')}</colgroup><tr>${['Stage', 'Goal', 'Feels', 'Barrier', 'Design response'].map(h => `<th class="eyebrow">${h}</th>`).join('')}</tr>${CJM.map((r, i) => `<tr><td class="st"><span class="eyebrow" style="color:#6E7390">0${i + 1}</span>${nb(r[0])}</td><td>${nb(r[1])}</td><td>${nb(r[2])}</td><td>${nb(r[3])}</td><td class="resp">${nb(r[4])}</td></tr>`).join('')}</table></div>`;
+const L = (x, y, w, h, c, o) => `<div class="light" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; background:${c}; opacity:${o}"></div>`;
+const V = '#6355D6', PV = '#B45FC4';
+const build = (id, tf, pos) => document.getElementById(id).insertAdjacentHTML('beforeend',
+  `<div class="label">04 / Research</div><h2 class="h1">What people come for, <em>and where</em><br>they might give up</h2>
+   <div class="panel" style="left:102px">${L(-160, 700, 760, 460, PV, .32)}${L(380, 760, 640, 420, V, .38)}
+     <div class="head"><h3 class="t2">Job stories</h3><p class="desc">${nb('Eleven stories from four people showed what really drives someone to a tool like Soma.')}</p></div>
+     <div class="tilt" style="left:${pos.jx}px; top:${pos.jy}px; transform:${tf}"><div class="grid">${STORIES.map(card).join('')}</div></div></div>
+   <div class="panel" style="left:972px">${L(220, 720, 780, 460, V, .36)}${L(-140, 780, 560, 380, PV, .26)}
+     <div class="head"><h3 class="t2">Customer journey</h3><p class="desc">${nb('I mapped the way from a tense evening to the first practice to see where people drop off.')}</p></div>
+     <div class="tilt" style="left:${pos.tx}px; top:${pos.ty}px; transform:${tf}">${table()}</div></div>`);
+// same transform (and so the same scale) for both panels
+build('A1', 'rotate(6deg) scale(.9)', { jx: 40, jy: 300, tx: 50, ty: 300 });
+build('A2', 'rotate(10deg) scale(.9)', { jx: 60, jy: 290, tx: 70, ty: 290 });
+</script>
+</body></html>
