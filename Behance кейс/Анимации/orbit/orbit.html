@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Orbit loop</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,400&display=swap" rel="stylesheet">
+<!-- Introduction orbit, animated. Geometry, colours and type copied from Figma frame 881:950 ("Orbit — Observe · Understand · Respond").
+     Background = the Introduction block exported from Figma with the orbit hidden (bg-slice.png, block y 1560–2274).
+     window.render(t) draws the frame at t seconds; the loop is seamless at T = 24 s (one revolution, the centre pulses 5×).
+     The step words stay where they are in Figma; only the three points travel the orbit. -->
+<style>
+  html, body { margin:0; background:#050816; }
+  #s { position:relative; width:1920px; height:714px; background:url('bg-slice.png') 0 0/1920px 714px no-repeat; overflow:hidden; }
+  svg { position:absolute; left:0; top:0; }
+  .num { font:400 15px 'Nunito Sans', sans-serif; letter-spacing:4.5px; fill:#4F5373; }
+  .word { font-family:'Nunito Sans', sans-serif; font-weight:200; letter-spacing:.55em; }
+  .you { font:400 16px 'Nunito Sans', sans-serif; letter-spacing:4.8px; fill:#4F5373; }
+</style></head><body><div id="s"><svg id="v" width="1920" height="714"></svg></div>
+<script>
+const T = 24, PULSE = 4.8;
+const CX = 102 + 864.05, CY = 55 + 232.8, RX = 781.65, RY = 150;
+const NODES = [{ th0: 195 }, { th0: 334 }, { th0: 90 }];
+// fixed step labels, exactly where they sit in the Figma frame (centre x, top y, word size)
+const LABELS = [['01', 'OBSERVE', '#F3D9F0', 109, 12, 28], ['02', 'UNDERSTAND', '#BCB1F5', 1565, 12, 28], ['03', 'RESPOND', '#D6CEFB', 864, 417, 32]];
+const labels = () => LABELS.map(([n, w, col, cx, top, size]) => { const x = 102 + cx, y = 55 + top, ls = size * .55;
+  return `<text class="num" x="${x + 2.25}" y="${y + 15}" text-anchor="middle">${n}</text><text class="word" x="${x + ls / 2}" y="${y + 34 + size * .95}" text-anchor="middle" style="font-size:${size}px; fill:${col}">${w}</text>`; }).join('');
+const rad = d => d * Math.PI / 180, lerp = (a, b, t) => a + (b - a) * t, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
+const arc = (rx, ry, from, to, n = 120) => { let d = ''; for (let i = 0; i <= n; i++) { const a = rad(from + (to - from) * i / n); d += (i ? ' L ' : 'M ') + (CX + rx * Math.cos(a)).toFixed(2) + ' ' + (CY + ry * Math.sin(a)).toFixed(2); } return d; };
+// near half as a tapered crescent (thin at the ends, ~2px in front), like the Figma vector
+const crescent = () => { const top = arc(RX, 149, 0, 180), bot = arc(RX + .6, RY + 1.1, 180, 0); return top + ' L ' + bot.slice(2) + ' Z'; };
+const DEFS = `<defs>
+  <linearGradient id="far" x1="${CX - RX}" x2="${CX + RX}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".22"/><stop offset=".5" stop-color="#C9BBFA" stop-opacity=".10"/><stop offset="1" stop-color="#C9BBFA" stop-opacity=".22"/></linearGradient>
+  <linearGradient id="near" x1="${CX - RX}" x2="${CX + RX}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".22"/><stop offset=".18" stop-color="#8B7CF6" stop-opacity=".55"/><stop offset=".5" stop-color="#C9BBFA" stop-opacity=".8"/><stop offset=".82" stop-color="#FFC6F1" stop-opacity=".55"/><stop offset="1" stop-color="#C9BBFA" stop-opacity=".22"/></linearGradient>
+  <radialGradient id="glow"><stop offset="0" stop-color="#A89CF8" stop-opacity=".42"/><stop offset=".4" stop-color="#6355D6" stop-opacity=".16"/><stop offset="1" stop-color="#050816" stop-opacity="0"/></radialGradient>
+  <radialGradient id="halo"><stop offset="0" stop-color="#C9BBFA" stop-opacity=".7"/><stop offset="1" stop-color="#8B7CF6" stop-opacity="0"/></radialGradient>
+</defs>`;
+const FAR = `<path d="${arc(RX, RY, 180, 360)}" fill="none" stroke="url(#far)" stroke-width="1.2"/>`, NEAR = `<path d="${crescent()}" fill="url(#near)"/>`;
+function node(nd, t) {
+  const th = rad(nd.th0 + 360 * t / T), x = CX + RX * Math.cos(th), y = CY + RY * Math.sin(th), d = (Math.sin(th) + 1) / 2;
+  const dot = 8 + 6 * d, halo = 24 + 20 * d, op = .75 + .25 * d;
+  let g = `<circle cx="${x}" cy="${y}" r="${halo / 2}" fill="url(#halo)" opacity="${op}"/><circle cx="${x}" cy="${y}" r="${dot / 2}" fill="#EDE8FF" opacity="${op}"/>`;
+  return { g, back: Math.sin(th) < 0 };
+}
+window.render = t => {
+  const p = (1 + Math.cos(2 * Math.PI * t / PULSE)) / 2; // 1..0..1 breathing, full (= the Figma still) at t = 0
+  const nodes = NODES.map(n => node(n, t));
+  const centre = `<circle cx="${CX}" cy="${CY}" r="${140 * (.9 + .1 * p)}" fill="url(#glow)" opacity="${.8 + .2 * p}"/>
+    <circle cx="${CX}" cy="${CY}" r="${10 + 6 * p}" fill="url(#halo)" opacity="${.25 + .35 * p}"/><circle cx="${CX}" cy="${CY}" r="4" fill="#EDE8FF" opacity="${.65 + .35 * p}"/>
+    <text class="you" x="${CX + 2.4}" y="${CY - 33}" text-anchor="middle">YOU</text>`;
+  document.getElementById('v').innerHTML = DEFS + FAR + nodes.filter(n => n.back).map(n => n.g).join('') + centre + NEAR + nodes.filter(n => !n.back).map(n => n.g).join('') + labels();
+};
+document.fonts.ready.then(() => { window.render(0); window.__ready = true; });
+</script></body></html>
