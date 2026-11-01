@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Wireframes light wave</title>
+<!-- Block "08 / Wireframes" (Figma 983:2), animated: a soft band of light sweeps across the wireframe wall towards the Care screen,
+     lighting each wireframe as it passes ("from structure to light"); the wave runs from the first frame and never stops. bg.png = block fill + star dust; overlay.png = fades, texts, phone;
+     cells are drawn from the same -dark wireframe PNGs, positions and opacities read from Figma. window.render(t), seamless at T. -->
+<style>html,body{margin:0;background:#050816} #s{position:relative;width:1920px;height:1500px} canvas{position:absolute;left:0;top:0}</style>
+</head><body><div id="s"><canvas id="c" width="1920" height="1500"></canvas></div>
+<script>
+// a continuous, wrapping wave: one band always on the wall, starting at once; L = wrap length along the diagonal
+// the light is a LINE: a thin bright core with long soft falloff on both sides (her ask: a line with smooth edges, not a spot)
+const T = 8, L = 3000, BOOST = 0.125, CORE = 120, SOFT = 300, SOFT_K = .45, TINT = .10, GLOW = .027;
+// the band is cut straight at the top and bottom (a slanted parallelogram with softened corners, not a rounded capsule)
+const CUT = [560, 1300], RAMP = 44;
+const W = '../../Мокапы/wireframes/en/';
+// [file, x, y, base opacity] from Figma (wall frame at y 380; cells 170×371, radius 16)
+const CELLS = [["01-start",11,380,0.28],["02-about-1",203,380,0.28],["03-about-2",395,380,0.28],["04-about-3",587,380,0.29],["06-name",779,380,0.384],["07-email",971,380,0.47],["08-gender",1163,380,0.538],["09-support",1355,380,0.571],["10-choose",1547,380,0.553],["11-profile-start",1739,380,0.494],["12-dob",11,773,0.28],["13-sleep",203,773,0.28],["14-mood",395,773,0.28],["15-cycle",587,773,0.337],["16-visual-style",779,773,0.443],["17-personalization-5",971,773,0.55],["18-personalization-7",1163,773,0.656],["19-home",1355,773,0.761],["20-care",1547,773,0.689],["22-breathing",1739,773,0.583],["29-breathing-end",11,1165,0.28],["23-tea-categories",203,1165,0.28],["24-calming-teas",395,1165,0.28],["25-chamomile",587,1165,0.281],["26-article-water",779,1165,0.373],["27-analytics",971,1165,0.456],["28-analytics-biorhythm",1163,1165,0.521],["30-breathing-4",1355,1165,0.551],["05-start-5",1547,1165,0.535],["01-start",1739,1165,0.479],["02-about-1",11,1558,0.28],["03-about-2",203,1558,0.28],["04-about-3",395,1558,0.28],["06-name",587,1558,0.28],["07-email",779,1558,0.28],["08-gender",971,1558,0.28],["09-support",1163,1558,0.317],["10-choose",1355,1558,0.333],["11-profile-start",1547,1558,0.325],["12-dob",1739,1558,0.292]];
+const CW = 170, CH = 371, R = 16;
+const ctx = document.getElementById('c').getContext('2d');
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+let bg, ov; const imgs = {};
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+// offscreen layers: the wall at rest, the wall fully lit, and a soft diagonal light mask (per pixel, so the light is continuous
+// across screens and gaps instead of switching per screen)
+const mk = () => { const c = document.createElement('canvas'); c.width = 1920; c.height = 1500; return [c, c.getContext('2d')]; };
+const [restC, rest] = mk(), [litC, lit] = mk(), [glowC, glow] = mk();
+const DX = 1 / Math.sqrt(1 + .45 * .45), DY = .45 * DX; // unit vector of the 'along' axis (x + .45·y)
+function drawWall(g, lift) {
+  g.clearRect(0, 0, 1920, 1500);
+  for (const [f, x, y, base] of CELLS) { g.save(); g.beginPath(); g.moveTo(x + R, y); g.arcTo(x + CW, y, x + CW, y + CH, R); g.arcTo(x + CW, y + CH, x, y + CH, R); g.arcTo(x, y + CH, x, y, R); g.arcTo(x, y, x + CW, y, R); g.closePath(); g.clip();
+    g.globalAlpha = Math.min(1, base + lift); g.fillStyle = '#050816'; g.fillRect(x, y, CW, CH); g.drawImage(imgs[f], x, y, CW, CH);
+    if (lift) { g.globalAlpha = TINT * lift / BOOST; g.globalCompositeOperation = 'screen'; g.fillStyle = '#A89CF8'; g.fillRect(x, y, CW, CH); g.globalCompositeOperation = 'source-over'; }
+    g.restore(); }
+}
+function band(g, front, peak) { // fill the whole canvas with a gaussian band along the diagonal (with wrap copies)
+  const a0 = -1600, a1 = 4600, grad = g.createLinearGradient(a0 * DX, a0 * DY, a1 * DX, a1 * DY);
+  // a point's gradient position is DX·(x + .45y); 'along' (as for the cells) = x + .45(y − 940) = position/DX − 423
+  for (let k = 0; k <= 620; k++) { const at = a0 + (a1 - a0) * k / 620, along = at / DX - 423;
+    const prof = d => Math.exp(-d * d / (2 * CORE * CORE)) * (1 - SOFT_K) + Math.exp(-d * d / (2 * SOFT * SOFT)) * SOFT_K;
+    const v = [0, L, -L].reduce((m, o) => Math.max(m, prof(along - front + o)), 0);
+    grad.addColorStop(k / 620, `rgba(255,255,255,${(v * peak).toFixed(4)})`); }
+  g.fillStyle = grad; g.fillRect(0, 0, 1920, 1500);
+  const op = g.globalCompositeOperation, v = g.createLinearGradient(0, CUT[0] - RAMP, 0, CUT[1] + RAMP);
+  const H = CUT[1] - CUT[0] + 2 * RAMP; v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(RAMP / H, 'rgba(0,0,0,1)'); v.addColorStop(1 - RAMP / H, 'rgba(0,0,0,1)'); v.addColorStop(1, 'rgba(0,0,0,0)');
+  g.globalCompositeOperation = 'destination-in'; g.fillStyle = v; g.fillRect(0, 0, 1920, 1500); g.globalCompositeOperation = op;
+}
+window.render = t => {
+  const front = -350 + L * (t / T);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(bg, 0, 0);
+  // faint light on the background itself, so the band is visible in the gaps too
+  glow.clearRect(0, 0, 1920, 1500); band(glow, front, 1); glow.globalCompositeOperation = 'source-in'; glow.fillStyle = `rgba(168,156,248,${GLOW})`; glow.fillRect(0, 380, 1920, 1120); glow.globalCompositeOperation = 'source-over';
+  ctx.globalCompositeOperation = 'screen'; ctx.drawImage(glowC, 0, 0); ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(restC, 0, 0);
+  // lit wall, masked by the band
+  const [mC, m] = window.__m || (window.__m = mk()); m.globalCompositeOperation = 'source-over'; m.clearRect(0, 0, 1920, 1500); m.drawImage(litC, 0, 0);
+  m.globalCompositeOperation = 'destination-in'; band(m, front, 1); m.globalCompositeOperation = 'source-over';
+  ctx.drawImage(mC, 0, 0);
+  ctx.drawImage(ov, 0, 0);
+  // dither the wall area: the light lifts the screens by only ~10 levels, which shows up as visible steps (banding) in 8-bit video;
+  // a static, very fine noise of ±1.5 levels breaks the steps without looking grainy (static, so it compresses well)
+  const Y0 = 380, im = ctx.getImageData(0, Y0, 1920, 1500 - Y0), d = im.data;
+  for (let i = 0, j = 0; i < d.length; i += 4, j++) { const n = NOISE[j]; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  ctx.putImageData(im, 0, Y0);
+};
+const NOISE = (() => { let s = 99; const r = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); const a = new Float32Array(1920 * 1120);
+  for (let i = 0; i < a.length; i++) a[i] = (r() + r() - 1) * 1.6; return a; })(); // triangular-PDF dither
+Promise.all([load('bg.png'), load('overlay.png'), ...[...new Set(CELLS.map(c => c[0]))].map(f => load(W + f + '-dark.png').then(i => imgs[f] = i))])
+  .then(([a, b]) => { bg = a; ov = b; drawWall(rest, 0); drawWall(lit, BOOST); window.render(0); window.__ready = true; });
+</script></body></html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Built in code — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<!-- Block "Built in code". Real facts from the repo: Expo SDK 57 · React Native 0.86 · Reanimated 4.5; 33 screens and 35 components in code;
+     156 commits from 2026-07-30 to 2026-10-25; tokens in app/theme/colors.ts ported 1:1 from UI Kit; scenario audit by 17 roles, 17 findings
+     (docs/state/findings.md). Honest: personalisation is still mocked (finding 5), so the copy never claims real calculations. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .lead { position:absolute; left:1258px; top:261px; width:560px; margin:0; font-weight:300; font-size:26px; line-height:1.5; color:#6E7390; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .glass { border-radius:28px; background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(168,156,248,.04) 45%, rgba(255,255,255,.02));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 1px rgba(201,187,250,.14), 0 30px 60px rgba(0,0,0,.45); }
+  .code { font-family:'JetBrains Mono', monospace; font-size:19px; line-height:1.75; color:#A6ABC6; white-space:pre; }
+  .code .k { color:#A89CF8; } .code .s { color:#B7F5D8; } .code .c { color:#454A63; } .code .p { color:#6E7390; }
+  .sw { display:inline-block; width:18px; height:18px; border-radius:5px; vertical-align:-3px; margin-left:14px; box-shadow:inset 0 0 0 1px rgba(201,187,250,.2); }
+  .num { font-weight:300; font-size:88px; line-height:1; color:#F2F0FA; }
+  .numl { font-size:20px; color:#6E7390; margin-top:12px; }
+  .phone { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .t { font-weight:300; font-size:22px; line-height:1.55; color:#6E7390; }
+  .t b { display:block; font-weight:400; color:#A6ABC6; margin-bottom:4px; }
+  .strike { color:#454A63; text-decoration:line-through; text-decoration-color:rgba(240,132,127,.6); }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>A · Same tokens, two places.</b> Left, the real colour tokens from the app’s code; right, the Care screen built with them. A thin line links three tokens to where they show up. Says: the design system made it into code one‑to‑one.</div>
+<div class="frame" id="A" style="height:1500px; margin-bottom:-406px"></div>
+
+<div class="opt"><b>B · A real app and the numbers behind it.</b> A phone with a short recording of the live app; next to it four quiet facts in the Glance style: screens and components in code, commits, the stack.</div>
+<div class="frame" id="B" style="height:1400px; margin-bottom:-379px"></div>
+
+<div class="opt"><b>C · Audited like a product.</b> Code wasn’t the end: a scenario audit by 17 roles found 17 issues. Three of them as small before/after cards (the honest herb copy, the bigger mood buttons, the date check), with the status.</div>
+<div class="frame" id="C" style="height:1450px; margin-bottom:-392px"></div>
+
+<div class="opt"><b>D · Code, numbers and one fix, together.</b> A compact block: the token snippet on the left, three numbers on the right, one before/after audit card under them.</div>
+<div class="frame" id="D" style="height:1450px; margin-bottom:-392px"></div>
+
+<div class="opt"><b>E · A living prototype, explained.</b> One large phone with the real app (a short recording on Behance); thin lines lead from it to five details of how it was built, each a short line of text. Shows craft, not just a claim.</div>
+<div class="frame" id="E" style="height:1600px; margin-bottom:-433px"></div>
+
+<div class="opt"><b>F · Three months in code.</b> A quiet timeline of the build, July to October, with the real commit count per month as soft bars and one real milestone per month; under it four phones from the app in the order they were built.</div>
+<div class="frame" id="F" style="height:1750px; margin-bottom:-474px"></div>
+
+<div class="opt"><b>G · Three pillars.</b> A richer layout: one large statement and three columns, each with a visual: the design system in code (token snippet), real interactions (a phone), audited like a product (a before/after card). Numbers run along the bottom.</div>
+<div class="frame" id="G" style="height:1750px; margin-bottom:-474px"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)\s(\S+)$/, ' $1 $2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (lead = 'Soma isn’t only a Figma file. I built it as a real React Native app, with the same tokens, type and components as the UI kit.') =>
+  `<div class="label">13 / Built in code</div><h2 class="h1">From the kit<br><em>to a working app</em></h2><p class="lead">${nb(lead)}</p>`;
+const tok = (name, val, c) => `  <span class="p">${name}:</span> <span class="s">'${val}'</span>,<span class="sw" style="background:${c}"></span>`;
+const CODE = `<span class="c">// app/theme/colors.ts — ported 1:1 from the UI kit</span>
+<span class="k">export const</span> colors = {
+${tok('bg0', '#050816', '#050816')}
+${tok('violet300', '#A89CF8', '#A89CF8')}
+${tok('violet400', '#8B7CF6', '#8B7CF6')}
+${tok('pink300', '#FBD3F1', '#FBD3F1')}
+${tok('green400', '#6EE7B7', '#6EE7B7')}
+${tok('textSecondary', '#A6ABC6', '#A6ABC6')}
+};`;
+const codeCard = (x, y, w, h) => `<div class="glass abs" style="left:${x}px; top:${y}px; width:${w}px; height:${h}px; padding:46px 52px"><div class="code">${CODE}</div></div>`;
+const FACTS = [['33', 'screens in code'], ['35', 'components'], ['156', 'commits in 3 months'], ['RN', 'React Native · Expo · iOS & Android']];
+const fact = (x, y, [n, l]) => `<div class="abs" style="left:${x}px; top:${y}px; width:360px"><div class="num">${n}</div><div class="numl">${nb(l)}</div></div>`;
+const FIX = [
+  ['Herb copy', 'Chamomile helps reduce inner tension.', 'A familiar evening ritual: a soft taste and the feeling that you can finally exhale.', 'Fixed · finding 10'],
+  ['Mood check‑in', 'A thin slider in the hardest place to reach.', 'Large shape buttons instead of a slider.', 'Fixed · finding 11'],
+  ['Date of birth', 'Any date accepted, even a future one.', 'A friendly check for impossible dates.', 'Fixed · finding 17'],
+];
+const fixCard = (x, y, w, [t, before, after, st]) => `<div class="glass abs" style="left:${x}px; top:${y}px; width:${w}px; padding:34px 36px 36px">
+  <div class="cap" style="color:#A89CF8">${t}</div>
+  <div class="t" style="margin-top:18px"><span class="strike">${nb(before)}</span></div>
+  <div class="t" style="margin-top:10px; color:#D9D5F2">${nb(after)}</div>
+  <div class="cap" style="margin-top:22px; font-size:12px; color:#4ADE9A">${st}</div></div>`;
+const PH = '../Мокапы/thin/';
+
+// A
+put('A', head() + codeCard(102, 560, 880, 400) +
+  `<img class="phone" src="${PH}phone-care.png" style="left:1300px; top:520px; width:400px">` +
+  `<svg class="abs" style="left:0; top:0" width="1920" height="1500">
+    <path d="M 730 676 C 1050 676, 1150 640, 1330 640" stroke="#C9BBFA" stroke-opacity=".3" fill="none"/>
+    <path d="M 760 712 C 1050 712, 1200 760, 1420 760" stroke="#C9BBFA" stroke-opacity=".3" fill="none"/>
+    <path d="M 760 712 C 1050 712, 1200 1180, 1380 1180" stroke="#C9BBFA" stroke-opacity=".3" fill="none"/>
+    ${[[1330, 640], [1420, 760], [1380, 1180]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" fill="#F2F0FA"/>`).join('')}</svg>` +
+  `<div class="abs t" style="left:102px; top:1010px; width:880px">${nb('Colours, type, spacing and radii live in one theme file, so the app and the kit can’t drift apart.')}</div>`);
+
+// B
+put('B', head() + `<img class="phone" src="${PH}phone-home-biorhythms.png" style="left:102px; top:500px; width:400px">` +
+  `<div class="abs cap" style="left:102px; top:1360px; font-size:12px">Poster frame · replaced by a short app recording on Behance</div>` +
+  fact(760, 600, FACTS[0]) + fact(1300, 600, FACTS[1]) + fact(760, 900, FACTS[2]) + fact(1300, 900, FACTS[3]));
+
+// C
+put('C', head('After the build, a scenario audit by 17 roles, from accessibility to wellbeing safety, went through every flow and found 17 issues. Eight are already fixed.') +
+  FIX.map((f, i) => fixCard(102 + i * (552 + 30), 600, 552, f)).join('') +
+  `<div class="abs" style="left:102px; top:1060px; display:flex; gap:140px">${[['17', 'roles in the audit'], ['17', 'findings'], ['8', 'fixed so far']].map(([n, l]) => `<div><div class="num" style="font-size:64px">${n}</div><div class="numl">${l}</div></div>`).join('')}</div>`);
+
+// D
+put('D', head() + codeCard(102, 560, 880, 400) +
+  fact(1100, 580, FACTS[0]) + fact(1480, 580, FACTS[2]) + fixCard(1100, 820, 718, FIX[0]));
+
+// E · living prototype with craft callouts
+(() => { const px = 760, py = 520, pw = 400; let h = head('Soma isn’t only a Figma file. It is a working React Native app, built screen by screen from the same kit, with real interactions and states.');
+  h += `<img class="phone" src="${PH}phone-care.png" style="left:${px}px; top:${py}px; width:${pw}px">`;
+  const C = [
+    ['L', 600, 'Star field', 'The kit’s 319 stars as one light SVG behind every screen.', 790, 600],
+    ['L', 860, 'Resource ring', 'Drawn in SVG and animated in code, like in the kit.', 860, 800],
+    ['L', 1120, 'Glass cards', 'The kit’s blur, border and glow recipe, one shared component.', 790, 1240],
+    ['R', 640, 'Tone of voice', 'Soft, hedged copy, rewritten after the audit.', 1000, 610],
+    ['R', 900, 'What helps now', 'Opens the real breathing practice: a 16‑second box breath, six rounds.', 1080, 1220],
+    ['R', 1160, 'Tab bar', 'Quiet icons that light up when active, straight from the kit.', 1060, 1380],
+  ];
+  let svg = '<svg class="abs" style="left:0; top:0" width="1920" height="1600">';
+  for (const [side, y, t, d, tx, ty] of C) { const x = side === 'L' ? 102 : 1318, ax = side === 'L' ? 102 + 460 : 1318 - 20;
+    svg += `<path d="M ${ax} ${y + 14} L ${tx} ${ty}" stroke="#C9BBFA" stroke-opacity=".28" fill="none"/><circle cx="${tx}" cy="${ty}" r="4" fill="#F2F0FA"/>`;
+    h += `<div class="abs t" style="left:${x}px; top:${y}px; width:440px; ${side === 'L' ? 'text-align:right' : ''}"><b>${t}</b>${nb(d)}</div>`; }
+  put('E', h + svg + '</svg>'); })();
+
+// F · three months in code
+(() => { let h = head('I built the app myself over three months, alongside the design, so every decision was checked on a real phone, not only in Figma.');
+  const M = [['July', 12, 'Expo scaffold, tokens ported from the kit'], ['August', 83, 'Onboarding, Home, Care, the breathing practice'], ['September', 40, 'Scenario audit by 17 roles, honest copy'], ['October', 21, 'Tea ritual, articles, polish']];
+  const x0 = 102, w = 1716 / 4, base = 860, k = 3.2;
+  h += `<div class="abs" style="left:102px; top:${base}px; width:1716px; height:1px; background:rgba(201,187,250,.18)"></div>`;
+  M.forEach(([m, c, d], i) => { const x = x0 + i * w;
+    h += `<div class="abs" style="left:${x}px; top:${base - c * k}px; width:${w - 40}px; height:${c * k}px; border-radius:16px 16px 0 0; background:linear-gradient(180deg, rgba(139,124,246,.32), rgba(139,124,246,.06))"></div>
+      <div class="abs" style="left:${x + 4}px; top:${base - c * k - 58}px; font-size:40px; font-weight:300; color:#F2F0FA">${c}</div>
+      <div class="abs t" style="left:${x}px; top:${base + 24}px; width:${w - 50}px"><b>${m}</b>${nb(d)}</div>`; });
+  h += `<div class="abs cap" style="left:102px; top:${base - 330}px">Commits per month · React Native · Expo · iOS & Android</div>`;
+  const P = ['ph-ob-about.png', 'phone-home.png', 'phone-care.png', 'phone-tea.png'];
+  P.forEach((f, i) => { h += `<img class="phone" src="${PH}${f}" style="left:${x0 + i * w + (w - 40 - 300) / 2}px; top:1080px; width:300px">`; });
+  put('F', h); })();
+
+// G · three pillars
+(() => { let h = head('Soma isn’t only a Figma file. It is a working React Native app, and it was checked like a real product.');
+  const colW = 552, gap = 30, top = 560;
+  const col = (i, title, d) => `<div class="abs" style="left:${102 + i * (colW + gap)}px; top:${top}px; width:${colW}px"><div class="cap" style="color:#A89CF8">0${i + 1}</div><div style="font-weight:300; font-size:34px; color:#F2F0FA; margin-top:12px">${title}</div><div class="t" style="margin-top:10px">${nb(d)}</div></div>`;
+  h += col(0, 'The kit, in code', 'Tokens, type and components ported one‑to‑one, so design and app never drift apart.')
+     + col(1, 'Real interactions', 'Onboarding, Home, Care, a breathing practice and a tea ritual you can actually use.')
+     + col(2, 'Audited like a product', 'Seventeen roles went through every flow. Eight findings are already fixed.');
+  h += `<div class="glass abs" style="left:102px; top:${top + 230}px; width:${colW}px; height:520px; padding:40px 40px; overflow:hidden"><div class="code" style="font-size:17px">${CODE}</div></div>`;
+  h += `<div class="glass abs" style="left:${102 + colW + gap}px; top:${top + 230}px; width:${colW}px; height:520px; overflow:hidden"><img src="${PH}phone-home-biorhythms.png" style="position:absolute; left:${(colW - 300) / 2}px; top:40px; width:300px"></div>`;
+  h += fixCard(102 + 2 * (colW + gap), top + 230, colW, FIX[0]) + fixCard(102 + 2 * (colW + gap), top + 230 + 270, colW, FIX[1]);
+  h += `<div class="abs" style="left:102px; top:${top + 850}px; width:1716px; display:flex; justify-content:space-between">${[['33', 'screens in code'], ['35', 'components'], ['156', 'commits in 3 months'], ['17', 'roles in the audit']].map(([n, l]) => `<div><div class="num" style="font-size:64px">${n}</div><div class="numl">${l}</div></div>`).join('')}</div>`;
+  put('G', h); })();
+</script>
+</body></html>
