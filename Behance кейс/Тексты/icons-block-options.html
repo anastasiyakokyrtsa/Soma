@@ -31,6 +31,7 @@
   .vhair { position:absolute; width:1px; background:rgba(201,187,250,.28); }
   .dot { position:absolute; width:7px; height:7px; border-radius:50%; background:#C9BBFA; margin:-3px 0 0 -3px; }
   .fadetop { -webkit-mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); }
+  .fadesoft { -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 50%, #000 75%, transparent 100%); mask-image:radial-gradient(ellipse 90% 90% at 50% 50%, #000 75%, transparent 100%); }
   .fadeb { -webkit-mask-image:linear-gradient(#000 70%, transparent); mask-image:linear-gradient(#000 70%, transparent); }
   .fadeall { -webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); mask-image:radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); }
   /* app components at 2x of their real size */
@@ -49,6 +50,9 @@
 
 <div class="opt"><b>3 · In their place.</b> Элементы там, где они живут: три настоящих фрагмента экранов (плитки Care, нижняя панель, травяная иллюстрация чая) и тонкие выноски к коротким заметкам. Рекомендация арт-директора (вариант E).</div>
 <div class="frame" id="V3" style="height:1760px; margin-bottom:-477px"></div>
+
+<div class="opt"><b>3+ · In their place, the whole kit.</b> Тот же стиль, но семь фрагментов вместо трёх, по одному на каждое семейство кита: иконки и карточки, навигация, кнопка, данные (кольцо ресурса), шкала настроения, иллюстрации, чипы выбора. У каждого фрагмента одна заметка: зачем он такой.</div>
+<div class="frame" id="V3b" style="height:2100px; margin-bottom:-569px"></div>
 
 <div class="opt"><b>4 · Herbarium of light.</b> Травы как ботаническая таблица: шесть растений целиком, без карточек, на одной тонкой линии; названия под ними. Иконки сверху как указатель, одной строкой. Самый «красивый» вариант для Алины, без клинического вида.</div>
 <div class="frame" id="V4" style="height:1600px; margin-bottom:-433px"></div>
@@ -115,6 +119,23 @@ const HEAD = 'Small signs, <em>drawn with light</em>';
   h += line(1500, 1230, 1000) + note(1000, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
   h += line(1560, 1230, 1210) + note(1210, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
   put('V3', h); })();
+
+// 3+ · In their place, the whole kit: seven real fragments in three columns, one quiet note under each
+(() => { let h = head(HEAD, 'Every element has one job. Here they are where they live, on the screens of the app.');
+  const frag = (src, x, y, w, cls, title, sub) => { const im = `<img class="abs ${cls}" src="${B}${src}" style="left:${x}px; top:${y}px; width:${w}px">`;
+    return { im, note: ny => `<div class="abs note" style="left:${x}px; top:${ny}px; width:${Math.min(w, 460)}px">${title}<small>${nb(sub)}</small></div>` }; };
+  const C1 = 102, C2 = 726, C3 = 1290, W1 = 560, W2 = 500, W3 = 528;
+  // column 1: icons and cards, navigation, button
+  let f = frag('care-tiles.png', C1, 604, W1, 'fadeb', 'Gradient icons on ritual tiles', 'Practices and body signals carry the gradient. They never glow.'); h += f.im + f.note(604 + 337 + 30);
+  f = frag('tabbar.png', C1, 1150, W1, 'fadetop', 'Navigation, 30 px', 'Outline at rest, solid violet with a label when active.'); h += f.im + f.note(1150 + 140 + 30);
+  f = frag('button.png', C1, 1520, W1, '', 'Primary button', 'Glow means “press”. A quiet link under it lets you fill this in later.'); h += f.im + f.note(1520 + 156 + 34);
+  // column 2: data, mood
+  f = frag('care-ring.png', C2, 604, W2, 'fadeall', 'Resource meter', 'A thin arc in the same calm violet, even at a low 42%.'); h += f.im + f.note(604 + 500 + 20);
+  f = frag('mood-scale.png', C2, 1300, W2, 'fadeall', 'Mood scale', 'Five shapes instead of numbers, and a 44 px touch strip around a 2 px line.'); h += f.im + f.note(1300 + 423 + 30);
+  // column 3: illustration, chips
+  f = frag('tea-herb.png', C3 + 60, 590, 410, 'fadeall', 'Herb illustrations', 'Drawn in points of light, like the stars behind every screen.'); h += f.im + `<div class="abs note" style="left:${C3}px; top:1250px; width:460px">Herb illustrations<small>${nb('Drawn in points of light, like the stars behind every screen. Six plants for the tea ritual.')}</small></div>`;
+  f = frag('chips.png', C3, 1420, W3, 'fadesoft', 'Select chips', 'An outline means chosen. Several can be picked at once, so they stay quiet.'); h += f.im + f.note(1420 + 392 + 30);
+  put('V3b', h); })();
 
 // 4 · Herbarium of light
 (() => { let h = head('A herbarium <em>of light</em>', 'Icons for signals and practices, and six plants for the tea ritual, drawn with the same soft light.');
