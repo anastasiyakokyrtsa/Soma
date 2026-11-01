@@ -1,0 +1,89 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Reflection — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&family=Onest:wght@600&display=swap" rel="stylesheet">
+<!-- Last block "Reflection" + closing. Honest content: only the science path is designed; personalisation is still mocked (audit finding 5);
+     no testing with real people yet; a path to professional support is deferred (finding 4); Patterns waits for honest data. No em dashes. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .t { font-weight:300; font-size:24px; line-height:1.55; color:#6E7390; }
+  .t b { display:block; font-weight:400; color:#A6ABC6; margin-bottom:6px; }
+  .big { font-weight:300; font-size:44px; line-height:1.45; color:#A6ABC6; }
+  .big em { font-style:normal; color:#E4E1F2; }
+  .dot { position:absolute; border-radius:50%; background:#fff; }
+  .thanks { font-weight:300; font-size:34px; color:#A6ABC6; letter-spacing:.02em; }
+  .soma { font-family:'Onest'; font-weight:600; font-size:220px; letter-spacing:.1em; color:rgba(255,255,255,.06); -webkit-text-stroke:1px rgba(201,187,250,.22); }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>R1 · Learned, would change, next.</b> Three calm columns, two or three short points each; under them a quiet closing: the glass SOMA wordmark, “Thank you for watching” and the motto.</div>
+<div class="frame" id="R1" style="height:1700px; margin-bottom:-460px"></div>
+
+<div class="opt"><b>R2 · Back to the orbit.</b> The case ends where it began: the Introduction’s orbit returns, and its three points now carry the reflection. Observed (what I learned about the people), Understood (what I learned as a designer), Respond (what comes next).</div>
+<div class="frame" id="R2" style="height:1800px; margin-bottom:-487px"></div>
+
+<div class="opt"><b>R3 · A short letter.</b> One honest paragraph in large light type, like a note at the end of a book; next steps in one small line under it; then the closing.</div>
+<div class="frame" id="R3" style="height:1500px; margin-bottom:-406px"></div>
+
+<div class="opt"><b>R4 · A constellation of lessons.</b> Five lessons as stars joined by faint lines (a callback to the Glance constellation), each with one line of text; the closing below.</div>
+<div class="frame" id="R4" style="height:1750px; margin-bottom:-474px"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)\s(\S+)$/, ' $1 $2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h = 'What Soma<br><em>taught me</em>') => `<div class="label">14 / Reflection</div><h2 class="h1">${h}</h2>`;
+const stars = (n, seed, y0, hh) => { let s = seed; const r = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); let d = '';
+  for (let i = 0; i < n; i++) { const z = .9 + r() * 1.1; d += `<div class="dot" style="left:${(r() * 1920).toFixed(0)}px; top:${(y0 + r() * hh).toFixed(0)}px; width:${z}px; height:${z}px; opacity:${(.15 + r() * .45).toFixed(2)}"></div>`; } return d; };
+const closing = y => stars(140, 5, y - 120, 520) +
+  `<div class="abs soma" style="left:0; right:0; top:${y}px; text-align:center">SOMA</div>
+   <div class="abs" style="left:0; right:0; top:${y + 270}px; text-align:center"><div class="thanks">Thank you for watching</div>
+   <div class="cap" style="margin-top:18px; color:#6E7390">Listen to your rhythm</div></div>`;
+const LEARNED = [['Design for the lowest‑energy day', 'Every extra tap is a reason to give up. The bar for “simple” is set by a tired person, not a curious one.'],
+  ['Words are part of the interface', 'Soft, hedged, guilt‑free copy mattered as much as any screen. The audit made me rewrite claims I couldn’t back up.'],
+  ['Code keeps design honest', 'Building the app myself showed which ideas held up on a real phone and which only worked in Figma.']];
+const CHANGE = [['Test with real people sooner', 'I checked flows with an audit, not yet with users. That is the next step.'],
+  ['Show real data earlier', 'Parts of Home are still placeholders. I would connect one real input to one real reading first.']];
+const NEXT = [['The astrological path and the synthesis', 'Two of the three ways in are mapped but not designed yet.'],
+  ['Patterns, when the data is honest', 'Only once there is enough of a person’s own history to show.'],
+  ['A gentle path to support', 'For long stretches of low days, a calm link to professional help.']];
+
+// R1
+(() => { const cols = [['Learned', LEARNED], ['Would change', CHANGE], ['Next', NEXT]]; const w = 520, gap = (1716 - 3 * w) / 2;
+  let h = head();
+  cols.forEach(([t, items], i) => { const x = 102 + i * (w + gap); h += `<div class="abs" style="left:${x}px; top:548px; width:${w}px"><div class="cap">${t}</div>${items.map(([a, b]) => `<div class="t" style="margin-top:34px"><b>${nb(a)}</b>${nb(b)}</div>`).join('')}</div>`; });
+  put('R1', h + closing(1260)); })();
+
+// R2 · orbit callback
+(() => { const cx = 960, cy = 900, rx = 760, ry = 150;
+  let h = head('Observe, understand,<br><em>respond</em>');
+  h += `<svg class="abs" style="left:0; top:0" width="1920" height="1700"><defs><radialGradient id="g"><stop offset="0" stop-color="#A89CF8" stop-opacity=".35"/><stop offset="1" stop-color="#050816" stop-opacity="0"/></radialGradient></defs>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#C9BBFA" stroke-opacity=".25"/><circle cx="${cx}" cy="${cy}" r="120" fill="url(#g)"/><circle cx="${cx}" cy="${cy}" r="4" fill="#EDE8FF"/>
+    ${[[cx - rx * .96, cy - 40], [cx + rx * .94, cy - 50], [cx, cy + ry]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i === 2 ? 7 : 4}" fill="#EDE8FF"/>`).join('')}</svg>`;
+  const P = [['01 · Observed', 'People want to know why they feel this way, without guilt and without one more demanding app.', 102, 548], ['02 · Understood', 'Design for the lowest‑energy day. Words are part of the interface. Code keeps design honest.', 1318, 548], ['03 · Respond', 'Test with real people, design the astrological path and the synthesis, add a gentle path to support.', 700, 1100]];
+  P.forEach(([t, d, x, y]) => { h += `<div class="abs" style="left:${x}px; top:${y}px; width:500px; ${x === 700 ? 'text-align:center; width:520px' : ''}"><div class="cap">${t}</div><div class="t" style="margin-top:14px">${nb(d)}</div></div>`; });
+  h += `<div class="abs cap" style="left:${cx - 40}px; top:${cy - 50}px; color:#4F5373">YOU</div>`;
+  put('R2', h + closing(1360)); })();
+
+// R3 · letter
+put('R3', head() + `<div class="abs big" style="left:102px; top:548px; width:1500px">${nb('Soma began as a question: why do I feel this way today? Designing it taught me to build for the')} <em>${nb('lowest‑energy day')}</em>, ${nb('to treat every word as part of the interface, and to check ideas on a real phone, not only in Figma. Next I want to test it with real people and design the two paths that are still only mapped.')}</div>
+  <div class="abs t" style="left:102px; top:960px; width:1500px; font-size:20px">Next · testing with people · the astrological path and the synthesis · Patterns on honest data · a gentle path to support</div>` + closing(1060));
+
+// R4 · constellation
+(() => { const L = [['Design for the lowest‑energy day', 'A tired person sets the bar for “simple”.', 200, 640], ['Words are interface', 'Soft, hedged, guilt‑free copy.', 640, 860], ['Honesty over promises', 'No claims I can’t back up.', 1060, 600], ['Code keeps design honest', 'Every screen checked on a real phone.', 1440, 880], ['Next: real people', 'Testing, then the two other paths.', 1700, 560]];
+  let h = head(), svg = '<svg class="abs" style="left:0; top:0" width="1920" height="1750">';
+  for (let i = 0; i < L.length - 1; i++) svg += `<line x1="${L[i][2]}" y1="${L[i][3]}" x2="${L[i + 1][2]}" y2="${L[i + 1][3]}" stroke="#C9BBFA" stroke-opacity=".22"/>`;
+  L.forEach(([t, d, x, y]) => { svg += `<circle cx="${x}" cy="${y}" r="18" fill="#A89CF8" opacity=".14"/><circle cx="${x}" cy="${y}" r="5" fill="#F2F0FA"/>`;
+    h += `<div class="abs t" style="left:${x - 150}px; top:${y + 34}px; width:300px; text-align:center; font-size:21px"><b>${nb(t)}</b>${nb(d)}</div>`; });
+  put('R4', h + svg + '</svg>' + closing(1300)); })();
+</script>
+</body></html>

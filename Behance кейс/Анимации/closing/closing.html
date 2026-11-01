@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Closing — Soma logo pulse</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Closing block of the case: the app's own logo animation (app/components/SomaLogoAnimation.tsx), only its final, settled state:
+     the drawn ring with its orbital dot at 12 o'clock and "Soma" inside, breathing. Same constants: R 115 on a 480 canvas,
+     layers outer/mid/inner/text pulse 1 → 0.52 → 1 over 3 s (in-out quad), staggered 0 / 0.15 / 0.3 / 0.5 s. No drawing ("loading") phase.
+     window.render(t), seamless at T = 3 s. -->
+<style>html,body{margin:0;background:#050816} #s{position:relative;width:1920px;height:1000px} canvas{position:absolute;left:0;top:0}
+  .tx{position:absolute;left:0;right:0;text-align:center;font-family:'Nunito Sans',sans-serif}</style>
+</head><body><div id="s"><canvas id="c" width="1920" height="1000"></canvas>
+  <div class="tx" style="top:772px;font-weight:300;font-size:28px;color:#A6ABC6">Thank you for watching</div>
+  <div class="tx" style="top:828px;font-weight:400;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#6E7390">Listen to your rhythm</div></div>
+<script>
+const T = 3, PULSE = 3, CX = 960, CY = 440, SC = 210 / 115; // the logo's R 115 drawn at 210 px
+const C_OUTER = '#8B7CF6', C_MID = '#A99CF8', C_INNER = '#C4BBFA', C_TEXT = '#DDD9FF';
+const ctx = document.getElementById('c').getContext('2d');
+let seed = 3; const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+const STARS = Array.from({ length: 220 }, () => ({ x: rnd() * 1920, y: rnd() * 1000, r: .4 + rnd() * .5, a: .15 + rnd() * .45 }));
+const inOutQuad = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+// app's withRepeat(withSequence(1→.52, .52→1)) with in-out quad on each half
+const breathe = (t, off) => { const p = (((t - off) % PULSE) + PULSE) % PULSE / PULSE; return p < .5 ? 1 - .48 * inOutQuad(p * 2) : .52 + .48 * inOutQuad((p - .5) * 2); };
+function ring(width, color, alpha, blur) { ctx.save(); ctx.globalAlpha = alpha; ctx.filter = blur ? `blur(${blur * SC}px)` : 'none'; ctx.strokeStyle = color; ctx.lineWidth = width * SC;
+  ctx.beginPath(); ctx.arc(CX, CY, 115 * SC, 0, 2 * Math.PI); ctx.stroke(); ctx.restore(); }
+function dot(r, color, alpha, blur) { ctx.save(); ctx.globalAlpha = alpha; ctx.filter = blur ? `blur(${blur * SC}px)` : 'none'; ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(CX, CY - 115 * SC, r * SC, 0, 2 * Math.PI); ctx.fill(); ctx.restore(); }
+function word(alpha, blur) { ctx.save(); ctx.globalAlpha = alpha; ctx.filter = blur ? `blur(${blur * SC}px)` : 'none'; ctx.fillStyle = C_TEXT;
+  ctx.font = `300 ${30 * SC}px 'Nunito Sans'`; const chars = 'Soma'.split(''), ws = chars.map(c => ctx.measureText(c).width), total = ws.reduce((a, b) => a + b, 0) + 7 * SC * 3;
+  let x = CX - total / 2; chars.forEach((c, i) => { ctx.fillText(c, x, CY + 10 * SC); x += ws[i] + 7 * SC; }); ctx.restore(); }
+window.render = t => {
+  ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.fillStyle = '#050816'; ctx.fillRect(0, 0, 1920, 1000);
+  for (const s of STARS) { ctx.globalAlpha = s.a; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI); ctx.fill(); }
+  ring(22, C_OUTER, .28 * breathe(t, 0), 18); ring(9, C_MID, .6 * breathe(t, .15), 8); ring(3.5, C_INNER, .9 * breathe(t, .3), 3); ring(1.2, '#FFFFFF', 1, 0);
+  dot(5, C_OUTER, .45, 16); dot(5, C_OUTER, .9, 6); dot(5, '#FFFFFF', 1, 1.5);
+  const tp = breathe(t, .5); word(tp * .7, 10); word(tp, 0);
+};
+document.fonts.load("300 55px 'Nunito Sans'").then(() => { window.render(0); window.__ready = true; });
+</script></body></html>

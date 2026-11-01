@@ -1,0 +1,115 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Reflection and closing — round 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400&display=swap" rel="stylesheet">
+<!-- Part 1: five new layouts for "14 / Reflection" (honest content only). Part 2: five closings, built around the app's real logo
+     (UI kit: a glowing orbital ring with "Soma" inside, Мокапы/parts/soma-logo-kit.png) and the real "Well done" screen. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  h3 { color:#e4e2ee; font-weight:400; font-size:20px; margin:70px 0 0; }
+  .opt { color:#9a9aa6; font-size:15px; margin:30px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .abs { position:absolute; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .capq { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#6E7390; }
+  .t { font-weight:300; font-size:24px; line-height:1.55; color:#6E7390; }
+  .t b { display:block; font-weight:400; color:#A6ABC6; margin-bottom:6px; }
+  .q { font-weight:300; font-size:46px; line-height:1.35; color:#C9C6DC; }
+  .dot { position:absolute; border-radius:50%; background:#fff; }
+  .phone { position:absolute; filter:drop-shadow(0 40px 60px rgba(0,0,0,.6)); }
+  .soma { font-weight:300; color:#DDD9FF; letter-spacing:.32em; text-shadow:0 0 18px rgba(196,187,250,.55), 0 0 4px rgba(221,217,255,.6); }
+</style></head><body><div class="wrap">
+
+<h3>Reflection · five more layouts</h3>
+<div class="opt"><b>R5 · Three sentences.</b> Three large, quiet statements stacked with lots of air, each with one small line under it. Reads like conclusions, not a list.</div>
+<div class="frame" id="R5" style="height:1500px; margin-bottom:-406px"></div>
+<div class="opt"><b>R6 · I thought / I learned.</b> Three pairs side by side: what I assumed at the start, struck through softly, and what the project taught me instead.</div>
+<div class="frame" id="R6" style="height:1020px; margin-bottom:-276px"></div>
+<div class="opt"><b>R7 · The process line, continued.</b> The Glance line Discover · Design · Build gets a fourth station, Next, glowing; under each station what it gave me, under Next the honest next steps.</div>
+<div class="frame" id="R7" style="height:1060px; margin-bottom:-287px"></div>
+<div class="opt"><b>R8 · Persona voice, my answer.</b> One line from the research (Irina’s need) as a large quote; my three lessons answer it below.</div>
+<div class="frame" id="R8" style="height:1160px; margin-bottom:-314px"></div>
+<div class="opt"><b>R9 · Done and next.</b> Two calm halves: what is done (the science path, the kit, the app, the audit) and what is next, as two short lists with a thin divider.</div>
+<div class="frame" id="R9" style="height:1060px; margin-bottom:-287px"></div>
+
+<h3>Closing · five ways to say thank you</h3>
+<div class="opt"><b>K1 · The app’s logo.</b> The real Soma logo from the kit, the glowing orbital ring with “Soma” inside, on the star field; one small line under it.</div>
+<div class="frame" id="K1" style="height:1000px; margin-bottom:-271px"></div>
+<div class="opt"><b>K2 · Mirror of the cover.</b> The cover’s top line returns at the bottom (project · role · year); the motto small above a large, light “Thank you”.</div>
+<div class="frame" id="K2" style="height:900px; margin-bottom:-244px"></div>
+<div class="opt"><b>K3 · Practice complete.</b> The real “Well done! You finished the practice” screen as the last image; next to it “Thank you for watching”. The case ends like a calm practice does.</div>
+<div class="frame" id="K3" style="height:1250px; margin-bottom:-338px"></div>
+<div class="opt"><b>K4 · Ring and words.</b> The logo’s ring alone, large and faint, with “Thank you for watching” written inside it instead of the name.</div>
+<div class="frame" id="K4" style="height:1100px; margin-bottom:-298px"></div>
+<div class="opt"><b>K5 · Just stars.</b> Almost empty: the star field, a tiny logo ring and two words. The quietest ending.</div>
+<div class="frame" id="K5" style="height:800px; margin-bottom:-216px"></div>
+
+</div>
+<script>
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/\s(\S+)\s(\S+)$/, ' $1 $2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h = 'What Soma<br><em>taught me</em>') => `<div class="label">14 / Reflection</div><h2 class="h1">${h}</h2>`;
+const stars = (n, seed, y0, hh) => { let s = seed; const r = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); let d = '';
+  for (let i = 0; i < n; i++) { const z = .8 + r() * 1; d += `<div class="dot" style="left:${(r() * 1920).toFixed(0)}px; top:${(y0 + r() * hh).toFixed(0)}px; width:${z}px; height:${z}px; opacity:${(.15 + r() * .45).toFixed(2)}"></div>`; } return d; };
+// the kit logo: thin glowing ring (#8B7CF6 → #A99CF8 → #C4BBFA) with "Soma" inside, letter-spaced
+const ring = (cx, cy, r, w = 2, op = 1) => `<svg class="abs" style="left:${cx - r - 40}px; top:${cy - r - 40}px; overflow:visible" width="${2 * r + 80}" height="${2 * r + 80}">
+  <defs><linearGradient id="rg${r}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C4BBFA"/><stop offset=".5" stop-color="#A99CF8"/><stop offset="1" stop-color="#8B7CF6"/></linearGradient>
+  <filter id="gl${r}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${r * .05}"/></filter></defs>
+  <circle cx="${r + 40}" cy="${r + 40}" r="${r}" fill="none" stroke="url(#rg${r})" stroke-width="${w * 4}" opacity="${.45 * op}" filter="url(#gl${r})"/>
+  <circle cx="${r + 40}" cy="${r + 40}" r="${r}" fill="none" stroke="url(#rg${r})" stroke-width="${w}" opacity="${op}"/></svg>`;
+const logo = (cx, cy, r) => ring(cx, cy, r) + `<div class="abs soma" style="left:${cx - 300}px; width:600px; text-align:center; top:${cy - r * .16}px; font-size:${r * .26}px">Soma</div>`;
+
+// R5
+(() => { const S = [['I design for the lowest‑energy day.', 'A tired person, not a curious one, sets the bar for “simple”.'], ['Words are part of the interface.', 'Soft, hedged, guilt‑free copy mattered as much as any screen.'], ['Code keeps design honest.', 'Building the app showed which ideas held up on a real phone.']];
+  put('R5', head() + S.map(([a, b], i) => `<div class="abs" style="left:102px; top:${548 + i * 270}px; width:1500px"><div class="q">${nb(a)}</div><div class="t" style="margin-top:12px">${nb(b)}</div></div>`).join('')); })();
+
+// R6
+(() => { const P = [['More data means more insight', 'One honest reading beats a dashboard'], ['Wellness copy should motivate', 'It should never make anyone feel guilty'], ['The design is done in Figma', 'It is done when it works on a phone']]; const w = 520, gap = (1716 - 3 * w) / 2;
+  put('R6', head() + P.map(([a, b], i) => `<div class="abs" style="left:${102 + i * (w + gap)}px; top:548px; width:${w}px">
+    <div class="capq">I thought</div><div class="t" style="margin-top:12px; color:#454A63; text-decoration:line-through; text-decoration-color:rgba(168,156,248,.4)">${nb(a)}</div>
+    <div class="cap" style="margin-top:46px">I learned</div><div class="t" style="margin-top:12px; color:#D9D5F2; font-size:30px">${nb(b)}</div></div>`).join('')); })();
+
+// R7
+(() => { const ST = [['Discover', 'People want to know why they feel this way, without guilt.'], ['Design', 'Calm beats clever. Fewer screens, softer words.'], ['Build', 'A real phone shows what Figma hides.'], ['Next', 'Test with people, design the astrological path and the synthesis, add a gentle path to support.']];
+  const y = 640, w = 1716 / 4; let h = head() + `<div class="abs" style="left:102px; top:${y}px; width:1716px; height:1px; background:linear-gradient(90deg, rgba(201,187,250,.25), rgba(201,187,250,.25) 70%, rgba(255,198,241,.6))"></div>`;
+  ST.forEach(([t, d], i) => { const x = 102 + i * w, last = i === 3;
+    h += `<div class="abs" style="left:${x}px; top:${y - (last ? 9 : 5)}px; width:${last ? 18 : 10}px; height:${last ? 18 : 10}px; border-radius:50%; background:${last ? '#FFC6F1' : '#C9BBFA'}; box-shadow:0 0 ${last ? 22 : 8}px ${last ? '#FFC6F1' : '#A89CF8'}"></div>
+      <div class="abs" style="left:${x}px; top:${y + 46}px; width:${w - 60}px"><div class="cap" style="color:${last ? '#FFC6F1' : '#A89CF8'}">0${i + 1} · ${t}</div><div class="t" style="margin-top:14px">${nb(d)}</div></div>`; });
+  put('R7', h); })();
+
+// R8
+put('R8', head() + `<div class="abs" style="left:102px; top:548px; width:1400px"><div class="q">“${nb('I want to understand why I feel this way, without guilt and without one more demanding app.')}”</div>
+  <div class="capq" style="margin-top:22px">Irina, 47 · from the research</div></div>` +
+  [['Design for the lowest‑energy day', 'Every extra tap is a reason to give up.'], ['Words are interface', 'Soft, hedged, guilt‑free copy everywhere.'], ['Honesty over promises', 'No claims I can’t back up; the audit made sure.']].map(([a, b], i) => `<div class="abs t" style="left:${102 + i * 590}px; top:930px; width:520px"><b>${nb(a)}</b>${nb(b)}</div>`).join(''));
+
+// R9
+put('R9', head('Where Soma<br><em>is now</em>') + `<div class="abs" style="left:959px; top:548px; width:1px; height:420px; background:rgba(201,187,250,.14)"></div>` +
+  [['Done', ['The science path, end to end', 'A UI kit with tokens, type and components', 'A working React Native app', 'A scenario audit, 8 of 17 findings fixed']], ['Next', ['Testing with real people', 'The astrological path and the synthesis', 'Patterns, once the data is honest', 'A gentle path to professional support']]]
+    .map(([t, items], i) => `<div class="abs" style="left:${102 + i * 960}px; top:548px; width:760px"><div class="cap" style="${i ? 'color:#FFC6F1' : ''}">${t}</div>${items.map(s => `<div class="t" style="margin-top:22px; color:${i ? '#6E7390' : '#A6ABC6'}">${nb(s)}</div>`).join('')}</div>`).join(''));
+
+// K1 · real logo
+put('K1', stars(220, 3, 0, 1000) + logo(960, 440, 210) + `<div class="abs" style="left:0; right:0; top:760px; text-align:center"><div class="t" style="font-size:28px; color:#A6ABC6">Thank you for watching</div><div class="capq" style="margin-top:16px">Listen to your rhythm</div></div>`);
+
+// K2 · mirror of the cover
+put('K2', stars(160, 9, 0, 900) + `<div class="abs capq" style="left:0; right:0; top:250px; text-align:center">Listen to your rhythm</div>
+  <div class="abs" style="left:0; right:0; top:300px; text-align:center; font-weight:200; font-size:150px; color:#E4E1F2; letter-spacing:.02em">Thank you</div>
+  <div class="abs" style="left:102px; right:102px; top:780px; display:flex; justify-content:space-between; font-size:20px; color:#6E7390"><span>Soma · self‑knowledge app</span><span>Product design · UI · Code</span><span>2026</span></div>`);
+
+// K3 · practice complete
+put('K3', stars(160, 4, 0, 1250) + `<img class="phone" src="../Мокапы/thin/phone-done.png" style="left:420px; top:160px; width:440px">` +
+  `<div class="abs" style="left:1060px; top:470px; width:700px"><div class="capq">Practice complete</div><div style="font-weight:200; font-size:84px; line-height:1.15; color:#E4E1F2; margin-top:18px">Thank you<br>for watching</div><div class="t" style="margin-top:22px">${nb('Take a slow breath. Listen to your rhythm.')}</div></div>`);
+
+// K4 · ring with words
+put('K4', stars(200, 6, 0, 1100) + ring(960, 550, 400, 1.5, .8) + `<div class="abs" style="left:0; right:0; top:508px; text-align:center; font-weight:200; font-size:46px; color:#DDD9FF; letter-spacing:.08em">Thank you for watching</div>
+  <div class="abs capq" style="left:0; right:0; top:600px; text-align:center">Soma · listen to your rhythm</div>`);
+
+// K5 · just stars
+put('K5', stars(260, 8, 0, 800) + ring(960, 330, 34, 1.2) + `<div class="abs" style="left:0; right:0; top:410px; text-align:center; font-weight:300; font-size:30px; color:#A6ABC6; letter-spacing:.04em">Thank you</div>`);
+</script>
+</body></html>
