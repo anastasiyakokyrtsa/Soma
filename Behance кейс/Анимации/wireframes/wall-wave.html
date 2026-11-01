@@ -4,8 +4,8 @@
 <!-- Block "08 / Wireframes" (Figma 983:2), animated: a soft band of light sweeps across the wireframe wall towards the Care screen,
      lighting each wireframe as it passes ("from structure to light"); the wave runs from the first frame and never stops. bg.png = block fill + star dust; overlay.png = fades, texts, phone;
      cells are drawn from the same -dark wireframe PNGs, positions and opacities read from Figma. window.render(t), seamless at T. -->
-<style>html,body{margin:0;background:#050816} #s{position:relative;width:1920px;height:1500px} canvas{position:absolute;left:0;top:0}</style>
-</head><body><div id="s"><canvas id="c" width="1920" height="1500"></canvas></div>
+<style>html,body{margin:0;background:#050816} #s{position:relative;width:1920px;height:1556px} canvas{position:absolute;left:0;top:0}</style>
+</head><body><div id="s"><canvas id="c" width="1920" height="1556"></canvas></div>
 <script>
 // a continuous, wrapping wave: one band always on the wall, starting at once; L = wrap length along the diagonal
 // the light is a LINE: a thin bright core with long soft falloff on both sides (her ask: a line with smooth edges, not a spot)
@@ -13,6 +13,9 @@ const T = 8, L = 3000, BOOST = 0.125, CORE = 120, SOFT = 300, SOFT_K = .45, TINT
 // the band is cut straight at the top and bottom (a slanted parallelogram with softened corners, not a rounded capsule)
 const CUT = [560, 1300], RAMP = 44;
 const W = '../../Мокапы/wireframes/en/';
+// 11-01: the header became one line + a lead under it, so the wall moved down by OFF; the wall and light layers keep their
+// own coordinates (as below) and are drawn OFF lower; bg.png / overlay.png are the new 1920×1556 Figma exports
+const OFF = 56, H = 1556;
 // [file, x, y, base opacity] from Figma (wall frame at y 380; cells 170×371, radius 16)
 const CELLS = [["01-start",11,380,0.28],["02-about-1",203,380,0.28],["03-about-2",395,380,0.28],["04-about-3",587,380,0.29],["06-name",779,380,0.384],["07-email",971,380,0.47],["08-gender",1163,380,0.538],["09-support",1355,380,0.571],["10-choose",1547,380,0.553],["11-profile-start",1739,380,0.494],["12-dob",11,773,0.28],["13-sleep",203,773,0.28],["14-mood",395,773,0.28],["15-cycle",587,773,0.337],["16-visual-style",779,773,0.443],["17-personalization-5",971,773,0.55],["18-personalization-7",1163,773,0.656],["19-home",1355,773,0.761],["20-care",1547,773,0.689],["22-breathing",1739,773,0.583],["29-breathing-end",11,1165,0.28],["23-tea-categories",203,1165,0.28],["24-calming-teas",395,1165,0.28],["25-chamomile",587,1165,0.281],["26-article-water",779,1165,0.373],["27-analytics",971,1165,0.456],["28-analytics-biorhythm",1163,1165,0.521],["30-breathing-4",1355,1165,0.551],["05-start-5",1547,1165,0.535],["01-start",1739,1165,0.479],["02-about-1",11,1558,0.28],["03-about-2",203,1558,0.28],["04-about-3",395,1558,0.28],["06-name",587,1558,0.28],["07-email",779,1558,0.28],["08-gender",971,1558,0.28],["09-support",1163,1558,0.317],["10-choose",1355,1558,0.333],["11-profile-start",1547,1558,0.325],["12-dob",1739,1558,0.292]];
 const CW = 170, CH = 371, R = 16;
@@ -50,16 +53,16 @@ window.render = t => {
   ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(bg, 0, 0);
   // faint light on the background itself, so the band is visible in the gaps too
   glow.clearRect(0, 0, 1920, 1500); band(glow, front, 1); glow.globalCompositeOperation = 'source-in'; glow.fillStyle = `rgba(168,156,248,${GLOW})`; glow.fillRect(0, 380, 1920, 1120); glow.globalCompositeOperation = 'source-over';
-  ctx.globalCompositeOperation = 'screen'; ctx.drawImage(glowC, 0, 0); ctx.globalCompositeOperation = 'source-over';
-  ctx.drawImage(restC, 0, 0);
+  ctx.globalCompositeOperation = 'screen'; ctx.drawImage(glowC, 0, OFF); ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(restC, 0, OFF);
   // lit wall, masked by the band
   const [mC, m] = window.__m || (window.__m = mk()); m.globalCompositeOperation = 'source-over'; m.clearRect(0, 0, 1920, 1500); m.drawImage(litC, 0, 0);
   m.globalCompositeOperation = 'destination-in'; band(m, front, 1); m.globalCompositeOperation = 'source-over';
-  ctx.drawImage(mC, 0, 0);
+  ctx.drawImage(mC, 0, OFF);
   ctx.drawImage(ov, 0, 0);
   // dither the wall area: the light lifts the screens by only ~10 levels, which shows up as visible steps (banding) in 8-bit video;
   // a static, very fine noise of ±1.5 levels breaks the steps without looking grainy (static, so it compresses well)
-  const Y0 = 380, im = ctx.getImageData(0, Y0, 1920, 1500 - Y0), d = im.data;
+  const Y0 = 380 + OFF, im = ctx.getImageData(0, Y0, 1920, H - Y0), d = im.data;
   for (let i = 0, j = 0; i < d.length; i += 4, j++) { const n = NOISE[j]; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
   ctx.putImageData(im, 0, Y0);
 };
