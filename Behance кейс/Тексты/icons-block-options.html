@@ -1,0 +1,155 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Icons & elements — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600&display=swap" rel="stylesheet">
+<!-- Block "10 / Icons & elements", 5 directions after the team review (ui-designer, mobile-ux, accessibility, art director).
+     Only real assets: UI Kit/assets/icons-clean, app/assets/mood, Мокапы/parts/herbs-tiles, crops of the real EN screens (b10/).
+     Chips are drawn with the app's exact values (SelectChip.tsx, NavChip.tsx). Header follows the new rule: one-line headline, lead under it, content at +125. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; padding:30px 0 80px; }
+  .wrap { width:1400px; margin:0 auto; }
+  .opt { color:#9a9aa6; font-size:15px; margin:44px 0 10px; line-height:1.55; max-width:1300px; }
+  .opt b { color:#e4e2ee; font-weight:400; }
+  .frame { width:1920px; position:relative; overflow:hidden; background:#050816; transform:scale(.7292); transform-origin:top left; }
+  .abs { position:absolute; }
+  .label { position:absolute; left:102px; top:160px; font-size:20px; letter-spacing:.04em; color:#6E7390; }
+  .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; white-space:nowrap; }
+  .h1 em { font-style:normal; color:#A89CF8; }
+  .lead { position:absolute; left:102px; top:363px; width:1300px; font-weight:300; font-size:40px; line-height:1.45; color:#6E7390; }
+  .cap { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#A89CF8; }
+  .q { font-size:14px; letter-spacing:.14em; text-transform:uppercase; color:#4F5373; }
+  .rule { font-weight:300; font-size:34px; line-height:1.3; color:#E4E1F2; }
+  .t { font-weight:300; font-size:22px; line-height:1.55; color:#6E7390; }
+  .note { font-weight:300; font-size:20px; line-height:1.5; color:#A6ABC6; }
+  .note small { display:block; font-size:16px; color:#6E7390; margin-top:4px; }
+  .glass { border-radius:30px; background:linear-gradient(160deg, rgba(180,168,250,.09), rgba(139,124,246,.055) 55%, rgba(168,156,248,.03)); box-shadow:inset 0 0 0 1px rgba(220,214,255,.12); }
+  .ico { display:block; }
+  .lit { filter:drop-shadow(0 0 7px rgba(139,124,246,.75)) drop-shadow(0 0 2px rgba(139,124,246,.6)); }
+  .arrow { color:#4F5373; font-size:28px; font-weight:300; }
+  .hair { position:absolute; height:1px; background:rgba(201,187,250,.28); }
+  .vhair { position:absolute; width:1px; background:rgba(201,187,250,.28); }
+  .dot { position:absolute; width:7px; height:7px; border-radius:50%; background:#C9BBFA; margin:-3px 0 0 -3px; }
+  .fadetop { -webkit-mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); }
+  .fadeb { -webkit-mask-image:linear-gradient(#000 70%, transparent); mask-image:linear-gradient(#000 70%, transparent); }
+  .fadeall { -webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); mask-image:radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); }
+  /* app components at 2x of their real size */
+  .chip { display:inline-flex; align-items:center; height:88px; padding:0 28px; border-radius:999px; border:2px solid rgba(255,255,255,.24); background:#050816; font-weight:600; font-size:30px; color:#fff; }
+  .chip.on { border-color:rgba(168,156,248,.85); background:rgba(139,124,246,.12); }
+  .navchip { display:inline-flex; align-items:center; gap:24px; min-height:120px; padding:0 40px; border-radius:40px; border:2px solid transparent; background:rgba(255,255,255,.02); box-shadow:inset 0 0 0 2px rgba(255,255,255,.06); font-weight:600; font-size:28px; color:#fff; }
+  .navchip.on { border-color:rgba(168,156,248,.85); transform:scale(.98); box-shadow:none; }
+  .tablabel { font-weight:600; font-size:20px; color:#A89CF8; text-align:center; margin-top:10px; }
+</style></head><body><div class="wrap">
+
+<div class="opt"><b>1 · Three rules.</b> Вместо каталога три правила системы, у каждого одна пара-доказательство и подпись в одну строку. Справа одна трава крупно, без карточки. Совет UI-дизайнера (его вариант B).</div>
+<div class="frame" id="V1" style="height:1560px; margin-bottom:-422px"></div>
+
+<div class="opt"><b>2 · Quiet, then lit.</b> Блок как история касания: настоящая нижняя панель крупно, под ней четыре пары «в покое → после касания» (вкладка, чип выбора, навигационный чип, настроение). Совет mobile-UX и арт-директора (вариант B). Компоненты в 2× от реального размера.</div>
+<div class="frame" id="V2" style="height:1880px; margin-bottom:-509px"></div>
+
+<div class="opt"><b>3 · In their place.</b> Элементы там, где они живут: три настоящих фрагмента экранов (плитки Care, нижняя панель, травяная иллюстрация чая) и тонкие выноски к коротким заметкам. Рекомендация арт-директора (вариант E).</div>
+<div class="frame" id="V3" style="height:1760px; margin-bottom:-477px"></div>
+
+<div class="opt"><b>4 · Herbarium of light.</b> Травы как ботаническая таблица: шесть растений целиком, без карточек, на одной тонкой линии; названия под ними. Иконки сверху как указатель, одной строкой. Самый «красивый» вариант для Алины, без клинического вида.</div>
+<div class="frame" id="V4" style="height:1600px; margin-bottom:-433px"></div>
+
+<div class="opt"><b>5 · Anatomy of one sign.</b> Одна иконка навигации и одна градиентная крупно, с выносками о том, как они устроены; под ними лотос в реальных размерах системы с названием компонента. Плюс две честные заметки о доступности. Совет UI-дизайнера (A) и специалиста по доступности.</div>
+<div class="frame" id="V5" style="height:1640px; margin-bottom:-444px"></div>
+
+</div>
+<script>
+const I = '../../UI Kit/assets/icons-clean/', H = '../Мокапы/parts/herbs-tiles/', M = '../../app/assets/mood/', B = 'b10/';
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2&nbsp;').replace(/\s(\S+)\s(\S+)$/, ' $1&nbsp;$2');
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2 class="h1">${h}</h2><div class="lead">${nb(lead)}</div>`;
+const ic = (n, s, cls = '') => `<img class="ico ${cls}" src="${I}${n}.svg" style="height:${s}px; width:auto">`;
+const mood = ['very-bad', 'bad', 'neutral', 'good', 'very-good'];
+const HEAD = 'Small signs, <em>drawn with light</em>';
+
+// 1 · Three rules
+(() => { let h = head(HEAD, 'Every icon and element follows three quiet rules, so the screen never raises its voice at a tired person.');
+  const col = (i, x, title, vis, cap) => `<div class="abs" style="left:${x}px; top:604px; width:400px">
+    <div class="cap">0${i}</div><div class="rule" style="margin-top:18px; height:90px">${nb(title)}</div>
+    <div style="height:330px; display:flex; align-items:center; gap:34px; margin-top:30px">${vis}</div>
+    <div class="t" style="margin-top:30px">${nb(cap)}</div></div>`;
+  h += col(1, 102, 'Gradient is the body, flat is the app',
+    `<div>${ic('lotus', 96)}<div class="q" style="margin-top:22px">Signal</div></div><div>${ic('home', 96)}<div class="q" style="margin-top:22px">Navigation</div></div>`,
+    'Practices and body signals carry the pink to violet gradient. Navigation stays flat white.');
+  h += col(2, 562, 'Only touch makes light',
+    `<div>${ic('home', 96)}<div class="q" style="margin-top:22px">At rest</div></div><div class="arrow">→</div><div>${ic('home-alt', 96, 'lit')}<div class="tablabel">Home</div></div>`,
+    'Icons never glow on their own. Only the tab you are on lights up and says its name.');
+  h += col(3, 1022, 'Low is never red',
+    `<div style="position:relative; width:400px"><div style="width:250px; height:250px; background:url(${B}care-ring.png) center/cover; border-radius:50%"></div>
+     <div style="display:flex; gap:14px; margin-top:22px">${mood.map(m => `<img src="${M}picture-mood-scala-${m}.png" style="width:52px">`).join('')}</div></div>`,
+    'A low score keeps the same calm violet. Nothing turns red, even on a bad day.');
+  h += `<img class="abs" src="${H}lavender.png" style="left:1560px; top:560px; height:900px">`;
+  put('V1', h); })();
+
+// 2 · Quiet, then lit
+(() => { let h = head('Quiet until <em>you touch it</em>', 'Navigation stays dim and choices stay soft. Light appears only where your finger has just been.');
+  h += `<img class="abs fadetop" src="${B}tabbar.png" style="left:310px; top:604px; width:1300px">`;
+  h += `<div class="abs q" style="left:102px; top:1090px">At rest</div><div class="abs q" style="left:560px; top:1090px">Touched</div>
+        <div class="abs q" style="left:1010px; top:1090px">At rest</div><div class="abs q" style="left:1468px; top:1090px">Touched</div>`;
+  const pair = (x, y, a, b, cap) => `<div class="abs" style="left:${x}px; top:${y}px; width:808px">
+    <div style="display:flex; align-items:center; height:160px"><div style="width:400px">${a}</div><div class="arrow" style="width:58px; margin-left:-58px">→</div><div>${b}</div></div>
+    <div class="t" style="margin-top:22px; width:720px">${nb(cap)}</div></div>`;
+  h += pair(102, 1140, ic('care', 64), `<div style="display:inline-block">${ic('care-alt', 64, 'lit')}<div class="tablabel">Care</div></div>`, 'Only the screen you are on lights up and says its name.');
+  h += pair(1010, 1140, `<span class="chip">Sleep</span>`, `<span class="chip on">Sleep</span>`, 'Choosing never shouts: an outline means chosen, glow is saved for buttons.');
+  h += pair(102, 1480, `<span class="navchip">${ic('windy-weather', 40)}Breathing</span>`, `<span class="navchip on">${ic('windy-weather', 40)}Breathing</span>`, 'A pressed chip sinks a little and gets a thin violet edge.');
+  h += pair(1010, 1480, `<div style="display:flex; gap:18px">${mood.map(m => `<img src="${M}picture-mood-scala-${m}.png" style="width:58px">`).join('')}</div>`,
+    `<div style="display:flex; gap:18px">${mood.map(m => `<img src="${M}picture-mood-scala-${m}.png" style="width:58px; ${m === 'good' ? 'filter:drop-shadow(0 0 8px rgba(168,156,248,.9))' : 'opacity:.45'}">`).join('')}</div>`,
+    'Five taps instead of a slider: easy to hit with one thumb, half asleep.');
+  put('V2', h); })();
+
+// 3 · In their place
+(() => { let h = head(HEAD, 'Each sign has one job. Here they are where they live, on the screens of the app.');
+  h += `<img class="abs fadeb" src="${B}care-tiles.png" style="left:102px; top:604px; width:780px">`;
+  h += `<img class="abs fadetop" src="${B}tabbar.png" style="left:102px; top:1230px; width:780px">`;
+  h += `<img class="abs fadeall" src="${B}tea-herb.png" style="left:1210px; top:590px; height:1000px">`;
+  const call = (x1, y, x2, txt, sub, align = 'left') => `<div class="dot" style="left:${x1}px; top:${y}px"></div><div class="hair" style="left:${Math.min(x1, x2)}px; top:${y}px; width:${Math.abs(x2 - x1)}px"></div>
+    <div class="abs note" style="${align === 'left' ? `left:${x2 + 24}px` : `right:${1920 - x2 + 24}px; text-align:right`}; top:${y - 16}px; width:380px">${txt}<small>${nb(sub)}</small></div>`;
+  const note = (y, txt, sub) => `<div class="abs note" style="left:950px; top:${y - 16}px; width:270px">${txt}<small>${nb(sub)}</small></div>`;
+  const line = (x1, x2, y) => `<div class="dot" style="left:${x1}px; top:${y}px"></div><div class="hair" style="left:${Math.min(x1, x2)}px; top:${y}px; width:${Math.abs(x2 - x1)}px"></div>`;
+  h += line(746, 936, 790) + note(790, 'Gradient icon, 60 px', 'Practices and body signals. Never glows.');
+  h += line(330, 936, 1388) + note(1388, 'Nav icon, 30 px', 'Outline at rest, solid violet with a label when active.');
+  h += line(1500, 1230, 1000) + note(1000, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
+  h += line(1560, 1230, 1210) + note(1210, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
+  put('V3', h); })();
+
+// 4 · Herbarium of light
+(() => { let h = head('A herbarium <em>of light</em>', 'Icons for signals and practices, and six plants for the tea ritual, drawn with the same soft light.');
+  const icons = ['lotus', 'sun', 'meditation', 'circle', 'sea-waves', 'sleep', 'pulse', 'large-tree', 'trust', 'decentralized-network'];
+  const gap = (1716 - icons.length * 44) / (icons.length - 1);
+  h += icons.map((n, i) => `<div class="abs" style="left:${102 + i * (44 + gap)}px; top:604px; width:44px; height:44px; display:flex; align-items:center; justify-content:center">${ic(n, 40)}</div>`).join('');
+  h += `<div class="hair" style="left:102px; top:700px; width:1716px; opacity:.5"></div>`;
+  const herbs = [['intro', 434, 'Evening calm'], ['camomille', 392, 'Chamomile'], ['melissa', 369, 'Lemon balm'], ['lavender', 227, 'Lavender'], ['valeriana', 284, 'Valerian'], ['linden', 305, 'Linden']];
+  const HH = 640, ws = herbs.map(([, w]) => w * HH / 820), g = (1716 - ws.reduce((a, b) => a + b, 0)) / (herbs.length - 1), base = 790 + HH;
+  let x = 102; herbs.forEach(([f, , n], i) => { h += `<img class="abs" src="${H}${f}.png" style="left:${x}px; top:790px; height:${HH}px">
+    <div class="abs q" style="left:${x}px; width:${ws[i]}px; top:${base + 34}px; text-align:center; color:#6E7390">${n}</div>`; x += ws[i] + g; });
+  h += `<div class="hair" style="left:102px; top:${base}px; width:1716px"></div>`;
+  put('V4', h); })();
+
+// 5 · Anatomy of one sign
+(() => { let h = head(HEAD, 'Two kinds of icons, built differently: navigation changes shape when you touch it, signals carry their own light.');
+  // nav pair
+  h += `<div class="abs glass" style="left:102px; top:604px; width:820px; height:560px"></div>
+    <div class="abs" style="left:180px; top:720px">${ic('home', 220)}</div><div class="abs" style="left:540px; top:720px">${ic('home-alt', 220, 'lit')}</div>
+    <div class="abs tablabel" style="left:540px; top:960px; width:${220 * 47.8 / 49.8}px; font-size:30px">Home</div>
+    <div class="abs q" style="left:150px; top:650px">At rest</div><div class="abs q" style="left:540px; top:650px">Active</div>
+    <div class="abs note" style="left:150px; top:1040px; width:330px">White outline<small>19:1 on the bar</small></div>
+    <div class="abs note" style="left:540px; top:1040px; width:340px">Solid #8B7CF6, a soft glow<small>and the label appears</small></div>`;
+  // gradient icon
+  h += `<div class="abs glass" style="left:998px; top:604px; width:820px; height:560px"></div>
+    <div class="abs" style="left:1100px; top:700px">${ic('lotus', 300)}</div>
+    ${[['#FFC6F1', '30%'], ['#A89CF8', '70%'], ['#8B7CF6', '100%']].map(([c, p], i) => `<div class="abs" style="left:1500px; top:${760 + i * 90}px; display:flex; align-items:center; gap:18px">
+      <span style="width:34px; height:34px; border-radius:50%; background:${c}"></span><span class="note">${c}<small>stop at ${p}</small></span></div>`).join('')}
+    <div class="abs note" style="left:1500px; top:1040px; width:290px">No glow<small>the gradient is the light</small></div>`;
+  // sizes
+  const S = [[20, 'Nav chip'], [22, 'Recipe row'], [26, 'Chart legend'], [32, 'Article row'], [60, 'Ritual tile']];
+  h += `<div class="abs cap" style="left:102px; top:1260px">One icon, five sizes in the app</div>`;
+  S.forEach(([s, n], i) => { const x = 102 + i * 250; h += `<div class="abs" style="left:${x}px; top:${1330 + 60 - s}px">${ic('lotus', s)}</div>
+    <div class="abs note" style="left:${x}px; top:1420px">${s} px<small>${n}</small></div>`; });
+  h += `<div class="abs t" style="left:1360px; top:1330px; width:458px">${nb('Active state changes shape, not just colour: outline to solid, plus a label.')}</div>`;
+  put('V5', h); })();
+</script>
+</body></html>
