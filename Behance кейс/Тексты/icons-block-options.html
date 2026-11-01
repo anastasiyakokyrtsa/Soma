@@ -16,8 +16,9 @@
   .h1 { position:absolute; left:102px; top:247px; margin:0; font-weight:300; font-size:68px; line-height:1.3; color:#A6ABC6; white-space:nowrap; }
   .h1 em { font-style:normal; color:#A89CF8; }
   .lead { position:absolute; left:102px; top:363px; width:1300px; font-weight:300; font-size:40px; line-height:1.45; color:#6E7390; }
-  .note { font-weight:300; font-size:20px; line-height:1.5; color:#A6ABC6; }
-  .note small { display:block; font-size:16px; color:#6E7390; margin-top:4px; }
+  /* notes = block 11 (Onboarding) note style: title Regular 22 #A6ABC6, text Light 22 #6E7390, 155%, gap 4, width 300 */
+  .note { font-weight:400; font-size:22px; line-height:1.55; color:#A6ABC6; }
+  .note small { display:block; font-weight:300; font-size:22px; line-height:1.55; color:#6E7390; margin-top:4px; }
   .hair { position:absolute; height:1px; background:rgba(201,187,250,.28); }
   .dot { position:absolute; width:7px; height:7px; border-radius:50%; background:#C9BBFA; margin:-3px 0 0 -3px; }
   .fadetop { -webkit-mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); mask-image:linear-gradient(transparent 4%, #000 34%, #000 80%, transparent); }
@@ -39,32 +40,32 @@ const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2
 
 (() => { let h = head('Small signs, <em>drawn with light</em>', 'Each element has one job. Here they are as the kit draws them, with a note on why.');
   // every leader runs from the notes spine to the vertical middle of its target and stops GAP short of it (her rule)
-  const GAP = 22, SPINE_L = 936, SPINE_R = 1230;
-  const note = (y, txt, sub) => `<div class="abs note" style="left:950px; top:${y - 16}px; width:270px">${txt}<small>${nb(sub)}</small></div>`;
+  const GAP = 22, SPINE_L = 936, SPINE_R = 1264, G = 190;  // G: the same gap between consecutive elements in both columns
+  const note = (y, txt, sub) => `<div class="abs note" style="left:950px; top:${y - 17}px; width:300px">${txt}<small>${nb(sub)}</small></div>`;
   const toLeft = (edge, y) => `<div class="hair" style="left:${edge + GAP}px; top:${y}px; width:${SPINE_L - edge - GAP}px"></div><div class="dot" style="left:${edge + GAP}px; top:${y}px"></div>`;
   const toRight = (edge, y) => `<div class="hair" style="left:${SPINE_R}px; top:${y}px; width:${edge - GAP - SPINE_R}px"></div><div class="dot" style="left:${edge - GAP}px; top:${y}px"></div>`;
-  // kit renders (3x PNG, CSS-px boxes measured in b10/kit-boxes.json)
-  const T = 1.8;  // ritual tiles: row 380 css px wide, group padding 36; lotus box x 328..388, y 72..132
-  h += `<img class="abs" src="${B}kit-tiles.png" style="left:${102 - 36 * T}px; top:${604 - 36 * T}px; width:${452 * T}px">`;
-  h += toLeft(102 - 36 * T + 388 * T, 604 - 36 * T + 102 * T) + note(604 - 36 * T + 102 * T, 'Gradient icon, 60 px', 'Practices and body signals. Never glows.');
-  const N = 1.8, NY = 1100;  // tab bar: 412 css px, group padding 40; active icon x 386.5..413.5, y 107..134
-  h += `<img class="abs" src="${B}kit-nav.png" style="left:${102 - 40 * N}px; top:${NY - 40 * N}px; width:${492 * N}px">`;
-  h += toLeft(102 - 40 * N + 413.5 * N, NY - 40 * N + 120.5 * N) + note(NY - 40 * N + 120.5 * N, 'Nav icon, 27 px', 'Outline at rest, solid violet with a label when active.');
-  // the tea herb (real screen crop) on the right; its left edge at the two leader heights was measured from the image
-  h += `<img class="abs fadeall" src="${B}tea-herb.png" style="left:1290px; top:590px; height:1000px">`;
-  h += toRight(1343, 980) + note(980, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
-  h += toRight(1372, 1120) + note(1120, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
-  // band 2: resource meter (real screen crop; arc right edge at crop x 1627, centre y 890 of 1800) and kit stat cards
-  const RY = 1450, RS = 520 / 1800;
+  // LEFT COLUMN (kit renders, 3x PNG; CSS-px boxes in b10/kit-boxes.json)
+  const T = 1.8, top1 = 604, bot1 = top1 + 213 * T;  // ritual tiles: row 380 css px (= 684 here), group padding 36; lotus box x ..388, centre y 102
+  h += `<img class="abs" src="${B}kit-tiles.png" style="left:${102 - 36 * T}px; top:${top1 - 36 * T}px; width:${452 * T}px">`;
+  h += toLeft(102 - 36 * T + 388 * T, top1 + 66 * T) + note(top1 + 66 * T, 'Gradient icon, 60 px', 'Practices and body signals. Never glows.');
+  const N = 380 * T / 412, svgTop = bot1 + G - 6 * N, bot2 = svgTop + 125 * N;  // tab bar as wide as the tiles row; dome top at 6 css px
+  h += `<img class="abs" src="${B}kit-nav.png" style="left:${102 - 40 * N}px; top:${svgTop - 40 * N}px; width:${492 * N}px">`;
+  h += toLeft(102 + 373.5 * N, svgTop + 80.5 * N) + note(svgTop + 80.5 * N, 'Nav icon, 27 px', 'Outline at rest, solid violet with a label when active.');
+  const RS = 520 / 1800, RY = bot2 + G - 208 * RS, bot3 = RY + 1573 * RS;  // resource meter crop: arc spans y 208..1573, right edge x 1627, centre y 890
   h += `<img class="abs fadering" src="${B}care-ring.png" style="left:232px; top:${RY}px; width:520px">`;
   h += toLeft(232 + 1627 * RS, RY + 890 * RS) + note(RY + 890 * RS, 'Resource meter', 'A thin arc in the same calm violet, even at a low 42%.');
-  const C = 1.15, CY = 1880;  // stat cards: card 0 at x 36, 184 css px square
-  h += `<img class="abs" src="${B}kit-cards.png" style="left:1266px; top:${CY - 128 * C}px; width:${480 * C}px">`;
-  h += toRight(1266 + 36 * C, CY) + note(CY, 'Analytics stat card', 'No border at rest. Pressed, it sinks a little and gets a soft gradient ring.');
-  // band 3: kit buttons, rows default / pressed / disabled; the leader meets the pressed secondary button
-  const K = .9, KY = 2080;
-  h += `<img class="abs" src="${B}kit-buttons.png" style="left:${102 - 36 * K}px; top:${KY}px; width:${872 * K}px">`;
-  h += toLeft(102 - 36 * K + 830.3 * K, KY + 161 * K) + note(KY + 161 * K, 'Buttons, three states', 'Default glows to invite a tap. Pressed lights up and sinks a little. Disabled keeps only its outline.');
+  const K = 1.2, KY = bot3 + G - 36 * K;  // primary buttons only: default / pressed / disabled; pressed spans x 41.7..410.3, centre y 161
+  h += `<img class="abs" src="${B}kit-buttonsP.png" style="left:${102 - 36 * K}px; top:${KY}px; width:${452 * K}px">`;
+  h += toLeft(102 - 36 * K + 410.3 * K, KY + 161 * K) + note(KY + 161 * K, 'Primary button, three states', 'Default glows to invite a tap. Pressed lights up and sinks a little. Disabled keeps only its outline.');
+  // RIGHT COLUMN: the herb (transparent original, visible bbox x 18..831, y 16..1576 of 846×1580), its right edge on the 102 margin
+  const HS = 640 / 1560, HX = 1818 - 831 * HS, HY = top1 - 16 * HS, botH = top1 + 640;
+  h += `<img class="abs" src="../Мокапы/parts/evening-calm-herbs-hi.png" style="left:${HX}px; top:${HY}px; width:${846 * HS}px">`;
+  h += toRight(HX + 57 * HS, HY + 735 * HS) + note(HY + 735 * HS, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
+  h += toRight(HX + 178 * HS, HY + 1165 * HS) + note(HY + 1165 * HS, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
+  const C = 1.15, CT = botH + G;  // stat cards, right edge of card 2 (css x 444) on the margin
+  h += `<img class="abs" src="${B}kit-cards.png" style="left:${1818 - 444 * C}px; top:${CT - 36 * C}px; width:${480 * C}px">`;
+  h += toRight(1818 - 444 * C + 36 * C, CT + 92 * C) + note(CT + 92 * C, 'Analytics stat card', 'No border at rest. Pressed, it sinks a little and gets a soft gradient ring.');
+  document.getElementById('V3').style.height = Math.round(KY + 323 * K + 190) + 'px';
   put('V3', h); })();
 </script>
 </body></html>
