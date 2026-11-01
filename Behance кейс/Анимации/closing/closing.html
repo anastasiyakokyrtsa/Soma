@@ -3,7 +3,7 @@
 <title>Closing — Soma logo pulse</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&display=swap" rel="stylesheet">
 <!-- Closing block of the case: the app's own logo animation (app/components/SomaLogoAnimation.tsx), only its final, settled state:
-     the drawn ring with its orbital dot at 12 o'clock and "Soma" inside, breathing. Same constants: R 115 on a 480 canvas,
+     the drawn ring and "Soma" inside, breathing (the orbital dot is left out). Same constants: R 115 on a 480 canvas,
      layers outer/mid/inner/text pulse 1 → 0.52 → 1 over 3 s (in-out quad), staggered 0 / 0.15 / 0.3 / 0.5 s. No drawing ("loading") phase.
      window.render(t), seamless at T = 3 s. -->
 <style>html,body{margin:0;background:#050816} #s{position:relative;width:1920px;height:1000px} canvas{position:absolute;left:0;top:0}
@@ -31,7 +31,7 @@ window.render = t => {
   ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.fillStyle = '#050816'; ctx.fillRect(0, 0, 1920, 1000);
   for (const s of STARS) { ctx.globalAlpha = s.a; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 2 * Math.PI); ctx.fill(); }
   ring(22, C_OUTER, .28 * breathe(t, 0), 18); ring(9, C_MID, .6 * breathe(t, .15), 8); ring(3.5, C_INNER, .9 * breathe(t, .3), 3); ring(1.2, '#FFFFFF', 1, 0);
-  dot(5, C_OUTER, .45, 16); dot(5, C_OUTER, .9, 6); dot(5, '#FFFFFF', 1, 1.5);
+  // no orbital dot (her call): just the ring and the word
   const tp = breathe(t, .5); word(tp * .7, 10); word(tp, 0);
 };
 document.fonts.load("300 55px 'Nunito Sans'").then(() => { window.render(0); window.__ready = true; });
