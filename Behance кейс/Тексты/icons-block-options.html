@@ -27,8 +27,8 @@
   .fadering { -webkit-mask-image:radial-gradient(circle closest-side, #000 80%, transparent 100%); mask-image:radial-gradient(circle closest-side, #000 80%, transparent 100%); }
 </style></head><body><div class="wrap">
 
-<div class="opt"><b>3 · In their place</b>, плюс второй ряд: кольцо ресурса слева и главная кнопка справа, заметки на той же средней линии.</div>
-<div class="frame" id="V3" style="height:2300px; margin-bottom:-623px"></div>
+<div class="opt"><b>3 · In their place</b>, плюс кольцо ресурса, карточки аналитики (default / pressed) и все состояния кнопок из кита; заметки на той же средней линии.</div>
+<div class="frame" id="V3" style="height:2720px; margin-bottom:-737px"></div>
 
 </div>
 <script>
@@ -42,9 +42,11 @@ const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2
   h += `<img class="abs fadeb" src="${B}care-tiles.png" style="left:102px; top:604px; width:780px">`;
   h += `<img class="abs fadetop" src="${B}tabbar.png" style="left:102px; top:1230px; width:780px">`;
   h += `<img class="abs fadeall" src="${B}tea-herb.png" style="left:1210px; top:590px; height:1000px">`;
-  // band 2: resource meter on the left, primary button on the right
+  // band 2: resource meter on the left, analytics stat cards (kit, default and pressed) on the right
   h += `<img class="abs fadering" src="${B}care-ring.png" style="left:232px; top:1600px; width:520px">`;
-  h += `<img class="abs fadesoft" src="${B}button.png" style="left:1330px; top:1893px; width:488px">`;
+  h += `<img class="abs" src="${B}kit-cards.png" style="left:1266px; top:1713px; width:552px">`;
+  // band 3: buttons from the kit, primary and secondary, default / pressed / disabled (rows)
+  h += `<img class="abs" src="${B}kit-buttons.png" style="left:70px; top:2240px; width:785px">`;
   // all notes sit on one spine in the middle column; hairlines run to it from the fragments
   const note = (y, txt, sub) => `<div class="abs note" style="left:950px; top:${y - 16}px; width:270px">${txt}<small>${nb(sub)}</small></div>`;
   const line = (x1, x2, y) => `<div class="dot" style="left:${x1}px; top:${y}px"></div><div class="hair" style="left:${Math.min(x1, x2)}px; top:${y}px; width:${Math.abs(x2 - x1)}px"></div>`;
@@ -52,8 +54,9 @@ const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2
   h += line(1500, 1230, 1000) + note(1000, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
   h += line(1560, 1230, 1210) + note(1210, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
   h += line(330, 936, 1388) + note(1388, 'Nav icon, 30 px', 'Outline at rest, solid violet with a label when active.');
-  h += line(677, 936, 1760) + note(1760, 'Resource meter', 'A thin arc in the same calm violet, even at a low 42%.');
-  h += line(1355, 1230, 1946) + note(1946, 'Primary button', 'Glow means “press”. A quiet link under it lets you fill this in later.');
+  h += line(624, 936, 1700) + note(1700, 'Resource meter', 'A thin arc in the same calm violet, even at a low 42%.');
+  h += line(1307, 1230, 1860) + note(1860, 'Analytics stat card', 'No border at rest. Pressed, it sinks a little and gets a soft gradient ring.');
+  h += line(822, 936, 2385) + note(2385, 'Buttons, three states', 'Default glows to invite a tap. Pressed lights up and sinks a little. Disabled keeps only its outline.');
   put('V3', h); })();
 </script>
 </body></html>
