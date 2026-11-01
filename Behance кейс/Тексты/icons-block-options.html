@@ -34,7 +34,7 @@
 </div>
 <script>
 const B = 'b10/';
-const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2&nbsp;').replace(/\s(\S+)\s(\S+)$/, ' $1&nbsp;$2');
+const nb = s => s.replace(/(^|\s)(\S{1,3})\s/g, '$1$2 ').replace(/ ([^ ]+) ([^ ]+)$/, ' $1 $2');  // last-pair rule must not undo the short-word nbsp
 const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
 const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2 class="h1">${h}</h2><div class="lead">${nb(lead)}</div>`;
 
@@ -61,7 +61,7 @@ const head = (h, lead) => `<div class="label">10 / Icons &amp; elements</div><h2
   const HS = 640 / 1560, HX = 1818 - 831 * HS, HY = top1 - 16 * HS, botH = top1 + 640;
   h += `<img class="abs" src="../Мокапы/parts/evening-calm-herbs-hi.png" style="left:${HX}px; top:${HY}px; width:${846 * HS}px">`;
   h += toRight(HX + 57 * HS, HY + 735 * HS) + note(HY + 735 * HS, 'Herb illustration', 'Drawn in points of light, like the stars behind every screen.');
-  h += toRight(HX + 178 * HS, HY + 1165 * HS) + note(HY + 1165 * HS, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
+  h += toRight(HX + 57 * HS, HY + 1165 * HS) + note(HY + 1165 * HS, 'One herb per tea', 'Six plants for the tea ritual, in one hand.');
   const C = 1.15, CT = botH + G;  // stat cards, right edge of card 2 (css x 444) on the margin
   h += `<img class="abs" src="${B}kit-cards.png" style="left:${1818 - 444 * C}px; top:${CT - 36 * C}px; width:${480 * C}px">`;
   h += toRight(1818 - 444 * C + 36 * C, CT + 92 * C) + note(CT + 92 * C, 'Analytics stat card', 'No border at rest. Pressed, it sinks a little and gets a soft gradient ring.');
