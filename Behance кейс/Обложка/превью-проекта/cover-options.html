@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Behance project cover — options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400&family=Onest:wght@300;400&display=swap" rel="stylesheet">
+<!-- Behance feed thumbnail (808×632, made at 2x = 1616×1264). Goal: readable at matchbox size: one big bright object, little or no text.
+     Only real assets: thin phone mockups (Мокапы/thin), a frame of the 'hard evening' video (breathing orb), the closing logo render, the herb original.
+     ?full=1 shows the frames at 100% for export. -->
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1e1e22; font-family:'Nunito Sans',sans-serif; color:#9a9aa6; padding:30px 40px 80px; }
+  .opt { font-size:15px; margin:40px 0 10px; line-height:1.55; max-width:1100px; } .opt b { color:#e4e2ee; font-weight:400; }
+  .zoom { zoom:.42; } body.full .zoom { zoom:1; } body.full .opt, body.full .feed { display:none; }
+  .c { width:1616px; height:1264px; position:relative; overflow:hidden; background:#050816; }
+  .abs { position:absolute; }
+  .glow { position:absolute; border-radius:50%; filter:blur(120px); }
+  .feed { display:flex; gap:22px; margin-top:16px; flex-wrap:wrap; }
+  .feed .t { width:404px; } .feed .t .img { width:404px; height:316px; border-radius:8px; overflow:hidden; }
+  .feed .t .img > .c { zoom:.25; } .feed .cap { font-size:13px; color:#e4e2ee; margin-top:8px; } .feed .cap span { display:block; color:#8a8a96; font-size:12px; }
+  .ph { position:absolute; filter:drop-shadow(0 30px 80px rgba(5,8,22,.9)); }
+  .word { position:absolute; font-family:'Onest'; font-weight:300; letter-spacing:.32em; color:#DDD9FF; }
+  .sub { position:absolute; font-family:'Nunito Sans'; font-weight:300; letter-spacing:.04em; color:#A6ABC6; }
+</style></head><body><div id="wrap">
+
+<div class="opt"><b>A · Breath.</b> Один телефон с большим светящимся шаром дыхания (кадр из «A hard evening»), за ним мягкий фиолетовый свет. Ни одного слова, только самый «живой» экран приложения.</div>
+<div class="zoom"><div class="c" id="A"></div></div>
+
+<div class="opt"><b>B · Three screens.</b> Три настоящих экрана веером: Home с биоритмами, Care с кольцом 42% в центре и крупнее, экран с шаром дыхания. Сразу видно, что это целое приложение.</div>
+<div class="zoom"><div class="c" id="B"></div></div>
+
+<div class="opt"><b>C · The ring.</b> Логотип Soma, кольцо света из финала кейса, крупно по центру, под ним тихая подпись. Самый узнаваемый и «брендовый» вариант.</div>
+<div class="zoom"><div class="c" id="C"></div></div>
+
+<div class="opt"><b>D · Care and the herb.</b> Экран Care с кольцом 42% слева, справа крупно трава из чайного ритуала, светящаяся точками. Самый атмосферный вариант, про заботу.</div>
+<div class="zoom"><div class="c" id="D"></div></div>
+
+<div class="opt"><b>Как это выглядит в ленте</b> (размер превью на Behance):</div>
+<div class="feed" id="feed"></div>
+
+</div>
+<script>
+if (new URLSearchParams(location.search).get('full')) document.body.classList.add('full');
+const TH = '../../Мокапы/thin/', P = '../../Мокапы/parts/';
+const put = (id, h) => document.getElementById(id).insertAdjacentHTML('beforeend', h);
+const glow = (x, y, r, c, o) => `<div class="glow" style="left:${x - r}px; top:${y - r}px; width:${2 * r}px; height:${2 * r}px; background:${c}; opacity:${o}"></div>`;
+// thin phones are 1620×3400 (phone fills the canvas); the breathing phone cut from video is 463×973
+const phone = (src, cx, top, h, ratio = 1620 / 3400) => `<img class="ph" src="${src}" style="left:${cx - h * ratio / 2}px; top:${top}px; height:${h}px">`;
+
+// A · Breath
+put('A', glow(808, 600, 520, '#6355D6', .55) + glow(808, 520, 260, '#A89CF8', .35) +
+  phone('phone-breath.png', 808, 120, 1180, 463 / 973));
+
+// B · Three screens
+put('B', glow(808, 640, 600, '#4C41B0', .55) + glow(808, 560, 300, '#8B7CF6', .35) +
+  phone(TH + 'phone-home-biorhythms.png', 330, 270, 940) + phone('phone-breath.png', 1286, 270, 940, 463 / 973) +
+  phone(TH + 'phone-care.png', 808, 120, 1180));
+
+// C · The ring (closing render: ring centre 960,440, radius 210 on 1920×1000)
+put('C', `<div class="abs" style="left:${808 - 960 * 1.6}px; top:${560 - 440 * 1.6}px; width:${1920 * 1.6}px; height:${1000 * 1.6}px; background:url(../../Анимации/closing/closing-poster.png) 0 0/100% 100%;
+  -webkit-mask-image:radial-gradient(circle at ${960 * 1.6}px ${440 * 1.6}px, #000 400px, transparent 500px); mask-image:radial-gradient(circle at ${960 * 1.6}px ${440 * 1.6}px, #000 400px, transparent 500px)"></div>` +
+  glow(808, 560, 420, '#6355D6', .35) +
+  `<div class="sub" style="left:0; right:0; top:1040px; text-align:center; font-size:40px">Wellness app · UX/UI case study</div>`);
+
+// D · Care and the herb
+put('D', glow(560, 640, 520, '#4C41B0', .55) + glow(1180, 600, 420, '#6355D6', .45) +
+  phone(TH + 'phone-care.png', 520, 120, 1180) +
+  `<img class="abs" src="${P}evening-calm-herbs-hi.png" style="left:900px; top:140px; height:1000px">`);
+
+// feed preview
+const feed = document.getElementById('feed');
+for (const id of ['A', 'B', 'C', 'D']) { const src = document.getElementById(id);
+  feed.insertAdjacentHTML('beforeend', `<div class="t"><div class="img">${src.outerHTML.replace(`id="${id}"`, '')}</div><div class="cap">Soma · Wellness App UX/UI Case Study<span>Anastasia Kokyrtsa · вариант ${id}</span></div></div>`); }
+</script>
+</body></html>
