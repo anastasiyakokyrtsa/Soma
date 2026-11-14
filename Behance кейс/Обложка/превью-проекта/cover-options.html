@@ -34,8 +34,10 @@ const phone = (src, cx, top, h, ratio = 1620 / 3400) => `<img class="ph" src="${
 const D = lights => lights + phone(TH + 'phone-care.png', 520, 120, 1180) + `<img class="abs" src="${P}evening-calm-herbs-hi.png" style="left:900px; top:140px; height:1000px">`;
 
 // one light behind the phone, an ellipse stretched to the right so its soft edge reaches under the herb (her ask, 11-14)
-put('DF', D(`<div class="glow" style="left:${600 - 640}px; top:${640 - 560}px; width:1280px; height:1120px; background:#4C41B0; opacity:.55"></div>` +
-  `<div class="glow" style="left:${560 - 380}px; top:${600 - 380}px; width:760px; height:760px; background:#4C41B0; opacity:.25"></div>`));
+// centred on the phone (x 520, visible centre y ≈ 692); wide enough that its soft edge still reaches under the herb
+const PX = 520, PY = 692;
+put('DF', D(`<div class="glow" style="left:${PX - 760}px; top:${PY - 560}px; width:1520px; height:1120px; background:#4C41B0; opacity:.55"></div>` +
+  `<div class="glow" style="left:${PX - 380}px; top:${PY - 380}px; width:760px; height:760px; background:#4C41B0; opacity:.25"></div>`));
 
 const feed = document.getElementById('feed');
 for (const id of ['DF']) { const src = document.getElementById(id);  feed.insertAdjacentHTML('beforeend', `<div class="t"><div class="img">${src.outerHTML.replace(`id="${id}"`, '')}</div><div class="cap">Soma · Wellness App UX/UI Case Study<span>Anastasia Kokyrtsa · ${id}</span></div></div>`); }
