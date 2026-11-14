@@ -2,7 +2,7 @@
 <html><head><meta charset="utf-8">
 <title>Behance project cover — D</title>
 <!-- Behance feed thumbnail (808×632, made at 2x = 1616×1264), her pick: variant D (Care phone bleeding off the bottom + the evening-calm herb).
-     11-14: other variants removed; she found the light under the herb too bright, so D1 = softer, smaller light; D2 = no lights at all; D3 = light behind the phone only.
+     11-14: other variants removed; final lighting = one soft light behind the phone whose edge reaches under the herb (no separate herb light).
      ?full=1 shows the frames at 100% for export (tools/cover-shoot.js). -->
 <style>
   * { box-sizing:border-box; }
@@ -18,14 +18,8 @@
   .ph { position:absolute; filter:drop-shadow(0 30px 80px rgba(5,8,22,.9)); }
 </style></head><body><div id="wrap">
 
-<div class="opt"><b>D1 · Мягче.</b> Свет за травой меньше и тусклее, за телефоном как было.</div>
-<div class="zoom"><div class="c" id="D1"></div></div>
-
-<div class="opt"><b>D2 · Без пятен.</b> Чистый тёмный фон, светятся только экран и трава.</div>
-<div class="zoom"><div class="c" id="D2"></div></div>
-
-<div class="opt"><b>D3 · Свет только за телефоном.</b> Трава на чистом тёмном фоне, мягкое пятно остаётся только за экраном.</div>
-<div class="zoom"><div class="c" id="D3"></div></div>
+<div class="opt"><b>D · Свет за телефоном.</b> Одно мягкое пятно за экраном; его край чуть заходит под траву, поэтому она не висит в пустоте, но и отдельного пятна у неё нет.</div>
+<div class="zoom"><div class="c" id="DF"></div></div>
 
 <div class="opt"><b>Как это выглядит в ленте</b> (размер превью на Behance):</div>
 <div class="feed" id="feed"></div>
@@ -39,12 +33,11 @@ const glow = (x, y, r, c, o) => `<div class="glow" style="left:${x - r}px; top:$
 const phone = (src, cx, top, h, ratio = 1620 / 3400) => `<img class="ph" src="${src}" style="left:${cx - h * ratio / 2}px; top:${top}px; height:${h}px">`;
 const D = lights => lights + phone(TH + 'phone-care.png', 520, 120, 1180) + `<img class="abs" src="${P}evening-calm-herbs-hi.png" style="left:900px; top:140px; height:1000px">`;
 
-put('D1', D(glow(560, 640, 520, '#4C41B0', .55) + glow(1180, 620, 260, '#6355D6', .22)));
-put('D2', D(''));
-put('D3', D(glow(560, 640, 520, '#4C41B0', .55)));
+// one light behind the phone, an ellipse stretched to the right so its soft edge reaches under the herb (her ask, 11-14)
+put('DF', D(`<div class="glow" style="left:${600 - 640}px; top:${640 - 560}px; width:1280px; height:1120px; background:#4C41B0; opacity:.55"></div>` +
+  `<div class="glow" style="left:${560 - 380}px; top:${600 - 380}px; width:760px; height:760px; background:#4C41B0; opacity:.25"></div>`));
 
 const feed = document.getElementById('feed');
-for (const id of ['D1', 'D2', 'D3']) { const src = document.getElementById(id);
-  feed.insertAdjacentHTML('beforeend', `<div class="t"><div class="img">${src.outerHTML.replace(`id="${id}"`, '')}</div><div class="cap">Soma · Wellness App UX/UI Case Study<span>Anastasia Kokyrtsa · ${id}</span></div></div>`); }
+for (const id of ['DF']) { const src = document.getElementById(id);  feed.insertAdjacentHTML('beforeend', `<div class="t"><div class="img">${src.outerHTML.replace(`id="${id}"`, '')}</div><div class="cap">Soma · Wellness App UX/UI Case Study<span>Anastasia Kokyrtsa · ${id}</span></div></div>`); }
 </script>
 </body></html>
