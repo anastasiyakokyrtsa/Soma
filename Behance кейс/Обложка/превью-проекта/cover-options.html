@@ -27,11 +27,17 @@
 <div class="opt"><b>B · Three screens.</b> Три настоящих экрана веером: Home с биоритмами, Care с кольцом 42% в центре и крупнее, экран с шаром дыхания. Сразу видно, что это целое приложение.</div>
 <div class="zoom"><div class="c" id="B"></div></div>
 
+<div class="opt"><b>B2 · Three screens, целиком.</b> То же, но телефоны не уходят за край: целиком, с отступами сверху и снизу.</div>
+<div class="zoom"><div class="c" id="B2"></div></div>
+
 <div class="opt"><b>C · The ring.</b> Логотип Soma, кольцо света из финала кейса, крупно по центру, под ним тихая подпись. Самый узнаваемый и «брендовый» вариант.</div>
 <div class="zoom"><div class="c" id="C"></div></div>
 
 <div class="opt"><b>D · Care and the herb.</b> Экран Care с кольцом 42% слева, справа крупно трава из чайного ритуала, светящаяся точками. Самый атмосферный вариант, про заботу.</div>
 <div class="zoom"><div class="c" id="D"></div></div>
+
+<div class="opt"><b>D2 · Care and the herb, целиком.</b> Телефон целиком, трава чуть меньше, чтобы баланс сохранился.</div>
+<div class="zoom"><div class="c" id="D2"></div></div>
 
 <div class="opt"><b>Как это выглядит в ленте</b> (размер превью на Behance):</div>
 <div class="feed" id="feed"></div>
@@ -65,9 +71,19 @@ put('D', glow(560, 640, 520, '#4C41B0', .55) + glow(1180, 600, 420, '#6355D6', .
   phone(TH + 'phone-care.png', 520, 120, 1180) +
   `<img class="abs" src="${P}evening-calm-herbs-hi.png" style="left:900px; top:140px; height:1000px">`);
 
+// B2 · whole phones: centre 1000 tall (132 margin top and bottom), sides 860
+put('B2', glow(808, 632, 600, '#4C41B0', .55) + glow(808, 600, 300, '#8B7CF6', .35) +
+  phone(TH + 'phone-home-biorhythms.png', 350, 202, 860) + phone('phone-breath.png', 1266, 202, 860, 463 / 973) +
+  phone(TH + 'phone-care.png', 808, 132, 1000));
+
+// D2 · whole phone + herb
+put('D2', glow(600, 632, 520, '#4C41B0', .55) + glow(1150, 632, 420, '#6355D6', .45) +
+  phone(TH + 'phone-care.png', 560, 132, 1000) +
+  `<img class="abs" src="${P}evening-calm-herbs-hi.png" style="left:930px; top:190px; height:880px">`);
+
 // feed preview
 const feed = document.getElementById('feed');
-for (const id of ['A', 'B', 'C', 'D']) { const src = document.getElementById(id);
+for (const id of ['B', 'B2', 'C', 'D', 'D2']) { const src = document.getElementById(id);
   feed.insertAdjacentHTML('beforeend', `<div class="t"><div class="img">${src.outerHTML.replace(`id="${id}"`, '')}</div><div class="cap">Soma · Wellness App UX/UI Case Study<span>Anastasia Kokyrtsa · вариант ${id}</span></div></div>`); }
 </script>
 </body></html>
