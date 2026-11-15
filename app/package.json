@@ -2,6 +2,9 @@
   "name": "app",
   "version": "1.0.0",
   "main": "index",
+  "overrides": {
+    "react-native-windows": "$react-native"
+  },
   "dependencies": {
     "@expo-google-fonts/cormorant-garamond": "^0.4.1",
     "@expo-google-fonts/fredoka": "^0.4.1",
