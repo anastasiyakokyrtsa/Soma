@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, glow, type, fontFamily, spacing } from '../../theme';
 import { ProgressDots } from '../../components/ProgressDots';
+import { useT } from '../../i18n/useT';
 
 // Shared layout for the "About app" onboarding slides (Figma: About app / About
 // app 2 / About app 3) — same structure, varying only image/copy/button label.
@@ -43,6 +44,7 @@ export function OnboardingSlide({
   onPressLogin: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const t = useT();
 
   return (
     <Animated.View
@@ -80,9 +82,9 @@ export function OnboardingSlide({
         </Pressable>
 
         <View style={styles.loginRow}>
-          <Text style={styles.loginText}>У меня уже есть аккаунт </Text>
+          <Text style={styles.loginText}>{t('common.loginPrompt')}</Text>
           <Pressable onPress={onPressLogin}>
-            <Text style={styles.loginLink}>Войти</Text>
+            <Text style={styles.loginLink}>{t('common.loginLink')}</Text>
           </Pressable>
         </View>
       </View>

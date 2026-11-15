@@ -6,6 +6,7 @@ import { colors, glow, type, fontFamily, spacing } from '../../theme';
 import { StepProgressBar } from '../../components/StepProgressBar';
 import { BackIcon } from '../../components/icons/BackIcon';
 import { InfoIcon } from '../../components/icons/InfoIcon';
+import { useT } from '../../i18n/useT';
 import type { ReactNode } from 'react';
 
 // Shared layout for the profile-setup steps that follow "About app" (WF 6-9:
@@ -23,7 +24,7 @@ export function OnboardingStepLayout({
   title,
   description,
   children,
-  buttonLabel = 'Продолжить',
+  buttonLabel,
   buttonDisabled = false,
   onPressNext,
   onPressBack,
@@ -64,6 +65,8 @@ export function OnboardingStepLayout({
   bottomInset?: number;
 }) {
   const insets = useSafeAreaInsets();
+  const t = useT();
+  const resolvedButtonLabel = buttonLabel ?? t('common.continueButton');
   const [scrollY, setScrollY] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -160,13 +163,13 @@ export function OnboardingStepLayout({
               buttonDisabled && styles.buttonLabelDisabled,
             ]}
           >
-            {buttonLabel}
+            {resolvedButtonLabel}
           </Text>
         </Pressable>
 
         <View style={styles.skipRow}>
           <Pressable style={styles.skipTap} onPress={onPressSkip} hitSlop={6}>
-            <Text style={styles.skipText}>Пропустить онбординг</Text>
+            <Text style={styles.skipText}>{t('common.skipOnboarding')}</Text>
           </Pressable>
           <InfoIcon size={18} color={colors.violet300} />
         </View>

@@ -2,37 +2,28 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { RadioChoiceCard } from '../../components/RadioChoiceCard';
-
-const APPROACHES = [
-  {
-    title: 'Научно-практический',
-    description: 'Факторы тела, сна\nи окружающей среды',
-  },
-  {
-    title: 'Астрологический',
-    description: 'Циклы, символы и астрологические интерпретации',
-  },
-  {
-    title: 'Синтез двух систем',
-    description: 'Объединяет оба подхода',
-  },
-];
+import { useT } from '../../i18n/useT';
+import { useLanguage } from '../../i18n/LanguageContext';
+import { approaches } from '../../i18n/dictionaries/onboarding';
 
 export function ChooseApproachScreen({ navigation }: any) {
   const [selected, setSelected] = useState<number | null>(null);
+  const t = useT();
+  const { language } = useLanguage();
+  const options = approaches[language];
 
   return (
     <OnboardingStepLayout
       activeStep={5}
-      title="Выбери подход"
-      description="Это поможет точнее подобрать рекомендации. Подход всегда можно изменить в настройках"
+      title={t('onboarding.chooseApproachTitle')}
+      description={t('onboarding.chooseApproachDescription')}
       buttonDisabled={selected === null}
       onPressNext={() => navigation.navigate('VisualStyle')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >
       <View style={styles.list}>
-        {APPROACHES.map((approach, index) => (
+        {options.map((approach, index) => (
           <RadioChoiceCard
             key={approach.title}
             title={approach.title}

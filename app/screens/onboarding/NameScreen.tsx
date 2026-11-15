@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { TextField } from '../../components/TextField';
+import { useT } from '../../i18n/useT';
 
 export function NameScreen({ navigation }: any) {
   const [name, setName] = useState('');
+  const t = useT();
 
   return (
     <OnboardingStepLayout
       activeStep={1}
-      title="Как тебя зовут?"
+      title={t('onboarding.nameTitle')}
       buttonDisabled={name.trim().length === 0}
       onPressNext={() => navigation.navigate('Email')}
       onPressBack={() => navigation.goBack()}
@@ -17,7 +19,7 @@ export function NameScreen({ navigation }: any) {
       <TextField
         value={name}
         onChangeText={setName}
-        label="Твоё имя"
+        label={t('onboarding.nameFieldLabel')}
         autoFocus
         returnKeyType="next"
       />

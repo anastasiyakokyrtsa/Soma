@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { TextField } from '../../components/TextField';
+import { useT } from '../../i18n/useT';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
+  const t = useT();
 
   return (
     <OnboardingStepLayout
       activeStep={2}
-      title="Твоя электронная почта"
-      description="Мы используем её только для важных уведомлений и сохранения прогресса"
+      title={t('onboarding.emailTitle')}
+      description={t('onboarding.emailDescription')}
       buttonDisabled={!EMAIL_RE.test(email.trim())}
       onPressNext={() => navigation.navigate('Gender')}
       onPressBack={() => navigation.goBack()}
@@ -20,7 +22,7 @@ export function EmailScreen({ navigation }: any) {
       <TextField
         value={email}
         onChangeText={setEmail}
-        label="Твоя почта"
+        label={t('onboarding.emailFieldLabel')}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}

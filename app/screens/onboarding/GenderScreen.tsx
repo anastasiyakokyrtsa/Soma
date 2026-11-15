@@ -3,15 +3,17 @@ import { View, StyleSheet } from 'react-native';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { OptionRow } from '../../components/OptionRow';
 import { setOnboardingGender, type Gender } from '../../lib/onboardingProfile';
+import { useT } from '../../i18n/useT';
 
 export function GenderScreen({ navigation }: any) {
   const [gender, setGender] = useState<Gender | null>(null);
+  const t = useT();
 
   return (
     <OnboardingStepLayout
       activeStep={3}
-      title="Укажи свой пол"
-      description="Это необходимо, чтобы учитывать гормональные циклы, которые напрямую влияют на физическое состояние, сон и активность"
+      title={t('onboarding.genderTitle')}
+      description={t('onboarding.genderDescription')}
       buttonDisabled={gender === null}
       onPressNext={() => {
         setOnboardingGender(gender!);
@@ -21,8 +23,8 @@ export function GenderScreen({ navigation }: any) {
       onPressSkip={() => navigation.replace('Main')}
     >
       <View style={styles.list}>
-        <OptionRow label="Женщина" selected={gender === 'female'} onPress={() => setGender('female')} />
-        <OptionRow label="Мужчина" selected={gender === 'male'} onPress={() => setGender('male')} />
+        <OptionRow label={t('onboarding.genderFemale')} selected={gender === 'female'} onPress={() => setGender('female')} />
+        <OptionRow label={t('onboarding.genderMale')} selected={gender === 'male'} onPress={() => setGender('male')} />
       </View>
     </OnboardingStepLayout>
   );

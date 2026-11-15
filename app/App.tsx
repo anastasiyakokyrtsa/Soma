@@ -21,6 +21,7 @@ import {
   CormorantGaramond_600SemiBold,
 } from '@expo-google-fonts/cormorant-garamond';
 import { RootNavigator } from './navigation/RootNavigator';
+import { LanguageProvider } from './i18n/LanguageContext';
 import { colors } from './theme';
 
 // The app itself is Nunito Sans everywhere, except genuine screen/section
@@ -111,8 +112,10 @@ export default function App() {
     // without it, this isn't optional decoration.
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <RootNavigator />
-        <StatusBar style="light" />
+        <LanguageProvider>
+          <RootNavigator />
+          <StatusBar style="light" />
+        </LanguageProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
