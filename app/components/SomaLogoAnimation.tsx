@@ -10,7 +10,7 @@ import {
   useFont,
   type SkFont,
 } from '@shopify/react-native-skia';
-import {
+import Animated, {
   useSharedValue,
   withTiming,
   withDelay,
@@ -18,8 +18,10 @@ import {
   withSequence,
   Easing,
   useDerivedValue,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
+import { fontFamily } from '../theme';
 
 // 1:1 port of src/app/components/soma-logo-animation.tsx (Figma Make export,
 // "Логотип с анимацией" file) — same constants/timeline/colors, just re-expressed
@@ -51,6 +53,15 @@ const C_MID = '#A99CF8';
 const C_INNER = '#C4BBFA';
 const C_DOT = '#8B7CF6';
 const C_TEXT = '#DDD9FF';
+
+// Tagline under the wordmark (her ask, 2026-11-15) - a real RN Text, not
+// Skia canvas text like "Soma" above: SpacedText's per-letter layout is
+// tuned for a short all-caps-weight wordmark, not a full sentence, and a
+// plain Text can wrap/center a sentence without that trouble. Reuses
+// "Soma"'s own textOpacity/pulseText timing directly (fades in at the same
+// moment, once the ring has finished drawing) rather than introducing a
+// separate delay to keep in sync with.
+const TAGLINE = 'Прислушайся к ритмам своего тела';
 
 const SPLINE = Easing.bezierFn(0.4, 0, 0.6, 1);
 
@@ -182,8 +193,16 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
   const textHaloAlpha = useDerivedValue(() => textOpacity.value * pulseText.value * 0.7);
   const textSharpAlpha = useDerivedValue(() => textOpacity.value * pulseText.value);
 
+  // Same opacity curve as textSharpAlpha above, but as a View style (not a
+  // Skia prop) - this is the ordinary, fully-supported way to drive a plain
+  // RN style off a Reanimated shared value, unlike feeding one straight
+  // into a Skia prop (see memory/project_skia_reanimated_bridge.md).
+  const taglineStyle = useAnimatedStyle(() => ({
+    opacity: textOpacity.value * pulseText.value,
+  }));
+
   return (
-    <View style={[styles.wrap, { width: size, height: size }]}>
+    <View style={[styles.wrap, { width: size }]}>
       <Canvas style={{ width: size, height: size }}>
         <Group transform={[{ scale }]}>
           {/* Outer halo — trimmed to the same arc as the dot's progress, not a full faint circle
@@ -232,10 +251,24 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
           )}
         </Group>
       </Canvas>
+      <Animated.Text style={[styles.tagline, { width: size }, taglineStyle]}>{TAGLINE}</Animated.Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
+  // Negative margin pulls it up into the Canvas's own bottom whitespace
+  // (the ring sits well above the canvas's true edge) instead of adding
+  // visible gap below the logo.
+  tagline: {
+    marginTop: -75,
+    fontFamily: fontFamily.medium,
+    fontSize: 15,
+    lineHeight: 15 * 1.3,
+    // White at 75%, not textSecondary - this continues the wordmark's own
+    // meaning (her secondary-color rule, 2026-10-12), not a UI chrome label.
+    color: 'rgba(255,255,255,0.75)',
+    textAlign: 'center',
+  },
 });
