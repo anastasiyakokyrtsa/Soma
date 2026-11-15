@@ -21,7 +21,7 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
-import { fontFamily } from '../theme';
+import { colors, fontFamily } from '../theme';
 
 // 1:1 port of src/app/components/soma-logo-animation.tsx (Figma Make export,
 // "Логотип с анимацией" file) — same constants/timeline/colors, just re-expressed
@@ -61,7 +61,12 @@ const C_TEXT = '#DDD9FF';
 // "Soma"'s own textOpacity/pulseText timing directly (fades in at the same
 // moment, once the ring has finished drawing) rather than introducing a
 // separate delay to keep in sync with.
-const TAGLINE = 'Прислушайся к ритмам своего тела';
+//
+// Small tracked-caps "eyebrow" treatment (not a plain sentence) - her pick
+// from a web comparison of 5 directions, then a 1-line-vs-2-line follow-up:
+// explicit break after "ритмам" for a compact 2-line "stamp" rather than
+// one long tracked-out line.
+const TAGLINE = 'Прислушайся к ритмам\nсвоего тела';
 
 const SPLINE = Easing.bezierFn(0.4, 0, 0.6, 1);
 
@@ -261,14 +266,19 @@ const styles = StyleSheet.create({
   // Negative margin pulls it up into the Canvas's own bottom whitespace
   // (the ring sits well above the canvas's true edge) instead of adding
   // visible gap below the logo.
+  // Generous clear space above it on purpose (real logo-lockup practice:
+  // the tagline is a separate, quieter credit line, not something crowding
+  // the mark) - tuned against a real screenshot of the ring's own glow,
+  // not guessed; see the component's own history for the earlier, tighter
+  // number this replaced.
   tagline: {
-    marginTop: -75,
-    fontFamily: fontFamily.medium,
-    fontSize: 15,
-    lineHeight: 15 * 1.3,
-    // White at 75%, not textSecondary - this continues the wordmark's own
-    // meaning (her secondary-color rule, 2026-10-12), not a UI chrome label.
-    color: 'rgba(255,255,255,0.75)',
+    marginTop: -40,
+    fontFamily: fontFamily.semiBold,
+    fontSize: 11,
+    lineHeight: 11 * 1.7,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    color: colors.violet300,
     textAlign: 'center',
   },
 });
