@@ -100,7 +100,12 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   // apparently not the physical screen on this device/navigator
   // combination) and corrects any leftover gap directly, however large it
   // turns out to be, instead of computing a guessed number.
-  const wrapRef = useRef<View>(null);
+  // `any`, not `View` - RN 0.88's generated types dropped NativeMethods
+  // (measureInWindow/measure/measureLayout) from View's own ref type in the
+  // New Architecture's typings, even though the method itself still works
+  // at runtime (Fabric keeps it for migration). Typing-only gap from the
+  // SDK 58 upgrade, not a behavior change.
+  const wrapRef = useRef<any>(null);
   const [floatingGap, setFloatingGap] = useState(0);
 
   // Re-measures on every real layout pass (onLayout), not once on a timer -
@@ -109,7 +114,7 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   // reproducing the exact old behavior (which is exactly what she reported:
   // no change at all, not even a partial one).
   const measureGap = () => {
-    wrapRef.current?.measureInWindow((_x, y, _w, measuredHeight) => {
+    wrapRef.current?.measureInWindow((_x: number, y: number, _w: number, measuredHeight: number) => {
       const gap = screenHeight - (y + measuredHeight);
       if (gap > 0.5) setFloatingGap(gap);
       else if (gap < -0.5) setFloatingGap(0);

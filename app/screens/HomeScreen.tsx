@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Platform, useWindowDimensions, type NativeSyntheticEvent, type TextLayoutEventData } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Platform, useWindowDimensions, type TextLayoutEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
@@ -118,7 +118,7 @@ const GREETING_FONT_SIZE = 28;
 function GreetingHeading({ text }: { text: string }) {
   const [lines, setLines] = useState<{ text: string; y: number }[] | null>(null);
 
-  const onTextLayout = (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+  const onTextLayout = (e: TextLayoutEvent) => {
     setLines(e.nativeEvent.lines.map((l) => ({ text: l.text, y: l.y + l.height * 0.8 })));
   };
 

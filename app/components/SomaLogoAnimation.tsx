@@ -164,8 +164,9 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
   // NOT Skia's addCircle, whose own start point/winding direction doesn't match the
   // dot's angle formula below, which was the root cause of the dot drifting out of
   // sync with the ring's trimmed (drawn) arc.
-  const ringPath = Skia.Path.Make();
-  ringPath.addArc(Skia.XYWHRect(CX - R, CY - R, R * 2, R * 2), -90, 360);
+  // Skia 2.14 (SDK 58) moved addArc off SkPath onto SkPathBuilder - build
+  // then detach() to the immutable SkPath this component actually draws.
+  const ringPath = Skia.PathBuilder.Make().addArc(Skia.XYWHRect(CX - R, CY - R, R * 2, R * 2), -90, 360).detach();
 
   const outerOpacity = useDerivedValue(() => interpolateStops(draw.value, DRAW_GLOW_STOPS, DRAW_GLOW_VALUES) * pulseRing0.value);
   const midOpacity = useDerivedValue(() => interpolateStops(draw.value, DRAW_GLOW_STOPS, DRAW_GLOW_VALUES) * pulseRing1.value);
