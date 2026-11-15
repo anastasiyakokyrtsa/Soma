@@ -198,12 +198,11 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
   const textHaloAlpha = useDerivedValue(() => textOpacity.value * pulseText.value * 0.7);
   const textSharpAlpha = useDerivedValue(() => textOpacity.value * pulseText.value);
 
-  // Same opacity curve as textSharpAlpha above, but as a View style (not a
-  // Skia prop) - this is the ordinary, fully-supported way to drive a plain
-  // RN style off a Reanimated shared value, unlike feeding one straight
-  // into a Skia prop (see memory/project_skia_reanimated_bridge.md).
+  // Fades in on textOpacity alone, NOT multiplied by pulseText like "Soma"
+  // above - she wants the tagline static once it's in, not breathing with
+  // the wordmark (her ask, 2026-11-15: "не надо чтобы надпись мигала").
   const taglineStyle = useAnimatedStyle(() => ({
-    opacity: textOpacity.value * pulseText.value,
+    opacity: textOpacity.value,
   }));
 
   return (
@@ -272,11 +271,11 @@ const styles = StyleSheet.create({
   // not guessed; see the component's own history for the earlier, tighter
   // number this replaced.
   tagline: {
-    marginTop: -40,
+    marginTop: -50,
     fontFamily: fontFamily.semiBold,
     fontSize: 11,
     lineHeight: 11 * 1.7,
-    letterSpacing: 1.8,
+    letterSpacing: 2.3,
     textTransform: 'uppercase',
     color: colors.violet300,
     textAlign: 'center',
