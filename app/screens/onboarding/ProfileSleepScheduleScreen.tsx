@@ -4,6 +4,7 @@ import { ProfileStepLayout } from './ProfileStepLayout';
 import { SleepWheelPicker } from '../../components/SleepWheelPicker';
 import { spacing } from '../../theme';
 import { includesCycleStep, profileStepTotal } from '../../lib/onboardingProfile';
+import { useT } from '../../i18n/useT';
 
 export function ProfileSleepScheduleScreen({ navigation }: any) {
   // The dial is one 12h loop (see SleepWheelPicker.tsx's 2026-08-16 note on
@@ -16,13 +17,14 @@ export function ProfileSleepScheduleScreen({ navigation }: any) {
   // Responsive, capped at 340 (2026-08-16: "сделай его больше") - fixed
   // 340px could overflow a narrow phone's available width otherwise.
   const dialSize = Math.min(width - spacing.screenPadding * 2, 340);
+  const t = useT();
 
   return (
     <ProfileStepLayout
       step={2}
       totalSteps={profileStepTotal()}
-      title="Какой у тебя обычно график сна?"
-      description="Отметь, во сколько ты уснул и проснулся. Это поможет нам точнее понять твой текущий ритм и состояние"
+      title={t('onboarding.sleepScheduleTitle')}
+      description={t('onboarding.sleepScheduleDescription')}
       onPressNext={() => navigation.navigate(includesCycleStep() ? 'ProfileMenstrualCycle' : 'ProfileMood')}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}

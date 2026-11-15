@@ -3,6 +3,8 @@ import { View, Text, Image, Pressable, StyleSheet, PanResponder, type GestureRes
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { colors, glow, fontFamily, gradients, spacing } from '../theme';
+import { MOOD_KEYS, getMoodLabels, type MoodKey } from '../i18n/dictionaries/moodOptions';
+import { useLanguage } from '../i18n/LanguageContext';
 
 // WF20 "Как ты чувствуешь себя сегодня?" — ported from the UI Kit's already
 // finished Mood Scale component (`UI Kit/index.html`/`css/style.css`
@@ -15,13 +17,20 @@ import { colors, glow, fontFamily, gradients, spacing } from '../theme';
 // *center* lands exactly on its stop), same gradient title treatment.
 // Exported for MoodCheckIn.tsx (Home's compact daily check-in card) - same
 // 5 moods/images/order everywhere in the app, one source, not a copy.
-export const MOODS = [
-  { label: 'Ужасно', img: require('../assets/mood/picture-mood-scala-very-bad.png') },
-  { label: 'Плохо', img: require('../assets/mood/picture-mood-scala-bad.png') },
-  { label: 'Нейтрально', img: require('../assets/mood/picture-mood-scala-neutral.png') },
-  { label: 'Хорошо', img: require('../assets/mood/picture-mood-scala-good.png') },
-  { label: 'Отлично', img: require('../assets/mood/picture-mood-scala-very-good.png') },
-];
+// Labels are language-dependent (see i18n/dictionaries/moodOptions.ts) -
+// call this with the current language rather than importing a static array.
+const MOOD_IMAGES: Record<MoodKey, number> = {
+  veryBad: require('../assets/mood/picture-mood-scala-very-bad.png'),
+  bad: require('../assets/mood/picture-mood-scala-bad.png'),
+  neutral: require('../assets/mood/picture-mood-scala-neutral.png'),
+  good: require('../assets/mood/picture-mood-scala-good.png'),
+  veryGood: require('../assets/mood/picture-mood-scala-very-good.png'),
+};
+
+export function getMoods(language: 'ru' | 'en') {
+  const labels = getMoodLabels(language);
+  return MOOD_KEYS.map((key) => ({ label: labels[key], img: MOOD_IMAGES[key] }));
+}
 
 // Fixed width for the line/fill/thumb only (2026-08-17: "оставь саму линию
 // как сейчас" - the line itself is fine as-is, not part of this round's
@@ -50,6 +59,8 @@ const WALL_TO_LABEL = 16;
 const WALL_TO_CARD = spacing.screenPadding;
 
 export function MoodScale({ index, onChange }: { index: number; onChange: (index: number) => void }) {
+  const { language } = useLanguage();
+  const MOODS = getMoods(language);
   const [trackWidth, setTrackWidth] = useState(0);
   const [firstLabelWidth, setFirstLabelWidth] = useState(0);
   const [lastLabelWidth, setLastLabelWidth] = useState(0);

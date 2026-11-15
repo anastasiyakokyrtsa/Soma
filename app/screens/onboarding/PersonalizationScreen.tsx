@@ -18,6 +18,7 @@ import { colors, glow, gradients, fontFamily, spacing } from '../../theme';
 import { StepProgressRing } from '../../components/icons/StepProgressRing';
 import { ProgressRingCheckIcon } from '../../components/icons/ProgressRingCheckIcon';
 import { PersonalizationIllustration } from '../../components/PersonalizationIllustration';
+import { useT } from '../../i18n/useT';
 
 // "Настраиваем пространство" - the auto-advancing screen shown right after
 // "Применить стиль" on Visual style / Style preview. 1:1 from Figma's 5
@@ -60,6 +61,7 @@ export function PersonalizationScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [phase, setPhase] = useState<Phase>('step1');
+  const t = useT();
 
   const time = useSharedValue(0);
   // A stable callback identity is load-bearing here, not a style nicety: an
@@ -122,10 +124,10 @@ export function PersonalizationScreen({ navigation }: any) {
 
   const title =
     phase === 'step1'
-      ? 'Настраиваем твое пространство'
+      ? t('onboarding.personalizationTitleStep1')
       : phase === 'step2'
-        ? 'Анализируем первые данные'
-        : 'Пространство готово!';
+        ? t('onboarding.personalizationTitleStep2')
+        : t('onboarding.personalizationTitleDone');
 
   const illustrationWidth = width - spacing.screenPadding * 2;
 
@@ -175,15 +177,15 @@ export function PersonalizationScreen({ navigation }: any) {
         <View style={styles.steps}>
           <StepRow
             number={1}
-            title="Настраиваем пространство"
-            subtitle="Подбираем визуальный ритм"
+            title={t('onboarding.personalizationStep1Title')}
+            subtitle={t('onboarding.personalizationStep1Subtitle')}
             state={step1State}
             progress={progress1}
           />
           <StepRow
             number={2}
-            title="Анализируем данные"
-            subtitle="Обрабатываем первые данные"
+            title={t('onboarding.personalizationStep2Title')}
+            subtitle={t('onboarding.personalizationStep2Subtitle')}
             state={step2State}
             progress={progress2}
           />
@@ -197,11 +199,11 @@ export function PersonalizationScreen({ navigation }: any) {
               style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
               onPress={() => navigation.replace('ProfileStart')}
             >
-              <Text style={styles.buttonLabel}>Продолжить</Text>
+              <Text style={styles.buttonLabel}>{t('common.continueButton')}</Text>
             </Pressable>
           </Animated.View>
         ) : (
-          <Text style={styles.caption}>Это займет не более 10 секунд</Text>
+          <Text style={styles.caption}>{t('onboarding.personalizationCaption')}</Text>
         )}
       </View>
     </Animated.View>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { CalendarRangePicker, type CalendarDate } from '../../components/CalendarRangePicker';
+import { useT } from '../../i18n/useT';
 
 const today = new Date();
 // A period longer than this is almost certainly a mis-tap, not a real one -
@@ -13,18 +14,17 @@ export function ProfileMenstrualCycleScreen({ navigation }: any) {
   const [month, setMonth] = useState(today.getMonth());
   const [rangeStart, setRangeStart] = useState<CalendarDate | null>(null);
   const [rangeEnd, setRangeEnd] = useState<CalendarDate | null>(null);
+  const t = useT();
 
   return (
     <ProfileStepLayout
       step={3}
-      title="Укажи даты последнего менструального цикла"
-      // Explicit breaks: RN has no balanced text-wrap and the greedy wrap left a
-      // short last line. Lines are measured against a real phone (~38 chars fit
-      // at the standard width, so each line here stays under ~34) - a first
-      // 3-line attempt at 39 chars per line overflowed and made it worse
-      // (2026-09-23). Breaks fall on clause boundaries; a much narrower
-      // phone may still re-wrap, so recheck if a short line turns up.
-      description={'Так мы сможем примерно\nпонять, на каком ты этапе\nцикла, и лучше отслеживать,\nкак меняются настроение и энергия'}
+      title={t('onboarding.cycleTitle')}
+      // Explicit \n breaks live in the dictionary string itself (see
+      // i18n/dictionaries/onboarding.ts) - tuned against a real phone for the
+      // Russian text; the English translation's own line lengths differ, so
+      // its breaks need a fresh on-device check, not an assumed carry-over.
+      description={t('onboarding.cycleDescription')}
       buttonDisabled={!rangeStart || !rangeEnd}
       onPressNext={() => navigation.navigate('ProfileMood')}
       onPressBack={() => navigation.goBack()}

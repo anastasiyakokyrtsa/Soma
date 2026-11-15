@@ -13,7 +13,9 @@ import Svg, {
 } from 'react-native-svg';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { colors, fontFamily, gradients, radius } from '../theme';
-import { MOODS } from './MoodScale';
+import { getMoods } from './MoodScale';
+import { useT } from '../i18n/useT';
+import { useLanguage } from '../i18n/LanguageContext';
 
 // A soft violet glow that hugs the mood icon's own silhouette (star points,
 // the flower's scalloped edge, etc.), not a bounding box - 2026-09-29, her
@@ -145,6 +147,9 @@ function GradientMoodWord({ text }: { text: string }) {
 
 export function MoodCheckIn() {
   const [selected, setSelected] = useState<number | null>(null);
+  const t = useT();
+  const { language } = useLanguage();
+  const MOODS = getMoods(language);
 
   if (selected !== null) {
     return (
@@ -154,14 +159,14 @@ export function MoodCheckIn() {
           onPress={() => setSelected(null)}
           hitSlop={6}
           accessibilityRole="button"
-          accessibilityLabel={`Сегодняшнее настроение: ${MOODS[selected].label}. Изменить`}
+          accessibilityLabel={t('common.moodCheckInA11y', { mood: MOODS[selected].label })}
         >
           <View style={styles.chipLeft}>
             <MoodIcon source={MOODS[selected].img} size={22} active id="chip" />
-            <Text style={styles.chipText}>Сегодня: </Text>
+            <Text style={styles.chipText}>{t('common.moodCheckInTodayLabel')}</Text>
             <GradientMoodWord text={MOODS[selected].label.toLowerCase()} />
           </View>
-          <Text style={styles.chipEdit}>изменить</Text>
+          <Text style={styles.chipEdit}>{t('common.moodCheckInEdit')}</Text>
         </Pressable>
       </Animated.View>
     );
@@ -197,7 +202,7 @@ export function MoodCheckIn() {
       </Svg>
       <View style={styles.whiteWash} pointerEvents="none" />
       <View style={styles.inner}>
-        <Text style={styles.prompt}>Как ты сегодня?</Text>
+        <Text style={styles.prompt}>{t('common.moodCheckInPrompt')}</Text>
         <View style={styles.row}>
           {MOODS.map((m, i) => (
             <Pressable

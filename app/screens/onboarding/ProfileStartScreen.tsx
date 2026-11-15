@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, glow, fontFamily, spacing } from '../../theme';
 import { InfoIcon } from '../../components/icons/InfoIcon';
+import { useT } from '../../i18n/useT';
 
 // WF16 "Profile - Start" — the intro screen between Personalization and the
 // 4-step profile-data mini-flow (WF17-20). No finished Figma frame (built
@@ -23,6 +24,7 @@ const ASTROLABE = require('../../assets/onboarding/astrolabe.png');
 export function ProfileStartScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const t = useT();
   // 16px is the target distance from screen edge to the *visible* drawing,
   // not to the (transparent, invisible) square canvas edge (her 2026-09-20
   // clarification - "пускай края картинки выходят, частицы всё равно в
@@ -44,11 +46,8 @@ export function ProfileStartScreen({ navigation }: any) {
       entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}
     >
       <View style={[styles.top, { paddingTop: insets.top + 40 }]}>
-        <Text style={styles.title}>Еще немного твоих данных</Text>
-        <Text style={styles.description}>
-          Пара ответов и ты уже увидишь первую аналитику. Ты можешь продолжить сейчас или вернуться к
-          заполнению профиля позже
-        </Text>
+        <Text style={styles.title}>{t('onboarding.profileStartTitle')}</Text>
+        <Text style={styles.description}>{t('onboarding.profileStartDescription')}</Text>
 
         <View style={styles.illustrationWrap}>
           <Image
@@ -64,12 +63,12 @@ export function ProfileStartScreen({ navigation }: any) {
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
           onPress={() => navigation.navigate('ProfileDateOfBirth')}
         >
-          <Text style={styles.buttonLabel}>Поехали</Text>
+          <Text style={styles.buttonLabel}>{t('onboarding.profileStartButton')}</Text>
         </Pressable>
 
         <View style={styles.skipRow}>
           <Pressable style={styles.skipTap} onPress={() => navigation.replace('Main')} hitSlop={6}>
-            <Text style={styles.skipText}>Заполнить позже</Text>
+            <Text style={styles.skipText}>{t('onboarding.fillInLater')}</Text>
           </Pressable>
           <InfoIcon size={18} color={colors.violet300} />
         </View>

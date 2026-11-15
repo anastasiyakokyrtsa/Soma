@@ -27,6 +27,38 @@ export const onboarding = {
 
     chooseApproachTitle: 'Выбери подход',
     chooseApproachDescription: 'Это поможет точнее подобрать рекомендации. Подход всегда можно изменить в настройках',
+
+    visualStyleTitle: 'Выбери свой стиль',
+    visualStyleDescription: 'Выбери оформление, которое вдохновляет тебя. Позже его можно будет изменить в настройках',
+    applyStyle: 'Применить стиль',
+
+    personalizationTitleStep1: 'Настраиваем твое пространство',
+    personalizationTitleStep2: 'Анализируем первые данные',
+    personalizationTitleDone: 'Пространство готово!',
+    personalizationStep1Title: 'Настраиваем пространство',
+    personalizationStep1Subtitle: 'Подбираем визуальный ритм',
+    personalizationStep2Title: 'Анализируем данные',
+    personalizationStep2Subtitle: 'Обрабатываем первые данные',
+    personalizationCaption: 'Это займет не более 10 секунд',
+
+    profileStartTitle: 'Еще немного твоих данных',
+    profileStartDescription:
+      'Пара ответов и ты уже увидишь первую аналитику. Ты можешь продолжить сейчас или вернуться к заполнению профиля позже',
+    profileStartButton: 'Поехали',
+    fillInLater: 'Заполнить позже',
+
+    stepCounter: 'Шаг {step}/{total}',
+
+    dateOfBirthTitle: 'Когда ты родился?',
+    dateOfBirthDescription: 'Дата рождения нужна, чтобы рассчитать индивидуальные биоритмы и ритмы восстановления',
+
+    cycleTitle: 'Укажи даты последнего менструального цикла',
+    cycleDescription: 'Так мы сможем примерно\nпонять, на каком ты этапе\nцикла, и лучше отслеживать,\nкак меняются настроение и энергия',
+
+    moodTitle: 'Как ты чувствуешь себя сегодня?',
+
+    sleepScheduleTitle: 'Какой у тебя обычно график сна?',
+    sleepScheduleDescription: 'Отметь, во сколько ты уснул и проснулся. Это поможет нам точнее понять твой текущий ритм и состояние',
   },
   en: {
     aboutApp1Title: 'Your state is a system',
@@ -56,6 +88,38 @@ export const onboarding = {
 
     chooseApproachTitle: 'Choose your approach',
     chooseApproachDescription: 'This helps us tailor recommendations more precisely. You can always change your approach later in settings',
+
+    visualStyleTitle: 'Choose your style',
+    visualStyleDescription: 'Pick the look that inspires you. You can change it later in settings',
+    applyStyle: 'Apply style',
+
+    personalizationTitleStep1: 'Setting up your space',
+    personalizationTitleStep2: 'Analyzing your first data',
+    personalizationTitleDone: 'Your space is ready!',
+    personalizationStep1Title: 'Setting up the space',
+    personalizationStep1Subtitle: 'Picking a visual rhythm',
+    personalizationStep2Title: 'Analyzing data',
+    personalizationStep2Subtitle: 'Processing your first data',
+    personalizationCaption: 'This will take no more than 10 seconds',
+
+    profileStartTitle: 'A bit more about you',
+    profileStartDescription:
+      "A couple of answers and you'll already see your first analytics. You can continue now or come back to finish your profile later",
+    profileStartButton: "Let's go",
+    fillInLater: 'Fill in later',
+
+    stepCounter: 'Step {step}/{total}',
+
+    dateOfBirthTitle: 'When were you born?',
+    dateOfBirthDescription: 'Your date of birth is used to calculate your individual biorhythms and recovery cycles',
+
+    cycleTitle: 'Enter the dates of your last menstrual cycle',
+    cycleDescription: "This helps us roughly understand\nwhat stage of your cycle\nyou're on, and better track\nhow your mood and energy change",
+
+    moodTitle: 'How are you feeling today?',
+
+    sleepScheduleTitle: "What's your usual sleep schedule?",
+    sleepScheduleDescription: "Mark when you fell asleep and woke up. This helps us better understand your current rhythm and state",
   },
 };
 

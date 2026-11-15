@@ -6,6 +6,7 @@ import { colors, fontFamily } from '../../theme';
 import { formatBirthDate, type BirthDate } from '../../lib/biorhythm';
 import { DateWheelPicker } from '../../components/DateWheelPicker';
 import { profileStepTotal } from '../../lib/onboardingProfile';
+import { useT } from '../../i18n/useT';
 
 // Audit finding #13 (platform-conformance): date pickers are one of the
 // component types that must diverge by platform, not share one custom look
@@ -53,6 +54,7 @@ const valueToDate = (v: BirthDate): Date => new Date(v.year, v.month, v.day);
 export function ProfileDateOfBirthScreen({ navigation }: any) {
   const [date, setDate] = useState<BirthDate>({ day: 14, month: 5, year: 1995 });
   const [androidPickerOpen, setAndroidPickerOpen] = useState(false);
+  const t = useT();
 
   const onChange = (_event: DateTimePickerEvent, selected?: Date) => {
     if (Platform.OS === 'android') setAndroidPickerOpen(false);
@@ -63,8 +65,8 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
     <ProfileStepLayout
       step={1}
       totalSteps={profileStepTotal()}
-      title="Когда ты родился?"
-      description="Дата рождения нужна, чтобы рассчитать индивидуальные биоритмы и ритмы восстановления"
+      title={t('onboarding.dateOfBirthTitle')}
+      description={t('onboarding.dateOfBirthDescription')}
       onPressNext={() => navigation.navigate('BiorhythmInsight', { birth: date })}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}

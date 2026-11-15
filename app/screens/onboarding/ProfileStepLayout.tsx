@@ -4,6 +4,7 @@ import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, glow, fontFamily, spacing } from '../../theme';
 import { BackIcon } from '../../components/icons/BackIcon';
 import { InfoIcon } from '../../components/icons/InfoIcon';
+import { useT } from '../../i18n/useT';
 import type { ReactNode } from 'react';
 
 // Shared layout for the post-Personalization profile-data mini-flow (WF
@@ -25,7 +26,7 @@ export function ProfileStepLayout({
   title,
   description,
   children,
-  buttonLabel = 'Продолжить',
+  buttonLabel,
   buttonDisabled = false,
   onPressNext,
   onPressBack,
@@ -43,6 +44,8 @@ export function ProfileStepLayout({
   onPressSkip: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const t = useT();
+  const resolvedButtonLabel = buttonLabel ?? t('common.continueButton');
 
   return (
     <Animated.View
@@ -54,9 +57,7 @@ export function ProfileStepLayout({
           <Pressable style={styles.backButton} onPress={onPressBack} hitSlop={8}>
             <BackIcon />
           </Pressable>
-          <Text style={styles.stepCounter}>
-            Шаг {step}/{totalSteps}
-          </Text>
+          <Text style={styles.stepCounter}>{t('onboarding.stepCounter', { step, total: totalSteps })}</Text>
           {/* Invisible spacer, same footprint as the back button, so the
               counter text is truly centered on the row instead of centered
               between the back button and the screen's right edge. */}
@@ -77,12 +78,12 @@ export function ProfileStepLayout({
           disabled={buttonDisabled}
           onPress={onPressNext}
         >
-          <Text style={[styles.buttonLabel, buttonDisabled && styles.buttonLabelDisabled]}>{buttonLabel}</Text>
+          <Text style={[styles.buttonLabel, buttonDisabled && styles.buttonLabelDisabled]}>{resolvedButtonLabel}</Text>
         </Pressable>
 
         <View style={styles.skipRow}>
           <Pressable style={styles.skipTap} onPress={onPressSkip} hitSlop={6}>
-            <Text style={styles.skipText}>Заполнить позже</Text>
+            <Text style={styles.skipText}>{t('onboarding.fillInLater')}</Text>
           </Pressable>
           <InfoIcon size={18} color={colors.violet300} />
         </View>

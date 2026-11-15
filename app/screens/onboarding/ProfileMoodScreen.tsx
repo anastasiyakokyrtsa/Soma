@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { MoodScale } from '../../components/MoodScale';
 import { profileStepTotal } from '../../lib/onboardingProfile';
+import { useT } from '../../i18n/useT';
 
 export function ProfileMoodScreen({ navigation }: any) {
   // Knob starts over "Ужасно" (her call, 2026-09-23), and Continue stays disabled
@@ -10,12 +11,13 @@ export function ProfileMoodScreen({ navigation }: any) {
   // picked (a pre-set "Хорошо" used to be submitted by just tapping Continue).
   const [moodIndex, setMoodIndex] = useState(0);
   const [touched, setTouched] = useState(false);
+  const t = useT();
 
   return (
     <ProfileStepLayout
       step={profileStepTotal()}
       totalSteps={profileStepTotal()}
-      title="Как ты чувствуешь себя сегодня?"
+      title={t('onboarding.moodTitle')}
       buttonDisabled={!touched}
       onPressNext={() => navigation.replace('Main')}
       onPressBack={() => navigation.goBack()}

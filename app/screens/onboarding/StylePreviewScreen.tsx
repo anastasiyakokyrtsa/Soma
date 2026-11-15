@@ -7,7 +7,9 @@ import { colors, glow, spacing } from '../../theme';
 import { StyleSwatch } from '../../components/StyleSwatch';
 import { BackIcon } from '../../components/icons/BackIcon';
 import { NextPageIcon } from '../../components/icons/NextPageIcon';
-import { VISUAL_STYLES, VisualStyleId } from '../../theme/visualStyles';
+import { getVisualStyles, VisualStyleId } from '../../theme/visualStyles';
+import { useT } from '../../i18n/useT';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 // #RRGGBB -> rgba(r,g,b,alpha) — used to turn each mood's solid accent into
 // a very faint tinted fill for the nav-icon rings (2026-08-08: "фон... ты
@@ -115,11 +117,14 @@ const MOOD: Record<
 const ICON_BACKDROP = 38.5;
 
 export function StylePreviewScreen({ navigation, route }: any) {
-  const found = VISUAL_STYLES.findIndex((s) => s.id === route.params?.initialId);
+  const t = useT();
+  const { language } = useLanguage();
+  const visualStyles = getVisualStyles(language);
+  const found = visualStyles.findIndex((s) => s.id === route.params?.initialId);
   const [index, setIndex] = useState(found === -1 ? 0 : found);
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const style = VISUAL_STYLES[index];
+  const style = visualStyles[index];
   const mood = MOOD[style.id];
 
   // Focus's rings want to sit centered in the real open space between the
@@ -187,7 +192,7 @@ export function StylePreviewScreen({ navigation, route }: any) {
           styles.nextButton,
           { borderColor: mood.accent, backgroundColor: withAlpha(mood.accent, 0.14) },
         ]}
-        onPress={() => setIndex((i) => (i + 1) % VISUAL_STYLES.length)}
+        onPress={() => setIndex((i) => (i + 1) % visualStyles.length)}
         hitSlop={8}
       >
         {/* Full kit size again, not shrunk — "возьми стрелку Дальше из кита". */}
@@ -225,7 +230,7 @@ export function StylePreviewScreen({ navigation, route }: any) {
           onPress={() => navigation.replace('Personalization')}
         >
           <Text style={[styles.buttonLabel, { fontFamily: mood.buttonFont, color: mood.onAccent }]}>
-            Применить стиль
+            {t('onboarding.applyStyle')}
           </Text>
         </Pressable>
       </View>

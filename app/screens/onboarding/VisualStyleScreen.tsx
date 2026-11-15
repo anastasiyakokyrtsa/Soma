@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { OnboardingStepLayout } from './OnboardingStepLayout';
 import { StyleGridTile } from '../../components/StyleGridTile';
-import { VISUAL_STYLES } from '../../theme/visualStyles';
+import { getVisualStyles } from '../../theme/visualStyles';
 import { spacing } from '../../theme';
+import { useT } from '../../i18n/useT';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 const GRID_GAP = 12;
 
@@ -11,13 +13,16 @@ export function VisualStyleScreen({ navigation }: any) {
   const [selected, setSelected] = useState<number | null>(null);
   const { width } = useWindowDimensions();
   const tileSize = (width - spacing.screenPadding * 2 - GRID_GAP) / 2;
+  const t = useT();
+  const { language } = useLanguage();
+  const visualStyles = getVisualStyles(language);
 
   return (
     <OnboardingStepLayout
       activeStep={6}
-      title="Выбери свой стиль"
-      description="Выбери оформление, которое вдохновляет тебя. Позже его можно будет изменить в настройках"
-      buttonLabel="Применить стиль"
+      title={t('onboarding.visualStyleTitle')}
+      description={t('onboarding.visualStyleDescription')}
+      buttonLabel={t('onboarding.applyStyle')}
       buttonDisabled={selected === null}
       // TODO: applying a non-Cosmos style doesn't actually re-theme the app
       // yet (see theme/visualStyles.ts).
@@ -26,7 +31,7 @@ export function VisualStyleScreen({ navigation }: any) {
       onPressSkip={() => navigation.replace('Main')}
     >
       <View style={styles.grid}>
-        {VISUAL_STYLES.map((style, index) => (
+        {visualStyles.map((style, index) => (
           <StyleGridTile
             key={style.id}
             styleId={style.id}

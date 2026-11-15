@@ -9,6 +9,8 @@ import {
   BIORHYTHM_INSIGHT_DEMO,
   BIORHYTHM_INSIGHT_EYEBROW,
 } from '../../content/biorhythmInsight';
+import { useT } from '../../i18n/useT';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 // TEMPORARY, same pattern as ProfileDateOfBirthScreen's FORCE_IOS_WHEEL_PREVIEW:
 // while Home still shows hand-drawn demo curves, the real-formula insight
@@ -53,10 +55,12 @@ export function BiorhythmInsightScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const birth: BirthDate = route?.params?.birth ?? { day: 14, month: 4, year: 1995 };
+  const t = useT();
+  const { language } = useLanguage();
 
   const values = getBiorhythmValues(birth);
   const { cycle, direction } = getStandoutCycle(values);
-  const insight = USE_HOME_DEMO_INSIGHT ? BIORHYTHM_INSIGHT_DEMO : BIORHYTHM_INSIGHTS[cycle][direction];
+  const insight = USE_HOME_DEMO_INSIGHT ? BIORHYTHM_INSIGHT_DEMO[language] : BIORHYTHM_INSIGHTS[language][cycle][direction];
 
   return (
     <View style={styles.container}>
@@ -72,7 +76,7 @@ export function BiorhythmInsightScreen({ navigation, route }: any) {
             <Image source={INSIGHT_BULB} style={styles.bulbImage} resizeMode="cover" />
           </View>
         </View>
-        <Text style={styles.eyebrow}>{BIORHYTHM_INSIGHT_EYEBROW}</Text>
+        <Text style={styles.eyebrow}>{BIORHYTHM_INSIGHT_EYEBROW[language]}</Text>
         <Text style={styles.insight}>{insight}</Text>
       </View>
 
@@ -90,7 +94,7 @@ export function BiorhythmInsightScreen({ navigation, route }: any) {
         style={({ pressed }) => [styles.cta, { marginBottom: insets.bottom + 64 }, pressed && styles.ctaPressed]}
         onPress={() => navigation.navigate('ProfileSleepSchedule')}
       >
-        <Text style={styles.ctaLabel}>Продолжить</Text>
+        <Text style={styles.ctaLabel}>{t('common.continueButton')}</Text>
       </Pressable>
     </View>
   );
