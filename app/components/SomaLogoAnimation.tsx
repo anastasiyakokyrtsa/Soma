@@ -22,6 +22,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
 import { colors, fontFamily } from '../theme';
+import { useLanguage } from '../i18n/LanguageContext';
 
 // 1:1 port of src/app/components/soma-logo-animation.tsx (Figma Make export,
 // "Логотип с анимацией" file) — same constants/timeline/colors, just re-expressed
@@ -65,8 +66,14 @@ const C_TEXT = '#DDD9FF';
 // Small tracked-caps "eyebrow" treatment (not a plain sentence) - her pick
 // from a web comparison of 5 directions, then a 1-line-vs-2-line follow-up:
 // explicit break after "ритмам" for a compact 2-line "stamp" rather than
-// one long tracked-out line.
-const TAGLINE = 'Прислушайся к ритмам\nсвоего тела';
+// one long tracked-out line. English line break (via english-editor agent,
+// 2026-11-21) mirrors the same rhythm/body split, not a literal word-count
+// match - "LISTEN TO THE RHYTHMS" / "OF YOUR BODY" (stored lower-case, the
+// uppercase look comes from styles.tagline's textTransform).
+const TAGLINE: Record<'ru' | 'en', string> = {
+  ru: 'Прислушайся к ритмам\nсвоего тела',
+  en: 'Listen to the rhythms\nof your body',
+};
 
 const SPLINE = Easing.bezierFn(0.4, 0, 0.6, 1);
 
@@ -126,6 +133,7 @@ function SpacedText({
 
 export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: number; animationKey?: number }) {
   const scale = size / DESIGN;
+  const { language } = useLanguage();
   const font = useFont(require('@expo-google-fonts/nunito-sans/300Light/NunitoSans_300Light.ttf'), 30);
 
   // 0 -> 1 over DRAW_DUR, delayed BEGIN, linear (matches stroke-dashoffset / animateMotion timing)
@@ -255,7 +263,7 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
           )}
         </Group>
       </Canvas>
-      <Animated.Text style={[styles.tagline, { width: size }, taglineStyle]}>{TAGLINE}</Animated.Text>
+      <Animated.Text style={[styles.tagline, { width: size }, taglineStyle]}>{TAGLINE[language]}</Animated.Text>
     </View>
   );
 }
