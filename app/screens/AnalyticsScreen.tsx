@@ -6,10 +6,11 @@ import { colors, fontFamily, gradients, radius } from '../theme';
 import { StarsBackground } from '../components/StarsBackground';
 import { GradientIcon, type GradientIconName } from '../components/icons/GradientIcon';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
+import { useT } from '../i18n/useT';
 
 type Stat = {
-  title: string;
-  value: string;
+  titleKey: string;
+  valueKey: string;
   icon: GradientIconName;
   available: boolean;
 };
@@ -21,16 +22,17 @@ type Stat = {
 // categories, per the scenario audit's standing rule on visible-vs-silent
 // dead taps (docs/state/findings.md #1).
 const STATS: Stat[] = [
-  { title: 'Биоритмы', value: '68% сегодня', icon: 'pulse', available: true },
-  { title: 'Сон', value: '7ч 32 м', icon: 'sleep', available: false },
-  { title: 'Состояния', value: 'Ровный фон', icon: 'battery', available: false },
-  { title: 'Луна', value: 'Убывающая', icon: 'moonSymbol', available: false },
-  { title: 'Солнце', value: 'Низкая активность', icon: 'sun', available: false },
-  { title: 'Паттерны', value: '2 совпадения', icon: 'network', available: false },
+  { titleKey: 'analytics.biorhythmsTitle', valueKey: 'analytics.biorhythmsValue', icon: 'pulse', available: true },
+  { titleKey: 'analytics.sleepTitle', valueKey: 'analytics.sleepValue', icon: 'sleep', available: false },
+  { titleKey: 'analytics.statesTitle', valueKey: 'analytics.statesValue', icon: 'battery', available: false },
+  { titleKey: 'analytics.moonTitle', valueKey: 'analytics.moonValue', icon: 'moonSymbol', available: false },
+  { titleKey: 'analytics.sunTitle', valueKey: 'analytics.sunValue', icon: 'sun', available: false },
+  { titleKey: 'analytics.patternsTitle', valueKey: 'analytics.patternsValue', icon: 'network', available: false },
 ];
 
 export function AnalyticsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
+  const t = useT();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const cardWidth = (screenWidth - 20 * 2 - 16) / 2;
   // Icon/text/gap sizes below (iconRing 70, its own 20/24 gaps, titles 20px,
@@ -68,14 +70,14 @@ export function AnalyticsScreen({ navigation }: any) {
             </SvgLinearGradient>
           </Defs>
           <SvgText x="50%" y="32" fontSize={32} fontFamily={fontFamily.bold} textAnchor="middle" fill="url(#analyticsTitleGrad)">
-            Аналитика
+            {t('analytics.title')}
           </SvgText>
         </Svg>
 
         <View style={styles.grid}>
           {STATS.map((s) => (
             <Pressable
-              key={s.title}
+              key={s.titleKey}
               disabled={!s.available}
               onPress={() => navigation.navigate('Biorhythms')}
               style={({ pressed }) => [
@@ -94,13 +96,13 @@ export function AnalyticsScreen({ navigation }: any) {
                   как в ките, а то сейчас она плоская". */}
               <Svg width={cardWidth} height={cardWidth} style={StyleSheet.absoluteFill}>
                 <Defs>
-                  <RadialGradient id={`analyticsFill-${s.title}`} cx="50%" cy="50%" r="70.7%">
+                  <RadialGradient id={`analyticsFill-${s.titleKey}`} cx="50%" cy="50%" r="70.7%">
                     <Stop offset="0" stopColor="#000000" stopOpacity={0.1} />
                     <Stop offset="0.212" stopColor="#000000" stopOpacity={0.1} />
                     <Stop offset="1" stopColor={colors.violet300} stopOpacity={0.2} />
                   </RadialGradient>
                 </Defs>
-                <Rect x={0} y={0} width={cardWidth} height={cardWidth} fill={`url(#analyticsFill-${s.title})`} />
+                <Rect x={0} y={0} width={cardWidth} height={cardWidth} fill={`url(#analyticsFill-${s.titleKey})`} />
               </Svg>
               <View style={styles.whiteWash} pointerEvents="none" />
 
@@ -121,8 +123,8 @@ export function AnalyticsScreen({ navigation }: any) {
                   <GradientIcon name={s.icon} size={32 * cardScale} />
                 </View>
                 <View style={styles.cardTextBlock}>
-                  <Text style={[styles.cardTitle, { fontSize: 20 * cardScale }]}>{s.title}</Text>
-                  <Text style={[styles.cardValue, { fontSize: 16 * cardScale, marginTop: 6 * cardScale }]}>{s.value}</Text>
+                  <Text style={[styles.cardTitle, { fontSize: 20 * cardScale }]}>{t(s.titleKey)}</Text>
+                  <Text style={[styles.cardValue, { fontSize: 16 * cardScale, marginTop: 6 * cardScale }]}>{t(s.valueKey)}</Text>
                 </View>
               </View>
             </Pressable>

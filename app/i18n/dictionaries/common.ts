@@ -8,6 +8,9 @@ export const common = {
     moodCheckInTodayLabel: 'Сегодня: ',
     moodCheckInEdit: 'изменить',
     moodCheckInA11y: 'Сегодняшнее настроение: {mood}. Изменить',
+    allArticles: 'Все статьи',
+    close: 'Закрыть',
+    swipeLeft: 'Свайпни влево',
   },
   en: {
     continueButton: 'Continue',
@@ -18,5 +21,8 @@ export const common = {
     moodCheckInTodayLabel: 'Today: ',
     moodCheckInEdit: 'edit',
     moodCheckInA11y: "Today's mood: {mood}. Change it",
+    allArticles: 'All articles',
+    close: 'Close',
+    swipeLeft: 'Swipe left',
   },
 };

@@ -4,10 +4,11 @@ import Animated, { FadeIn, Easing } from 'react-native-reanimated';
 import { colors, fontFamily, radius } from '../theme';
 import { StarsBackground } from '../components/StarsBackground';
 import { BackIcon } from '../components/icons/BackIcon';
+import { useT } from '../i18n/useT';
 
 type Category = {
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
   image: ImageSourcePropType;
   ratio: number;
   available: boolean;
@@ -15,8 +16,8 @@ type Category = {
 
 // WF 29 "Tea categories" - the real entry point of "Чай как ритуал", her
 // correction 2026-09-07: Care's "Начать церемонию" was going straight into
-// the "Успокоение на вечер" stories, skipping this picker screen entirely -
-// "мы же изначально должны попасть на экран где категории чаев". Only that
+// the "Успокоение на вечер" stories, skipping this picker screen entirely -
+// "мы же изначально должны попасть на экран где категории чаев". Only that
 // one category has real herb content behind it (see TeaCeremonyScreen.tsx's
 // own note on this), so the other 4 are shown but marked "Скоро" and not
 // tappable - same "visible unavailable state, not a silent dead tap"
@@ -25,36 +26,36 @@ type Category = {
 // of shipping another one of those.
 const CATEGORIES: Category[] = [
   {
-    title: 'Успокоение на вечер',
-    description: 'Для замедления, расслабления и подготовки ко сну',
+    titleKey: 'tea.cat1Title',
+    descKey: 'tea.cat1Desc',
     image: require('../assets/tea/category-calming.png'),
     ratio: 686 / 686,
     available: true,
   },
   {
-    title: 'Мягкая энергия',
-    description: 'Для спокойного пробуждения и постепенного наполнения энергией',
+    titleKey: 'tea.cat2Title',
+    descKey: 'tea.cat2Desc',
     image: require('../assets/tea/category-soft-energy.png'),
     ratio: 734 / 686,
     available: false,
   },
   {
-    title: 'Фокус и ясность',
-    description: 'Для концентрации, внимания и ясных мыслей',
+    titleKey: 'tea.cat3Title',
+    descKey: 'tea.cat3Desc',
     image: require('../assets/tea/category-focus.png'),
     ratio: 686 / 686,
     available: false,
   },
   {
-    title: 'Тепло и восстановление',
-    description: 'Поддержка тела, ощущение уюта и внутреннего тепла',
+    titleKey: 'tea.cat4Title',
+    descKey: 'tea.cat4Desc',
     image: require('../assets/tea/category-warmth.png'),
     ratio: 686 / 686,
     available: false,
   },
   {
-    title: 'Интуитивный выбор',
-    description: 'Доверься ощущению — выбери чай без размышлений',
+    titleKey: 'tea.cat5Title',
+    descKey: 'tea.cat5Desc',
     image: require('../assets/tea/category-intuitive-choice.png'),
     ratio: 662 / 686,
     available: false,
@@ -66,6 +67,7 @@ const IMAGE_SIZE = 140;
 export function TeaCategoriesScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const t = useT();
 
   return (
     <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
@@ -79,16 +81,14 @@ export function TeaCategoriesScreen({ navigation }: any) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Чай как ритуал</Text>
-          <Text style={styles.subtitle}>
-            Подбери чай под своё состояние — для спокойствия, энергии или мягкой поддержки тела.
-          </Text>
+          <Text style={styles.title}>{t('tea.categoriesTitle')}</Text>
+          <Text style={styles.subtitle}>{t('tea.categoriesSubtitle')}</Text>
         </View>
 
         <View style={styles.list}>
           {CATEGORIES.map((c) => (
             <Pressable
-              key={c.title}
+              key={c.titleKey}
               disabled={!c.available}
               onPress={() => navigation.navigate('TeaCeremony')}
               style={({ pressed }) => [
@@ -99,16 +99,16 @@ export function TeaCategoriesScreen({ navigation }: any) {
             >
               {!c.available ? (
                 <View style={styles.soonBadge}>
-                  <Text style={styles.soonBadgeLabel}>Скоро</Text>
+                  <Text style={styles.soonBadgeLabel}>{t('tea.soonBadge')}</Text>
                 </View>
               ) : null}
-              <Text style={styles.cardTitle}>{c.title}</Text>
+              <Text style={styles.cardTitle}>{t(c.titleKey)}</Text>
               <Image
                 source={c.image}
                 resizeMode="contain"
                 style={{ width: IMAGE_SIZE * c.ratio, height: IMAGE_SIZE, marginTop: 20 }}
               />
-              <Text style={styles.cardDescription}>{c.description}</Text>
+              <Text style={styles.cardDescription}>{t(c.descKey)}</Text>
             </Pressable>
           ))}
         </View>

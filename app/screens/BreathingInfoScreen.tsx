@@ -5,6 +5,7 @@ import { colors, fontFamily, radius, glow } from '../theme';
 import { BreathingOrb, ORB_TOP_OFFSET } from '../components/BreathingOrb';
 import { CloseIcon } from '../components/icons/CloseIcon';
 import { StarsBackground } from '../components/StarsBackground';
+import { useT } from '../i18n/useT';
 
 // WF 25 "Breathing session - Info" - the practice the "Дыхание" Mini Ritual
 // Tile on Care opens straight into, already picked for her current state
@@ -17,15 +18,15 @@ import { StarsBackground } from '../components/StarsBackground';
 export function BreathingInfoScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const t = useT();
   const p = route?.params ?? {};
-  const title: string = p.title ?? 'Дыхание для возвращения в тело';
+  const title: string = p.title ?? t('breathing.defaultTitle');
   // "2 минуты" - the real length (6 reps x 16s = 96s = 1 мин 36 сек) was
   // used literally here for one round, then reverted: "давай вначале в
   // информации все-таки напишем 2 минуты, а не 1 мин 36 сек" - a rounder,
   // friendlier label over the precise-but-fussy one.
-  const durationLabel: string = p.durationLabel ?? '2 минуты';
-  const description: string =
-    p.description ?? 'Эта практика помогает замедлиться и выровнять дыхание. Подходит, если внутри есть напряжение или усталость.';
+  const durationLabel: string = p.durationLabel ?? t('breathing.defaultDuration');
+  const description: string = p.description ?? t('breathing.defaultDescription');
 
   return (
     // Единый fade-in вход по всему приложению (2026-09-06: "на всех
@@ -55,7 +56,7 @@ export function BreathingInfoScreen({ navigation, route }: any) {
           style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
           onPress={() => navigation.navigate('BreathingSession', { title })}
         >
-          <Text style={styles.ctaLabel}>Я готов</Text>
+          <Text style={styles.ctaLabel}>{t('breathing.startButton')}</Text>
         </Pressable>
       </View>
     </Animated.View>

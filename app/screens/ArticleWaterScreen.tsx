@@ -25,9 +25,14 @@ import {
   ARTICLE_WATER_PAGES,
   type ArticleBlock,
 } from '../content/articleWater';
+import { useT } from '../i18n/useT';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const WATER_IMAGE = require('../assets/articles/water.jpg');
-const TOTAL_PAGES = 1 + ARTICLE_WATER_PAGES.length;
+// Both languages share the same page count by construction (a 1:1 RU/EN
+// translation, not independently-edited content) - 'ru' here is just a
+// fixed anchor for counting, not a language preference.
+const TOTAL_PAGES = 1 + ARTICLE_WATER_PAGES.ru.length;
 const SIDE_MARGIN = 16;
 // Literal row height for the "Все статьи / Закрыть" row, used only to
 // compute the card's own top offset below - not a measured value, close
@@ -133,6 +138,9 @@ function DepthPage({
 export function ArticleWaterScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const t = useT();
+  const { language } = useLanguage();
+  const pages = ARTICLE_WATER_PAGES[language];
   // Real-time scroll position on the UI thread, feeding each page's own
   // depth transform (DepthPage above) every frame of the gesture.
   const scrollX = useSharedValue(0);
@@ -163,10 +171,10 @@ export function ArticleWaterScreen({ navigation }: any) {
       <View style={[styles.topRow, { top: navTop }]} pointerEvents="box-none">
         <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backBtn}>
           <ChevronIcon direction="left" size={14} color={colors.textPrimary} />
-          <Text style={styles.topLabel}>Все статьи</Text>
+          <Text style={styles.topLabel}>{t('common.allArticles')}</Text>
         </Pressable>
         <Pressable onPress={() => navigation.goBack()} hitSlop={8}>
-          <Text style={styles.topLabel}>Закрыть</Text>
+          <Text style={styles.topLabel}>{t('common.close')}</Text>
         </Pressable>
       </View>
 
@@ -192,15 +200,15 @@ export function ArticleWaterScreen({ navigation }: any) {
           <ArticleCard pageIndex={0}>
             <View style={styles.contentSpacerTop} />
             <View style={styles.coverContent}>
-              <CoverTitle text={ARTICLE_WATER_TITLE} />
-              <Text style={styles.coverSubtitle}>{ARTICLE_WATER_SUBTITLE}</Text>
+              <CoverTitle text={ARTICLE_WATER_TITLE[language]} />
+              <Text style={styles.coverSubtitle}>{ARTICLE_WATER_SUBTITLE[language]}</Text>
               <View style={styles.readTimeRow}>
                 {/* size=8 (was 7) - readTime went 14->16px right after the
                     original consult, scaled to keep the same ~77%
                     cap-height ratio (ui-designer, 2026-10-07): ~12.3px tall
                     next to 16px text. */}
                 <HourglassIcon size={8} />
-                <Text style={styles.readTime}>{ARTICLE_WATER_READ_TIME}</Text>
+                <Text style={styles.readTime}>{ARTICLE_WATER_READ_TIME[language]}</Text>
               </View>
             </View>
             <View style={styles.contentSpacerBottom} />
@@ -212,12 +220,12 @@ export function ArticleWaterScreen({ navigation }: any) {
                 JSX simply doesn't exist on the other pages. */}
             <View style={styles.swipeHint} pointerEvents="none">
               <SwipeHandIcon size={28} />
-              <Text style={styles.swipeHintText}>Свайпни влево</Text>
+              <Text style={styles.swipeHintText}>{t('common.swipeLeft')}</Text>
             </View>
           </ArticleCard>
         </DepthPage>
 
-        {ARTICLE_WATER_PAGES.map((page, i) => (
+        {pages.map((page, i) => (
           <DepthPage
             key={i}
             pageIndex={i + 1}
@@ -254,6 +262,7 @@ export function ArticleWaterScreen({ navigation }: any) {
 // show the right fade/number for whichever page it is, mid-drag, before any
 // scroll-settle state update ever fires.
 function ArticleCard({ pageIndex, children }: { pageIndex: number; children: React.ReactNode }) {
+  const { language } = useLanguage();
   // Flat, not a progressive fade to nothing - her ask, 2026-10-07: every
   // content page should carry the same slightly-darkened photo page 2 had
   // (0.55), not fade further page over page until there's no image left by
@@ -306,7 +315,7 @@ function ArticleCard({ pageIndex, children }: { pageIndex: number; children: Rea
           {pageIndex === 0 ? (
             <View style={styles.tagPill}>
               <View style={styles.tagDot} />
-              <Text style={styles.tagText}>{ARTICLE_WATER_SERIES.toUpperCase()}</Text>
+              <Text style={styles.tagText}>{ARTICLE_WATER_SERIES[language].toUpperCase()}</Text>
               <View style={styles.tagDot} />
             </View>
           ) : (

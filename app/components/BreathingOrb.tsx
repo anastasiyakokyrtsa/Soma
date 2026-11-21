@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import { colors, fontFamily } from '../theme';
+import { useT } from '../i18n/useT';
 
 // Ports UI Kit's "Breathing Session" orb (index.html #breathing, style.css
 // ~L959-975, js/main.js ~L305-372) - a real, Figma-effect-sourced component
@@ -40,24 +41,34 @@ const LEVELS: Record<LevelKey, { size: number; inset1Blur: number; inset1Op: num
   E: { size: 300, inset1Blur: 250, inset1Op: 1, inset2Blur: 50, inset2Op: 0.7, outerBlur: 90, outerOp: 0.7 },
 };
 
-const STEPS: { name: string; sec: number; level: LevelKey }[] = [
-  { name: 'Вдох', sec: 4, level: 'A' },
-  { name: 'Вдох', sec: 3, level: 'B' },
-  { name: 'Вдох', sec: 2, level: 'C' },
-  { name: 'Вдох', sec: 1, level: 'D' },
-  { name: 'Задержка', sec: 4, level: 'E' },
-  { name: 'Задержка', sec: 3, level: 'D' },
-  { name: 'Задержка', sec: 2, level: 'E' },
-  { name: 'Задержка', sec: 1, level: 'D2' },
-  { name: 'Выдох', sec: 4, level: 'D' },
-  { name: 'Выдох', sec: 3, level: 'C' },
-  { name: 'Выдох', sec: 2, level: 'B' },
-  { name: 'Выдох', sec: 1, level: 'A2' },
-  { name: 'Задержка', sec: 4, level: 'A' },
-  { name: 'Задержка', sec: 3, level: 'A2' },
-  { name: 'Задержка', sec: 2, level: 'A' },
-  { name: 'Задержка', sec: 1, level: 'A2' },
+// Phase id is a stable key for logic/translation lookups - the displayed
+// name (STEPS title/subtitle below) is language-dependent, see PHASE_KEYS.
+type PhaseId = 'inhale' | 'hold' | 'exhale';
+
+const STEPS: { phase: PhaseId; sec: number; level: LevelKey }[] = [
+  { phase: 'inhale', sec: 4, level: 'A' },
+  { phase: 'inhale', sec: 3, level: 'B' },
+  { phase: 'inhale', sec: 2, level: 'C' },
+  { phase: 'inhale', sec: 1, level: 'D' },
+  { phase: 'hold', sec: 4, level: 'E' },
+  { phase: 'hold', sec: 3, level: 'D' },
+  { phase: 'hold', sec: 2, level: 'E' },
+  { phase: 'hold', sec: 1, level: 'D2' },
+  { phase: 'exhale', sec: 4, level: 'D' },
+  { phase: 'exhale', sec: 3, level: 'C' },
+  { phase: 'exhale', sec: 2, level: 'B' },
+  { phase: 'exhale', sec: 1, level: 'A2' },
+  { phase: 'hold', sec: 4, level: 'A' },
+  { phase: 'hold', sec: 3, level: 'A2' },
+  { phase: 'hold', sec: 2, level: 'A' },
+  { phase: 'hold', sec: 1, level: 'A2' },
 ];
+
+const PHASE_KEYS: Record<PhaseId, { title: string; subtitle: string }> = {
+  inhale: { title: 'breathing.phaseInhale', subtitle: 'breathing.subtitleInhale' },
+  hold: { title: 'breathing.phaseHold', subtitle: 'breathing.subtitleHold' },
+  exhale: { title: 'breathing.phaseExhale', subtitle: 'breathing.subtitleExhale' },
+};
 
 // Slow idle "alive" pulse for whenever the orb is at rest (Info screen
 // while she reads, Session screen before pressing play) - her explicit ask,
@@ -122,12 +133,6 @@ function boxShadowFor(inset1Blur: number, inset1Op: number, inset2Blur: number, 
   return `inset 0px 0px ${inset1Blur}px rgba(139,124,246,${clamp01(inset1Op)}), inset 0px 0px ${inset2Blur}px rgba(139,124,246,${clamp01(inset2Op)}), 0px 0px ${outerBlur}px rgba(139,124,246,${clamp01(outerOp)})`;
 }
 
-function subtitleFor(phase: string) {
-  if (phase === 'Вдох') return 'Вдыхай через нос';
-  if (phase === 'Задержка') return 'Задержи дыхание';
-  return 'Выдыхай через рот';
-}
-
 export function BreathingOrb({
   running,
   wrapSize = 300,
@@ -151,6 +156,7 @@ export function BreathingOrb({
   // jumping at cycle boundaries.
   onStepChange?: (fraction: number) => void;
 }) {
+  const t = useT();
   // Continuously-incrementing "step position" (0,1,2,3,...), animated 1
   // unit at a time over 1s so useAnimatedStyle can read a smooth
   // in-between value - not wrapped to 0-15 at the driving level, only when
@@ -272,7 +278,7 @@ export function BreathingOrb({
 
   // Frozen text on pause too, not just the orb itself - same
   // hasStarted-vs-running distinction as the orb's own animatedStyle above.
-  const phase = hasStarted ? STEPS[stepIndex].name : '';
+  const phaseId = hasStarted ? STEPS[stepIndex].phase : null;
   const seconds = hasStarted ? STEPS[stepIndex].sec : null;
 
   return (
@@ -286,11 +292,11 @@ export function BreathingOrb({
           reference's own orb has no text on it at all) into a plain title
           -> subtitle -> seconds stack below, each a visibly different
           weight/size/color instead of the old single all-in-one sentence. */}
-      {showInstruction && hasStarted && seconds !== null ? (
+      {showInstruction && hasStarted && seconds !== null && phaseId ? (
         <View style={styles.textBlock}>
-          <Text style={styles.phaseTitle}>{phase}</Text>
-          <Text style={styles.phaseSubtitle}>{subtitleFor(phase)}</Text>
-          <Text style={styles.phaseSeconds}>{seconds} сек</Text>
+          <Text style={styles.phaseTitle}>{t(PHASE_KEYS[phaseId].title)}</Text>
+          <Text style={styles.phaseSubtitle}>{t(PHASE_KEYS[phaseId].subtitle)}</Text>
+          <Text style={styles.phaseSeconds}>{t('breathing.secondsSuffix', { n: seconds })}</Text>
         </View>
       ) : null}
     </View>

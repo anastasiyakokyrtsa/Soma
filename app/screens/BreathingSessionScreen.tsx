@@ -12,6 +12,7 @@ import { SoundIcon } from '../components/icons/SoundIcon';
 import { PauseIcon } from '../components/icons/PauseIcon';
 import { PlayIcon } from '../components/icons/PlayIcon';
 import { StarsBackground } from '../components/StarsBackground';
+import { useT } from '../i18n/useT';
 
 const TOTAL_CYCLES = 6;
 
@@ -64,8 +65,9 @@ const SOUND_ICON_SIZE = BOOKMARK_SIZE * (47.24 / 36.24);
 export function BreathingSessionScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const t = useT();
   const p = route?.params ?? {};
-  const title: string = p.title ?? 'Дыхание для возвращения в тело';
+  const title: string = p.title ?? t('breathing.defaultTitle');
 
   const [paused, setPaused] = useState(true);
   const [saved, setSaved] = useState(false);

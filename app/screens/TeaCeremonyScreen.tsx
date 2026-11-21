@@ -7,10 +7,11 @@ import { StarsBackground } from '../components/StarsBackground';
 import { StoryProgress } from '../components/StoryProgress';
 import { TeaRecipeRow } from '../components/TeaRecipeRow';
 import { BackIcon } from '../components/icons/BackIcon';
+import { useT } from '../i18n/useT';
 
 type Slide = {
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
   image: ImageSourcePropType;
   // Each PNG is now cropped tight to its own real drawn content (no more
   // invisible margin baked into a shared canvas size - see the note above
@@ -18,17 +19,17 @@ type Slide = {
   // fixed display height actually renders every plant at the same true
   // visual size instead of just the same bounding box.
   imageRatio: number;
-  recipe?: { icon: 'spoon' | 'kettle' | 'clock'; label: string }[];
+  recipe?: { icon: 'spoon' | 'kettle' | 'clock'; labelKey: string }[];
 };
 
 // WF 29-35 "Чай как ритуал", her own drawn screens (Claude AI/v2/.../Calming
 // teas screens) - copy ported verbatim from those, not reworded (only
 // glued with non-breaking spaces per the project's standing "hanging
 // prepositions" rule - see feedback_rn_app_ui_defaults.md). Only one
-// category is actually designed content-wise ("Успокоение на вечер"); the
+// category is actually designed content-wise ("Успокоение на вечер"); the
 // other 4 category cards on WF29 have no herb screens behind them yet, so
 // this screen goes straight there - her explicit framing 2026-09-06: "в
-// наших условиях сейчас, если учитывать что у человека ресурс не очень и
+// наших условиях сейчас, если учитывать что у человека ресурс не очень и
 // надо успокоиться" - not a real state->category engine, just today's one
 // real path. The WF29 category-picker screen itself is skipped entirely.
 //
@@ -39,71 +40,72 @@ type Slide = {
 // single herb) even at the identical box size - invisible on an opaque
 // background, but obvious once the background was made transparent
 // (2026-09-06: "увеличь сами изображения трав так, чтобы они визуально были
-// такой же высоты как трава на экране 'Успокоение на вечер'"). Cropped each
+// такой же высоты как трава на экране 'Успокоение на вечер'"). Cropped each
 // PNG to its own real alpha bounding box (+6px breathing room) instead, so
 // `imageRatio` below is each plant's own true width/height.
 const SLIDES: Slide[] = [
   {
-    title: 'Успокоение\nна вечер',
-    description: 'Тёплый чай перед сном — простой способ дать телу сигнал, что день подходит к концу.',
+    // titleKey unused for the intro slide - its title is built specially
+    // from introTitleLine1/2 below (see `introTitle` in the component), so
+    // this is a placeholder.
+    titleKey: '',
+    descKey: 'tea.introDesc',
     image: require('../assets/tea/intro.png'),
     imageRatio: 358 / 669,
   },
   {
-    title: 'Ромашка',
-    description:
-      'Ромашковый чай — один из самых привычных вечерних ритуалов. Мягкий вкус, лёгкий цветочный аромат и то самое чувство, что можно наконец выдохнуть.',
+    titleKey: 'tea.camomileTitle',
+    descKey: 'tea.camomileDesc',
     image: require('../assets/tea/camomille.png'),
     imageRatio: 228 / 468,
     recipe: [
-      { icon: 'spoon', label: '1–2 ч. л. на чашку' },
-      { icon: 'kettle', label: 'Горячая, но не кипящая вода' },
-      { icon: 'clock', label: 'Настаивать 5–7 минут' },
+      { icon: 'spoon', labelKey: 'tea.camomileSpoon' },
+      { icon: 'kettle', labelKey: 'tea.camomileKettle' },
+      { icon: 'clock', labelKey: 'tea.camomileClock' },
     ],
   },
   {
-    title: 'Мелисса',
-    description:
-      'У мелиссы нежный лимонный аромат, от которого сразу становится немного уютнее. Хорошо заварить её, когда внутри слишком много суеты.',
+    titleKey: 'tea.melissaTitle',
+    descKey: 'tea.melissaDesc',
     image: require('../assets/tea/melissa.png'),
     imageRatio: 235 / 514,
     recipe: [
-      { icon: 'spoon', label: '1 ч. л. на чашку' },
-      { icon: 'kettle', label: 'Температура воды до 90°C' },
-      { icon: 'clock', label: 'Настаивать 5 минут' },
+      { icon: 'spoon', labelKey: 'tea.melissaSpoon' },
+      { icon: 'kettle', labelKey: 'tea.melissaKettle' },
+      { icon: 'clock', labelKey: 'tea.melissaClock' },
     ],
   },
   {
-    title: 'Лаванда',
-    description: 'Лавандовый чай пахнет летним садом и тишиной. Многие заваривают его именно перед сном, чтобы тело настроилось на покой.',
+    titleKey: 'tea.lavenderTitle',
+    descKey: 'tea.lavenderDesc',
     image: require('../assets/tea/lavender.png'),
     imageRatio: 144 / 489,
     recipe: [
-      { icon: 'spoon', label: '½–1 ч. л.' },
-      { icon: 'kettle', label: 'Залить горячей водой' },
-      { icon: 'clock', label: 'Настаивать 3–5 минут' },
+      { icon: 'spoon', labelKey: 'tea.lavenderSpoon' },
+      { icon: 'kettle', labelKey: 'tea.lavenderKettle' },
+      { icon: 'clock', labelKey: 'tea.lavenderClock' },
     ],
   },
   {
-    title: 'Валериана',
-    description: 'Валериану пьют не ради вкуса, а по давней привычке — вечером, когда хочется как следует расслабиться перед сном. Запах у неё сильный и ни на что не похожий, но именно с ним у многих ассоциируется этот момент покоя.',
+    titleKey: 'tea.valerianTitle',
+    descKey: 'tea.valerianDesc',
     image: require('../assets/tea/valeriana.png'),
     imageRatio: 146 / 406,
     recipe: [
-      { icon: 'spoon', label: 'Небольшое количество' },
-      { icon: 'kettle', label: 'Залить горячей водой' },
-      { icon: 'clock', label: 'Настаивать 10 минут' },
+      { icon: 'spoon', labelKey: 'tea.valerianSpoon' },
+      { icon: 'kettle', labelKey: 'tea.valerianKettle' },
+      { icon: 'clock', labelKey: 'tea.valerianClock' },
     ],
   },
   {
-    title: 'Липовый цвет',
-    description: 'У липового чая медовый, тёплый аромат — с него хорошо начинать вечер, когда хочется немного позаботиться о себе.',
+    titleKey: 'tea.lindenTitle',
+    descKey: 'tea.lindenDesc',
     image: require('../assets/tea/linden.png'),
     imageRatio: 157 / 406,
     recipe: [
-      { icon: 'spoon', label: '1 ст. л.' },
-      { icon: 'kettle', label: 'Горячая вода' },
-      { icon: 'clock', label: 'Настаивать 7–10 минут' },
+      { icon: 'spoon', labelKey: 'tea.lindenSpoon' },
+      { icon: 'kettle', labelKey: 'tea.lindenKettle' },
+      { icon: 'clock', labelKey: 'tea.lindenClock' },
     ],
   },
 ];
@@ -120,7 +122,7 @@ const TITLE_TOP_OFFSET = 80;
 // Baseline for the herb slides (1-5). Sized down 20% from the first pass -
 // at full size, with a 3-row recipe list below, there was no room left for
 // any bottom margin at all before hitting the screen edge (2026-09-07: "между
-// рецептом и низом экрана вообще нет расстояния").
+// рецептом и низом экрана вообще нет расстояния").
 const IMAGE_HEIGHT = 244 * 0.8;
 
 // Intro slide (no recipe below it, so there's real room) gets its plant
@@ -131,14 +133,16 @@ const IMAGE_HEIGHT = 244 * 0.8;
 // Solved from a real measured description height (word-wrap isn't
 // predictable from character count alone), not guessed - same "measure,
 // don't eyeball" approach as MoodScale's hidden label twins.
-const INTRO_TITLE_HEIGHT = 30 * 1.15 * 2; // always exactly 2 lines ("Успокоение\nна вечер")
+const INTRO_TITLE_HEIGHT = 30 * 1.15 * 2; // always exactly 2 lines (both languages' intro titles are 2 lines)
 const INTRO_BOTTOM_GAP = 160;
 
 export function TeaCeremonyScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [index, setIndex] = useState(0);
+  const t = useT();
   const slide = SLIDES[index];
+  const introTitle = `${t('tea.introTitleLine1')}\n${t('tea.introTitleLine2')}`;
 
   // No completion screen exists for this flow yet (unlike breathing's own
   // BreathingComplete) - advancing past the last herb just returns to Care,
@@ -195,22 +199,22 @@ export function TeaCeremonyScreen({ navigation }: any) {
           { paddingTop: insets.top + TITLE_TOP_OFFSET, paddingBottom: index === 0 ? 0 : insets.bottom + 40 },
         ]}
       >
-        <Text style={styles.title}>{slide.title}</Text>
+        <Text style={styles.title}>{index === 0 ? introTitle : t(slide.titleKey)}</Text>
         <Image
           source={slide.image}
           resizeMode="contain"
           style={{ width: imageHeight * slide.imageRatio, height: imageHeight, marginTop: 20 }}
         />
-        <Text style={styles.description}>{slide.description}</Text>
+        <Text style={styles.description}>{t(slide.descKey)}</Text>
         {slide.recipe ? (
           <View style={styles.recipeList}>
             {slide.recipe.map((r, i) => (
-              <TeaRecipeRow key={i} icon={r.icon} label={r.label} />
+              <TeaRecipeRow key={i} icon={r.icon} label={t(r.labelKey)} />
             ))}
           </View>
         ) : null}
         {/* Only on the last herb - her ask 2026-09-07: "на последней сторис
-            сделаем внизу под рецептом слово-ссылку 'К другим чаям'". Same
+            сделаем внизу под рецептом слово-ссылку 'К другим чаям'". Same
             text-link style Care/Home already use for "Все статьи" (the
             closest existing analog: a link below a list, to see more of the
             same kind of thing), not the separate violet-300-no-underline
@@ -218,7 +222,7 @@ export function TeaCeremonyScreen({ navigation }: any) {
             one's for a distinct action, not a see-more link. */}
         {index === SLIDES.length - 1 ? (
           <View onLayout={(e) => setLinkBox({ y: e.nativeEvent.layout.y, h: e.nativeEvent.layout.height })}>
-            <Text style={styles.otherTeasLink}>К другим чаям</Text>
+            <Text style={styles.otherTeasLink}>{t('tea.otherTeasLink')}</Text>
           </View>
         ) : null}
       </View>
@@ -228,7 +232,7 @@ export function TeaCeremonyScreen({ navigation }: any) {
           style={{ position: 'absolute', left: 0, right: 0, top: linkBox.y + 24 - 10, height: linkBox.h - 24 + 20 }}
           onPress={() => navigation.navigate('TeaCategories')}
           accessibilityRole="link"
-          accessibilityLabel="К другим чаям"
+          accessibilityLabel={t('tea.otherTeasLink')}
         />
       ) : null}
 
@@ -241,7 +245,7 @@ export function TeaCeremonyScreen({ navigation }: any) {
         style={[styles.description, styles.hiddenMeasure, { width: screenWidth - 48 }]}
         onLayout={(e: LayoutChangeEvent) => setIntroDescHeight(e.nativeEvent.layout.height)}
       >
-        {SLIDES[0].description}
+        {t('tea.introDesc')}
       </Text>
 
       {/* Visible only on the entry slide, matching her own drawn screens
@@ -298,7 +302,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   // No card/border - round 2 after a bordered card still read wrong to her
-  // (2026-09-07: "не нравится как оформлены"). The title/illustration/
+  // (2026-09-07: "не нравится как оформлены"). The title/illustration/
   // description above never sit in a box either; a boxed recipe was the one
   // chrome element on an otherwise open, starfield-backed screen. Quiet
   // list instead, spacing doing all the grouping work.

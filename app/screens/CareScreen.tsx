@@ -10,6 +10,7 @@ import { ArticleLinkRow } from '../components/ArticleLinkRow';
 import { StarsBackground } from '../components/StarsBackground';
 import { TeaIllustrationSway } from '../components/TeaIllustrationSway';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
+import { useT } from '../i18n/useT';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -51,6 +52,7 @@ const GAP = {
 export function CareScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const t = useT();
   // 3 tiles + 2×12px gaps + 2×16px side margins, derived from the real
   // screen width instead of MiniRitualTile's own literal 116 - that only
   // held on the Figma reference width, overflowed on a narrower real
@@ -91,7 +93,7 @@ export function CareScreen({ navigation }: any) {
               screen-reader element reading the real title - same fix as
               HomeScreen's GreetingHeading (audit finding #16, 2026-09-16):
               SvgText has no guaranteed screen-reader support. */}
-          <View accessible accessibilityRole="header" accessibilityLabel="Твое состояние сегодня изменчиво">
+          <View accessible accessibilityRole="header" accessibilityLabel={t('care.headingA11y')}>
             <Svg width="100%" height={56}>
               <Defs>
                 <SvgLinearGradient id="conditionGrad" x1="0" y1="0" x2="1" y2="1">
@@ -101,22 +103,22 @@ export function CareScreen({ navigation }: any) {
                 </SvgLinearGradient>
               </Defs>
               <SvgText x="0" y="26" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
-                Твое состояние
+                {t('care.headingLine1')}
               </SvgText>
               <SvgText x="0" y="54" fontSize={28} fontFamily={fontFamily.bold} fill="url(#conditionGrad)">
-                сегодня изменчиво
+                {t('care.headingLine2')}
               </SvgText>
             </Svg>
           </View>
-          <Text style={styles.subtitle}>Дай себе мягкое восстановление</Text>
+          <Text style={styles.subtitle}>{t('care.subtitle')}</Text>
         </View>
 
         <View style={{ marginTop: GAP.conditionToRing }}>
-          <ResourceRing value={42} caption="Низкий ресурс" />
+          <ResourceRing value={42} caption={t('care.lowEnergy')} />
         </View>
 
         <View style={[styles.whatHelps, { marginTop: GAP.ringToWhatHelps }]}>
-          <Text style={styles.sectionTitle}>Что поможет сейчас</Text>
+          <Text style={styles.sectionTitle}>{t('care.whatHelpsTitle')}</Text>
           <View style={styles.tilesRow}>
             {/* Opens straight into the practice already picked for her
                 current state (WF 25-28) - no picker screen exists yet since
@@ -126,8 +128,8 @@ export function CareScreen({ navigation }: any) {
             <MiniRitualTile
               width={tileWidth}
               icon="breathingCircle"
-              title="Дыхание"
-              time="2 мин"
+              title={t('care.tileBreathing')}
+              time={t('care.timeMinutes', { n: 2 })}
               onPress={() => navigation.navigate('BreathingInfo')}
             />
             {/* explicit break, not left to auto-wrap. iconMarginBottom
@@ -138,8 +140,8 @@ export function CareScreen({ navigation }: any) {
                 MiniRitualTile.tsx). 31 = 44 - 12*1.1 (one line's worth of
                 the 12px title size, after 2026-10-01's 13->12 drop for
                 "Медитация"). */}
-            <MiniRitualTile width={tileWidth} icon="seaWaves" title={'Звуки\nприроды'} time="10 мин" iconMarginBottom={31} />
-            <MiniRitualTile width={tileWidth} icon="lotus" title="Медитация" time="10 мин" />
+            <MiniRitualTile width={tileWidth} icon="seaWaves" title={t('care.tileNature')} time={t('care.timeMinutes', { n: 10 })} iconMarginBottom={31} />
+            <MiniRitualTile width={tileWidth} icon="lotus" title={t('care.tileMeditation')} time={t('care.timeMinutes', { n: 10 })} />
           </View>
         </View>
 
@@ -149,15 +151,15 @@ export function CareScreen({ navigation }: any) {
               concentric-circles icon Mini Ritual Tile uses for the same
               word - different context, different kit icon (2026-08-20:
               "иконки такие же к словам, бери из кита"). */}
-          <NavChip icon="windyWeather" label="Дыхание" />
-          <NavChip icon="largeTree" label="Звуки природы" />
-          <NavChip icon="meditationFigure" label="Медитации" />
-          <NavChip icon="pegasus" label="Сказки" />
-          <NavChip icon="cello" label="Успокаивающая музыка" />
+          <NavChip icon="windyWeather" label={t('care.chipBreathing')} />
+          <NavChip icon="largeTree" label={t('care.chipNature')} />
+          <NavChip icon="meditationFigure" label={t('care.chipMeditations')} />
+          <NavChip icon="pegasus" label={t('care.chipStories')} />
+          <NavChip icon="cello" label={t('care.chipMusic')} />
         </View>
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
-          <Text style={styles.sectionTitle}>Чай как ритуал</Text>
+          <Text style={styles.sectionTitle}>{t('care.teaSectionTitle')}</Text>
           {/* No glow behind the artwork anymore - several attempts never
               confirmed working and the last one produced a visible ghost-
               layer bug during the sway animation. See
@@ -166,29 +168,33 @@ export function CareScreen({ navigation }: any) {
           <View style={{ alignSelf: 'center', marginTop: GAP.teaTitleToImage }}>
             <TeaIllustrationSway />
           </View>
-          <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>Наполни тело теплом{'\n'}через простой ритуал</Text>
+          <Text style={[styles.teaCaption, { marginTop: GAP.imageToCaption }]}>
+            {t('care.teaCaptionLine1')}
+            {'\n'}
+            {t('care.teaCaptionLine2')}
+          </Text>
           <Pressable
             style={({ pressed }) => [styles.teaButton, { marginTop: GAP.captionToButton }, pressed && styles.teaButtonPressed]}
             onPress={() => navigation.navigate('TeaCategories')}
           >
-            <Text style={styles.teaButtonLabel}>Начать чайную церемонию</Text>
+            <Text style={styles.teaButtonLabel}>{t('care.teaButton')}</Text>
           </Pressable>
         </View>
 
         <View style={[styles.section, { marginTop: GAP.buttonToArticlesHeader }]}>
-          <Text style={styles.sectionTitle}>О теле и ритмах</Text>
-          <Text style={styles.sectionDesc}>Небольшие статьи о том, что ежедневно влияет на наше состояние</Text>
+          <Text style={styles.sectionTitle}>{t('care.articlesSectionTitle')}</Text>
+          <Text style={styles.sectionDesc}>{t('care.articlesSectionDesc')}</Text>
           <View style={[styles.articlesList, { marginTop: GAP.articlesHeaderToList }]}>
             <ArticleLinkRow
               icon="water"
-              title="Вода как основа баланса"
-              subtitle="Коротко о том, как тело сигнализирует о жажде"
+              title={t('care.article1Title')}
+              subtitle={t('care.article1Subtitle')}
               onPress={() => navigation.navigate('ArticleWater')}
             />
-            <ArticleLinkRow icon="moonSymbol" title="Свет и внутренние часы" subtitle="Почему освещение влияет на энергию и сон" />
-            <ArticleLinkRow icon="battery" title="Паузы и восстановление" subtitle="Как короткий отдых помогает нервной системе" />
+            <ArticleLinkRow icon="moonSymbol" title={t('care.article2Title')} subtitle={t('care.article2Subtitle')} />
+            <ArticleLinkRow icon="battery" title={t('care.article3Title')} subtitle={t('care.article3Subtitle')} />
             <Pressable>
-              <Text style={styles.allArticles}>Все статьи</Text>
+              <Text style={styles.allArticles}>{t('care.allArticles')}</Text>
             </Pressable>
           </View>
         </View>

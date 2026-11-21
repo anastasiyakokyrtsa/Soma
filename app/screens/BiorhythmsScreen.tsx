@@ -13,15 +13,18 @@ import { InfoIcon } from '../components/icons/InfoIcon';
 import { InfoSheet } from '../components/InfoSheet';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
 import { formatBirthDate, type BirthDate } from '../lib/biorhythm';
+import { useT } from '../i18n/useT';
+import { useLanguage, type Language } from '../i18n/LanguageContext';
 
 type Level = {
-  title: string;
+  titleKey: string;
   icon: 'pulse' | 'brain';
   useCareIcon?: boolean;
-  text: string;
-  ring: { value: string; caption: string };
-  dos: string[];
-  donts: string[];
+  textKey: string;
+  ringValue: string;
+  ringCaptionKey: string;
+  doKeys: string[];
+  dontKeys: string[];
 };
 
 // WF38 "Analytics - Biorhythm". Copy ported from the wireframe as closely as
@@ -30,39 +33,43 @@ type Level = {
 // style of every other bullet in the same lists), nothing else reworded.
 // День/Неделя/Месяц tabs are static (WF only ever shows one real dataset) -
 // "День" is the only one wired to anything.
+// Ring values stored with a plain decimal point (source-of-truth); the
+// Russian locale re-formats it to a comma at render time, see
+// formatRingValue below - same pattern as BiorhythmChart's own formatPct.
 const LEVELS: Level[] = [
   {
-    title: 'Физический уровень',
+    titleKey: 'biorhythms.physicalTitle',
     icon: 'pulse',
-    ring: { value: '49,8%', caption: 'Физиология' },
-    text:
-      'Твой физический биоритм находится сейчас в средней фазе: организм функционирует стабильно, но не в режиме максимального запаса энергии. В такие дни тело хорошо справляется с привычными задачами, однако ты можешь заметно быстро уставать и чувствительнее переносить недостаток сна, стресс или чрезмерную активность. В этот период необходимо внимательно относиться к своему ритму.',
-    dos: ['Прогулки', 'Растяжка', 'Спокойный ритм'],
-    donts: ['Интенсивные тренировки', 'Недосып', 'Перегрузки'],
+    ringValue: '49.8',
+    ringCaptionKey: 'biorhythms.ringPhysical',
+    textKey: 'biorhythms.physicalText',
+    doKeys: ['biorhythms.physicalDo1', 'biorhythms.physicalDo2', 'biorhythms.physicalDo3'],
+    dontKeys: ['biorhythms.physicalDont1', 'biorhythms.physicalDont2', 'biorhythms.physicalDont3'],
   },
   {
-    title: 'Эмоциональный уровень',
+    titleKey: 'biorhythms.emotionalTitle',
     icon: 'pulse',
     useCareIcon: true,
-    ring: { value: '−96,3%', caption: 'Эмоции' },
-    text:
-      'Сейчас твои эмоции в фазе повышенной чувствительности: эмоциональный отклик может ощущаться сильнее, а внутренний запас устойчивости — ниже обычного. В такие периоды реакции чаще рождаются из чувств, а не из рациональных оценок: слова и ситуации могут затрагивать глубже, а собственные мысли — звучать громче. Важно не забывать, что это естественный этап эмоционального ритма.',
-    dos: ['Дневник', 'Рефлексия', 'Личные границы'],
-    donts: ['Важные решения', 'Конфликты', 'Самокритика'],
+    ringValue: '-96.3',
+    ringCaptionKey: 'biorhythms.ringEmotional',
+    textKey: 'biorhythms.emotionalText',
+    doKeys: ['biorhythms.emotionalDo1', 'biorhythms.emotionalDo2', 'biorhythms.emotionalDo3'],
+    dontKeys: ['biorhythms.emotionalDont1', 'biorhythms.emotionalDont2', 'biorhythms.emotionalDont3'],
   },
   {
-    title: 'Интеллектуальный уровень',
+    titleKey: 'biorhythms.intellectTitle',
     icon: 'brain',
-    ring: { value: '68,1%', caption: 'Интеллект' },
-    text:
-      'Интеллектуальный биоритм сейчас находится в восходящей фазе, что может ощущаться как ясность мышления и более лёгкое понимание сложных тем. Этот период подходит для планирования, анализа и задач, требующих внимательности и умственной вовлечённости. При этом стоит помнить, что высокая интеллектуальная активность не всегда нивелирует эмоциональное или физическое утомление.',
-    dos: ['Планирование', 'Учёба', 'Чтение', 'Структура'],
-    donts: ['Многозадачность', 'Эмоциональные разговоры', 'Работа на износ'],
+    ringValue: '68.1',
+    ringCaptionKey: 'biorhythms.ringIntellect',
+    textKey: 'biorhythms.intellectText',
+    doKeys: ['biorhythms.intellectDo1', 'biorhythms.intellectDo2', 'biorhythms.intellectDo3', 'biorhythms.intellectDo4'],
+    dontKeys: ['biorhythms.intellectDont1', 'biorhythms.intellectDont2', 'biorhythms.intellectDont3'],
   },
 ];
 
-const SUMMARY =
-  'Сегодня твоё состояние неравномерно: ум работает ясно и стабильно, физический ресурс — на среднем уровне, а эмоциональный фон находится в чувствительной фазе. Это день, когда важно не требовать от себя слишком многого и опираться на сильные стороны.';
+function formatRingValue(value: string, language: Language) {
+  return `${language === 'ru' ? value.replace('.', ',') : value}%`;
+}
 
 // Finding #17's other half (audit-qa/owner, 2026-09-18): automated
 // validation can only catch impossible dates (future, 120+ years back -
@@ -77,7 +84,6 @@ const SUMMARY =
 // data, not wired to a real entered date yet) - swap for the real value
 // once birth date actually flows from onboarding through app state.
 const MOCK_BIRTH_DATE: BirthDate = { day: 14, month: 5, year: 1995 };
-const BIRTH_DATE_NOTE = `Расчёт использует дату рождения, которую ты указала при регистрации: ${formatBirthDate(MOCK_BIRTH_DATE)}.`;
 
 export function BiorhythmsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
@@ -85,6 +91,9 @@ export function BiorhythmsScreen({ navigation }: any) {
   const [selectedDay, setSelectedDay] = useState(14);
   const [infoVisible, setInfoVisible] = useState(false);
   const chartWidth = Math.min(screenWidth - 40, 380);
+  const t = useT();
+  const { language } = useLanguage();
+  const birthDateNote = t('biorhythms.birthDateNote', { date: formatBirthDate(MOCK_BIRTH_DATE) });
 
   return (
     <Animated.View style={styles.container} entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}>
@@ -92,16 +101,16 @@ export function BiorhythmsScreen({ navigation }: any) {
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: insets.bottom + 40 }} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backRow}>
-            <Text style={styles.backLabel}>← Вернуться в галерею данных</Text>
+            <Text style={styles.backLabel}>{t('biorhythms.backLink')}</Text>
           </Pressable>
 
           <View style={styles.titleRow}>
-            <Text style={styles.title}>Биоритмы</Text>
+            <Text style={styles.title}>{t('biorhythms.title')}</Text>
             <Pressable
               onPress={() => setInfoVisible(true)}
               hitSlop={10}
               accessibilityRole="button"
-              accessibilityLabel="Что означают биоритмы"
+              accessibilityLabel={t('biorhythms.a11y')}
             >
               <InfoIcon size={22} color={colors.textPrimary} />
             </Pressable>
@@ -110,43 +119,43 @@ export function BiorhythmsScreen({ navigation }: any) {
           <BiorhythmChart width={chartWidth} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
 
           <View style={styles.tabsRow}>
-            <Text style={[styles.tab, styles.tabActive]}>День</Text>
-            <Text style={styles.tab}>Неделя</Text>
-            <Text style={styles.tab}>Месяц</Text>
+            <Text style={[styles.tab, styles.tabActive]}>{t('biorhythms.tabDay')}</Text>
+            <Text style={styles.tab}>{t('biorhythms.tabWeek')}</Text>
+            <Text style={styles.tab}>{t('biorhythms.tabMonth')}</Text>
           </View>
 
           <View style={styles.ringsRow}>
             {LEVELS.map((l) => (
-              <View key={l.title} style={styles.ring}>
-                <Text style={styles.ringValue}>{l.ring.value}</Text>
-                <Text style={styles.ringCaption}>{l.ring.caption}</Text>
+              <View key={l.titleKey} style={styles.ring}>
+                <Text style={styles.ringValue}>{formatRingValue(l.ringValue, language)}</Text>
+                <Text style={styles.ringCaption}>{t(l.ringCaptionKey)}</Text>
               </View>
             ))}
           </View>
 
-          <Text style={styles.summary}>{SUMMARY}</Text>
+          <Text style={styles.summary}>{t('biorhythms.summary')}</Text>
 
           {LEVELS.map((l) => (
-            <View key={l.title} style={styles.section}>
+            <View key={l.titleKey} style={styles.section}>
               <View style={styles.sectionHeader}>
                 {l.useCareIcon ? <CareHandIcon size={26} /> : <GradientIcon name={l.icon} size={26} />}
-                <Text style={styles.sectionTitle}>{l.title}</Text>
+                <Text style={styles.sectionTitle}>{t(l.titleKey)}</Text>
               </View>
-              <Text style={styles.sectionText}>{l.text}</Text>
+              <Text style={styles.sectionText}>{t(l.textKey)}</Text>
               <View style={styles.columns}>
                 <View style={styles.column}>
-                  {l.dos.map((d) => (
-                    <View key={d} style={styles.bulletRow}>
+                  {l.doKeys.map((k) => (
+                    <View key={k} style={styles.bulletRow}>
                       <DoIcon size={18} />
-                      <Text style={styles.bulletText}>{d}</Text>
+                      <Text style={styles.bulletText}>{t(k)}</Text>
                     </View>
                   ))}
                 </View>
                 <View style={styles.column}>
-                  {l.donts.map((d) => (
-                    <View key={d} style={styles.bulletRow}>
+                  {l.dontKeys.map((k) => (
+                    <View key={k} style={styles.bulletRow}>
                       <DontIcon size={18} />
-                      <Text style={styles.bulletText}>{d}</Text>
+                      <Text style={styles.bulletText}>{t(k)}</Text>
                     </View>
                   ))}
                 </View>
@@ -158,8 +167,8 @@ export function BiorhythmsScreen({ navigation }: any) {
       <InfoSheet
         visible={infoVisible}
         onClose={() => setInfoVisible(false)}
-        title={BIORHYTHM_INFO_TITLE}
-        paragraphs={[...BIORHYTHM_INFO_PARAGRAPHS, BIRTH_DATE_NOTE]}
+        title={BIORHYTHM_INFO_TITLE[language]}
+        paragraphs={[...BIORHYTHM_INFO_PARAGRAPHS[language], birthDateNote]}
       />
     </Animated.View>
   );

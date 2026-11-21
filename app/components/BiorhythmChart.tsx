@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import Svg, { Line, Path, Circle, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
+import { useLanguage, type Language } from '../i18n/LanguageContext';
 
 // Ports UI Kit's "Biorhythm Chart" (.biorhythm/.biorhythm-axis/.biorhythm-chart/
 // .biorhythm-rings, style.css ~L811-833) - curve paths are the kit's own
@@ -54,8 +55,9 @@ export function getDayValues(day: number): CurveYs {
   return { physical: yToPct(y.physical), emotional: yToPct(y.emotional), intellect: yToPct(y.intellect) };
 }
 
-function formatPct(v: number) {
-  return `${v.toFixed(1).replace('.', ',')}%`;
+function formatPct(v: number, language: Language) {
+  const fixed = v.toFixed(1);
+  return `${language === 'ru' ? fixed.replace('.', ',') : fixed}%`;
 }
 
 const CURVES = [
@@ -95,11 +97,23 @@ const dashoffsetForPct = (pct: number) => {
   return Math.max((RING_CIRCUMFERENCE * (100 - pct)) / 100, MIN_VISIBLE_GAP);
 };
 
-const RING_META = [
-  { id: 'physical' as const, colors: ['#7DE8C4', '#5DC2A3', '#4BA78D'], glow: '#5DC2A3', label: 'Физика' },
-  { id: 'emotional' as const, colors: ['#FFCBF2', '#FFC6F1', '#FBBDEC'], glow: '#FFC6F1', label: 'Эмоции' },
-  { id: 'intellect' as const, colors: ['#B6ABFF', colors.violet400, '#7060E8'], glow: colors.violet400, label: 'Интеллект' },
-];
+const RING_LABELS: Record<Language, { physical: string; emotional: string; intellect: string }> = {
+  // Matches the day paragraphs' own "Physical/Emotional/Intellectual
+  // biorhythm" wording (i18n/dictionaries/home.ts) rather than a literal
+  // "Physiology/Emotions/Intellect" - cross-screen consistency, confirmed
+  // with the english-editor agent 2026-11-21.
+  ru: { physical: 'Физика', emotional: 'Эмоции', intellect: 'Интеллект' },
+  en: { physical: 'Physical', emotional: 'Emotional', intellect: 'Intellectual' },
+};
+
+function getRingMeta(language: Language) {
+  const labels = RING_LABELS[language];
+  return [
+    { id: 'physical' as const, colors: ['#7DE8C4', '#5DC2A3', '#4BA78D'], glow: '#5DC2A3', label: labels.physical },
+    { id: 'emotional' as const, colors: ['#FFCBF2', '#FFC6F1', '#FBBDEC'], glow: '#FFC6F1', label: labels.emotional },
+    { id: 'intellect' as const, colors: ['#B6ABFF', colors.violet400, '#7060E8'], glow: colors.violet400, label: labels.intellect },
+  ];
+}
 // 100, not the kit's literal 84 - her explicit ask to size these up past
 // the kit's own reference (2026-08-19, "прогресс бары... сделать побольше").
 const RING_BOX = 100;
@@ -132,6 +146,8 @@ export function BiorhythmChart({
   selectedDay: number;
   onSelectDay: (day: number) => void;
 }) {
+  const { language } = useLanguage();
+  const RING_META = getRingMeta(language);
   const scale = Math.min(width, 380) / 380;
   const chartW = 360 * scale;
   const chartH = 200 * scale;
@@ -258,7 +274,7 @@ export function BiorhythmChart({
                     strokeDashoffset={dashoffset}
                   />
                 </Svg>
-                <Text style={[styles.ringPct, { fontSize: 16 * scale }]}>{formatPct(pct)}</Text>
+                <Text style={[styles.ringPct, { fontSize: 16 * scale }]}>{formatPct(pct, language)}</Text>
               </View>
               <Text style={[styles.ringLabel, { fontSize: 16 * scale, marginTop: 8 * scale }]}>{r.label}</Text>
             </View>

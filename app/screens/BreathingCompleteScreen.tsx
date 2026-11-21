@@ -5,6 +5,7 @@ import { colors, fontFamily, radius, glow } from '../theme';
 import { BackIcon } from '../components/icons/BackIcon';
 import { CheckmarkIcon } from '../components/icons/CheckmarkIcon';
 import { StarsBackground } from '../components/StarsBackground';
+import { useT } from '../i18n/useT';
 
 // WF 28 "Breathing session - End". Circle glow reuses ResourceRing's own
 // 4-layer halo boxShadow recipe (borderRadius = size/2 so the shadow
@@ -22,6 +23,7 @@ import { StarsBackground } from '../components/StarsBackground';
 export function BreathingCompleteScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const t = useT();
 
   return (
     // Navigator-wide screen transitions are `animation: 'none'` (see
@@ -40,14 +42,14 @@ export function BreathingCompleteScreen({ navigation }: any) {
           <View style={styles.halo} />
           <CheckmarkIcon size={64} color={colors.violet400} glow />
         </View>
-        <Text style={styles.title}>Поздравляем!{'\n'}Ты выполнил практику</Text>
+        <Text style={styles.title}>{t('breathing.completeTitle')}</Text>
       </View>
 
       <Pressable
         style={({ pressed }) => [styles.cta, { marginBottom: insets.bottom + 40 }, pressed && styles.ctaPressed]}
         onPress={() => navigation.navigate('Main', { screen: 'Care' })}
       >
-        <Text style={styles.ctaLabel}>К другим дыхательным практикам</Text>
+        <Text style={styles.ctaLabel}>{t('breathing.completeButton')}</Text>
       </Pressable>
     </Animated.View>
   );

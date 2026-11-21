@@ -15,6 +15,9 @@ import { InfoSheet } from '../components/InfoSheet';
 import { MoodCheckIn } from '../components/MoodCheckIn';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
+import { useT } from '../i18n/useT';
+import { useLanguage } from '../i18n/LanguageContext';
+import { dayParagraphs } from '../i18n/dictionaries/home';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -48,7 +51,9 @@ const GAP = {
   cardsToQuote: 60,
 };
 
-const USER_NAME = 'Анастасия';
+// Transliterated, not translated - a proper name reads as broken/untranslated
+// left in Cyrillic inside an otherwise all-English UI (2026-11-21 fix).
+const USER_NAME: Record<'ru' | 'en', string> = { ru: 'Анастасия', en: 'Anastasia' };
 
 // 2026-08-19: "тексты ты не сделал разные на каждую дату... на каждую дату
 // сделай подходящее описание" - a rule-based generator (pick whichever
@@ -92,17 +97,8 @@ const USER_NAME = 'Анастасия';
 // просто фаза", "причина может быть здесь") instead of asserting it. Same
 // underlying per-day pattern and practical suggestion as before (see values
 // above) - only the factual/hedged framing changed, not the substance.
-const DAY_PARAGRAPHS: Record<number, string> = {
-  10: 'Эмоциональный биоритм сегодня заметно выше обычного, и возможно, поэтому настроение с утра кажется легче, чем в последние дни. Телу и голове по графику сейчас скорее нужна пауза, так что если не тянет на сложные задачи, это в порядке вещей.',
-  11: 'Судя по кривой, сегодня труднее всего именно с концентрацией. Если мысли разбегаются и трудно удержать фокус, дело может быть не в тебе, а в этом конкретном дне. Тело и настроение держатся ровно, так что для простых дел время неплохое, а важные решения лучше отложить.',
-  12: 'Интеллектуальный биоритм сегодня почти на нуле, а физический на подъёме. Собраться с мыслями сегодня может быть особенно тяжело, зато тянет двигаться. Хороший день для движения и не самый удачный для серьёзных решений.',
-  13: 'Тело сегодня по графику на пике, а голове и настроению, похоже, нужнее отдых. Не обязательно успевать всё и сразу. Если день располагает больше к физическому, чем к умственному, можно ему довериться.',
-  14: 'Сразу два биоритма, эмоциональный и интеллектуальный, сегодня внизу, а физический на максимуме. Это не значит, что день обязательно тяжёлый, но если сложные разговоры и решения даются труднее обычного, причина может быть здесь. Есть смысл направить силы туда, где их сегодня больше всего, в тело.',
-  15: 'Эмоциональная кривая на этой неделе ещё нигде не опускалась так низко, как сегодня, хотя тело держится хорошо. Если сегодня реагируешь острее обычного, это вполне может быть просто фаза, а не что-то, что нужно исправлять. Стоит быть мягче к себе в разговорах и оставить важное на потом.',
-  16: 'Эмоциональный биоритм пока не спешит выходить из низкой точки, хотя физический всё ещё держится хорошо. Движение часто помогает легче пережить такие дни, можно попробовать, если откликается.',
-  17: 'Настроение по графику потихоньку разворачивается вверх, а разум и тело идут ровно. Неплохой день для привычных дел без лишнего напряжения.',
-  18: 'Сегодня заметнее всего работает голова, интеллектуальная кривая выше остальных. Тело и настроение спокойны, без резких перепадов. Удачный момент для аналитической работы и планов.',
-};
+// English translation (2026-11-21) keeps this exact hedging - moved to
+// i18n/dictionaries/home.ts (dayParagraphs) now that it is bilingual.
 
 // "Доброе утро, {имя}" needs real dynamic line-wrapping (the name's length
 // varies) with a gradient fill - unlike the fixed 2-line headings elsewhere,
@@ -180,6 +176,8 @@ export function HomeScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [infoVisible, setInfoVisible] = useState(false);
+  const t = useT();
+  const { language } = useLanguage();
   // Capped at 380 (the kit's own reference width) but shrinks on anything
   // narrower - was a hardcoded 380 that clipped the axis ("18" cut off) on
   // any phone under 412 logical px wide (2026-08-17 review).
@@ -194,7 +192,7 @@ export function HomeScreen({ navigation }: any) {
   // не видно, чтобы его увидеть надо скроллить").
   const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
   const [selectedDay, setSelectedDay] = useState(14);
-  const paragraph = DAY_PARAGRAPHS[selectedDay] ?? DAY_PARAGRAPHS[14];
+  const paragraph = dayParagraphs[language][selectedDay] ?? dayParagraphs[language][14];
   // Real bar height + insets.bottom + a 60px clearance above it - was a flat
   // 160 (2026-08-26, matching Care's own flat number), but a flat value
   // can't track BottomBar's own height, which *grows* by insets.bottom
@@ -225,7 +223,7 @@ export function HomeScreen({ navigation }: any) {
       >
         <View style={styles.content}>
           <View style={styles.greetingRow}>
-            <GreetingHeading text={`Доброе утро, ${USER_NAME}`} />
+            <GreetingHeading text={t('home.greeting', { name: USER_NAME[language] })} />
             <ProfileIcon size={28} />
           </View>
 
@@ -235,18 +233,18 @@ export function HomeScreen({ navigation }: any) {
 
         <View style={[styles.biorhythmHeader, { marginTop: GAP.moodToBiorhythmTitle }]}>
           <View style={styles.biorhythmTitleRow}>
-            <Text style={[styles.biorhythmTitle, { lineHeight: 24 * 1.1 }]}>Биоритмы</Text>
+            <Text style={[styles.biorhythmTitle, { lineHeight: 24 * 1.1 }]}>{t('home.biorhythmsTitle')}</Text>
             <Pressable
               onPress={() => setInfoVisible(true)}
               hitSlop={10}
               accessibilityRole="button"
-              accessibilityLabel="Что означают биоритмы"
+              accessibilityLabel={t('home.biorhythmsA11y')}
             >
               <InfoIcon size={20} color={colors.textPrimary} />
             </Pressable>
           </View>
           <Pressable onPress={() => navigation.navigate('Biorhythms')} hitSlop={8}>
-            <Text style={styles.moreLink}>Подробнее</Text>
+            <Text style={styles.moreLink}>{t('home.biorhythmsDetails')}</Text>
           </Pressable>
         </View>
 
@@ -264,35 +262,35 @@ export function HomeScreen({ navigation }: any) {
         >
           <MoonSunCard
             width={cardWidth}
-            title="Лунная активность"
+            title={t('home.moonCardTitle')}
             image={MOON_IMAGE}
-            date="14 марта, 18:07"
-            phase="Убывающая луна"
+            date={t('home.demoDate')}
+            phase={t('home.moonPhase')}
             rows={[
-              { label: 'Освещенность', value: '24%' },
-              { label: 'Восход', value: '4:32 утра' },
-              { label: 'Закат', value: '12:15 дня' },
-              { label: 'До новолуния', value: '6 дней' },
+              { label: t('home.moonIllumination'), value: t('home.moonIlluminationValue') },
+              { label: t('home.moonrise'), value: t('home.moonriseValue') },
+              { label: t('home.moonset'), value: t('home.moonsetValue') },
+              { label: t('home.untilNewMoon'), value: t('home.untilNewMoonValue') },
             ]}
-            note="Конец лунного цикла. В ближайшие дни рекомендуется снизить нагрузку и сфокусироваться на отдыхе и восстановлении ресурса."
+            note={t('home.moonNote')}
           />
           <MoonSunCard
             width={cardWidth}
-            title="Солнечная активность"
+            title={t('home.sunCardTitle')}
             image={SUN_IMAGE}
-            date="14 марта, 18:07"
-            phase="Умеренная солнечная активность"
+            date={t('home.demoDate')}
+            phase={t('home.sunPhase')}
             rows={[
-              { label: 'Индекс', value: 'Кп 3/9' },
-              { label: 'Восход', value: '7:12 утра' },
-              { label: 'Закат', value: '18:41 дня' },
-              { label: 'Световой день', value: '11 ч 26 мин' },
+              { label: t('home.sunIndex'), value: t('home.sunIndexValue') },
+              { label: t('home.sunrise'), value: t('home.sunriseValue') },
+              { label: t('home.sunset'), value: t('home.sunsetValue') },
+              { label: t('home.daylight'), value: t('home.daylightValue') },
             ]}
-            note="Солнечная активность умеренная, день подойдёт для спокойной и сосредоточенной работы."
+            note={t('home.sunNote')}
           />
         </ScrollView>
 
-        <Text style={[styles.focusTitle, { marginTop: GAP.moonsunToFocusTitle }]}>Фокус дня</Text>
+        <Text style={[styles.focusTitle, { marginTop: GAP.moonsunToFocusTitle }]}>{t('home.focusTitle')}</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -314,24 +312,9 @@ export function HomeScreen({ navigation }: any) {
               each ending on a multi-word final line (not reintroducing the
               orphan-word problem take 2 had just fixed). Card 2 still
               untouched. */}
-          <FocusCard
-            width={cardWidth}
-            icon="lotus"
-            title="Мягкий старт"
-            text="Не время для рекордов, но отличный момент, чтобы мягко войти в ритм. Подойдут пилатес, растяжка или неспешная прогулка на свежем воздухе. Это поднимет настроение, вернёт лёгкость и немного сил."
-          />
-          <FocusCard
-            width={cardWidth}
-            icon="idea"
-            title="Планирование"
-            text="Хороший момент для спокойной аналитической работы в одиночестве — пишите стратегии, учите языки, разбирайте почту. Избегайте брейнштормов и публичных выступлений сегодня."
-          />
-          <FocusCard
-            width={cardWidth}
-            icon="broom"
-            title="Пространство"
-            text="Выбросьте лишнее из дома и цифрового пространства: старые вещи, ненужные файлы, лишние подписки. Избавление от старого возвращает контроль, добавляет лёгкости и ясность."
-          />
+          <FocusCard width={cardWidth} icon="lotus" title={t('home.focus1Title')} text={t('home.focus1Text')} />
+          <FocusCard width={cardWidth} icon="idea" title={t('home.focus2Title')} text={t('home.focus2Text')} />
+          <FocusCard width={cardWidth} icon="broom" title={t('home.focus3Title')} text={t('home.focus3Text')} />
         </ScrollView>
 
         <View style={{ marginTop: GAP.cardsToQuote }}>
@@ -340,8 +323,8 @@ export function HomeScreen({ navigation }: any) {
               (2026-08-20). */}
           <QuoteCard
             width={chartWidth}
-            quote={'Важно не то, как ты идёшь, а то, что ты\nне останавливаешься'}
-            author="Конфуций"
+            quote={t('home.quoteText')}
+            author={t('home.quoteAuthor')}
           />
         </View>
         </View>
@@ -349,8 +332,8 @@ export function HomeScreen({ navigation }: any) {
       <InfoSheet
         visible={infoVisible}
         onClose={() => setInfoVisible(false)}
-        title={BIORHYTHM_INFO_TITLE}
-        paragraphs={BIORHYTHM_INFO_PARAGRAPHS}
+        title={BIORHYTHM_INFO_TITLE[language]}
+        paragraphs={BIORHYTHM_INFO_PARAGRAPHS[language]}
       />
     </Animated.View>
   );
