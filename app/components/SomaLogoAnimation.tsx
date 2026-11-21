@@ -66,13 +66,13 @@ const C_TEXT = '#DDD9FF';
 // Small tracked-caps "eyebrow" treatment (not a plain sentence) - her pick
 // from a web comparison of 5 directions, then a 1-line-vs-2-line follow-up:
 // explicit break after "ритмам" for a compact 2-line "stamp" rather than
-// one long tracked-out line. English line break (via english-editor agent,
-// 2026-11-21) mirrors the same rhythm/body split, not a literal word-count
-// match - "LISTEN TO THE RHYTHMS" / "OF YOUR BODY" (stored lower-case, the
-// uppercase look comes from styles.tagline's textTransform).
+// one long tracked-out line. English is her own established tagline from
+// the Behance case, not a fresh transcreation of the Russian - "Listen to
+// your rhythm" (singular, one line - corrected 2026-11-21 after first
+// shipping an english-editor transcreation she hadn't actually asked for).
 const TAGLINE: Record<'ru' | 'en', string> = {
   ru: 'Прислушайся к ритмам\nсвоего тела',
-  en: 'Listen to the rhythms\nof your body',
+  en: 'Listen to your rhythm',
 };
 
 const SPLINE = Easing.bezierFn(0.4, 0, 0.6, 1);
