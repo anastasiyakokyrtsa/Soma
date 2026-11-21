@@ -62,7 +62,7 @@ export const onboarding = {
   },
   en: {
     aboutApp1Title: 'Your state is a system',
-    aboutApp1Description: 'Energy, mood, and focus move along their own patterns — and you can learn to read them.',
+    aboutApp1Description: 'Energy, mood, and focus move along their own patterns. You can learn to read them.',
     aboutApp1Button: 'Next',
     aboutApp2Title: 'Notice the patterns',
     aboutApp2Description: "Soma tracks your rhythms, reactions, and habits, and shows you what's shaping your state.",

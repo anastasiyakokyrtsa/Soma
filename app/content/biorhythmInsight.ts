@@ -27,16 +27,16 @@ export const BIORHYTHM_INSIGHTS: Record<Language, Insights> = {
   },
   en: {
     physical: {
-      high: "Your physical rhythm looks like it's on the rise today — a decent day to add a bit of movement.",
-      low: 'Your physical rhythm is tracking closer to a dip today — maybe worth going easier on yourself with the load.',
+      high: "Your physical rhythm looks like it's on the rise today. A decent day to add a bit of movement.",
+      low: 'Your physical rhythm is tracking closer to a dip today, maybe worth going easier on yourself with the load.',
     },
     emotional: {
       high: 'Your emotional rhythm is up today, so the day might feel a touch more vivid than usual.',
-      low: "Your emotional rhythm is running lower today — if something hits harder than usual, it might just be a phase.",
+      low: "Your emotional rhythm is running lower today. If something hits harder than usual, it might just be a phase.",
     },
     intellect: {
       high: "Your intellectual rhythm looks like it's on the rise today. A good day for tasks that need focus.",
-      low: "Your intellectual rhythm is lower today — if it's hard to gather your thoughts, it might not be just you.",
+      low: "Your intellectual rhythm is lower today. If it's hard to gather your thoughts, it might not be just you.",
     },
   },
 };
@@ -54,5 +54,5 @@ export const BIORHYTHM_INSIGHT_EYEBROW: Record<Language, string> = {
 // path, to come back once Home runs off the same formula.
 export const BIORHYTHM_INSIGHT_DEMO: Record<Language, string> = {
   ru: 'Сегодня по графику много сил в теле. Хороший день, чтобы выйти на прогулку или размяться, а сложные дела лучше отложить.',
-  en: "Today's graph shows plenty of physical energy. A good day for a walk or to stretch — better to put off the harder tasks.",
+  en: "Today's graph shows plenty of physical energy. A good day for a walk or to stretch, better to put off the harder tasks.",
 };
