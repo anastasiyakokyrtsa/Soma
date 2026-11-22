@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useId, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, PanResponder, Platform, type GestureResponderEvent } from 'react-native';
 import Svg, {
   Circle as SvgCircle,
@@ -118,6 +118,20 @@ export function SleepWheelPicker({
   onChange: (bedtimeMin: number, waketimeMin: number) => void;
   size?: number;
 }) {
+  // Unique per mounted instance - brief 002 (FAB quick-log) added a second
+  // place this component renders (QuickLogSheet.tsx) alongside the
+  // onboarding one (ProfileSleepScheduleScreen.tsx), and react-navigation
+  // keeps both mounted at once (native-stack doesn't unmount screens it
+  // navigates away from). The gradient/filter ids below used to be bare
+  // string literals, so with two instances in the DOM at the same time,
+  // `url(#sleepArcGrad)`/`url(#sleepGlow)`/`url(#sleepDurationGrad)` all
+  // resolved to whichever instance's <Defs> happened to come first in the
+  // document - the OTHER instance's gradient-filled arc and duration number
+  // silently failed to paint at all (only the plain-color track ring and
+  // tick marks, which don't reference any id, still showed). Caught via the
+  // FAB's sleep sheet rendering a track ring with no colored arc and no
+  // "Xh Ym" text while the onboarding step (mounted first) still worked.
+  const uid = useId();
   const center = size / 2;
   const outerRadius = (size * OUTER_RATIO) / 2;
   const stroke = outerRadius * STROKE_OF_OUTER;
@@ -239,7 +253,7 @@ export function SleepWheelPicker({
         style={{ margin: -RING_GLOW_PAD }}
       >
         <Defs>
-          <SvgLinearGradient id="sleepArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <SvgLinearGradient id={`sleepArcGrad-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset={0} stopColor={gradients.headingText.colors[0]} />
             <Stop offset={0.5} stopColor={gradients.headingText.colors[1]} />
             <Stop offset={1} stopColor={gradients.headingText.colors[2]} />
@@ -249,15 +263,15 @@ export function SleepWheelPicker({
               layered-opacity approximation. x/y/width/height widened past
               the default filter region so the blur isn't clipped at its own
               bounding box edge. */}
-          <Filter id="sleepGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <Filter id={`sleepGlow-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
             <FeGaussianBlur stdDeviation={blur} />
           </Filter>
         </Defs>
 
         <SvgCircle cx={center} cy={center} r={r} stroke="rgba(139,124,246,0.27)" strokeWidth={stroke} fill="none" />
 
-        <Path d={d} stroke="url(#sleepArcGrad)" strokeWidth={stroke} strokeLinecap="round" fill="none" filter="url(#sleepGlow)" opacity={glowOpacity} />
-        <Path d={d} stroke="url(#sleepArcGrad)" strokeWidth={stroke} strokeLinecap="round" fill="none" />
+        <Path d={d} stroke={`url(#sleepArcGrad-${uid})`} strokeWidth={stroke} strokeLinecap="round" fill="none" filter={`url(#sleepGlow-${uid})`} opacity={glowOpacity} />
+        <Path d={d} stroke={`url(#sleepArcGrad-${uid})`} strokeWidth={stroke} strokeLinecap="round" fill="none" />
 
         {HOUR_MARKS.filter((m) => m.label === null).map(({ angle }, i) => {
           const p0 = polar(angle, tickR - tickLen / 2);
@@ -286,7 +300,7 @@ export function SleepWheelPicker({
       <View style={[styles.centerText, { top: center - 40 }]} pointerEvents="none">
         <Svg width={size * 0.7} height={36}>
           <Defs>
-            <SvgLinearGradient id="sleepDurationGrad" x1="0" y1="0" x2="1" y2="0">
+            <SvgLinearGradient id={`sleepDurationGrad-${uid}`} x1="0" y1="0" x2="1" y2="0">
               <Stop offset={gradients.headingText.locations[0]} stopColor={gradients.headingText.colors[0]} />
               <Stop offset={gradients.headingText.locations[1]} stopColor={gradients.headingText.colors[1]} />
               <Stop offset={gradients.headingText.locations[2]} stopColor={gradients.headingText.colors[2]} />
@@ -298,7 +312,7 @@ export function SleepWheelPicker({
             fontSize={26}
             fontFamily={fontFamily.semiBold}
             textAnchor="middle"
-            fill="url(#sleepDurationGrad)"
+            fill={`url(#sleepDurationGrad-${uid})`}
           >
             {formatDuration(duration)}
           </SvgText>
