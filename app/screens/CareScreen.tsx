@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
@@ -11,7 +12,13 @@ import { StarsBackground } from '../components/StarsBackground';
 import { TeaIllustrationSway } from '../components/TeaIllustrationSway';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 import { useT } from '../i18n/useT';
-import { getOnboardingBirthDate, getOnboardingSleep, getOnboardingCycle, includesCycleStep } from '../lib/onboardingProfile';
+import {
+  getOnboardingBirthDate,
+  getOnboardingSleep,
+  getOnboardingCycle,
+  includesCycleStep,
+  subscribeOnboardingProfile,
+} from '../lib/onboardingProfile';
 import { computeEnergy, type EnergySource } from '../lib/energy';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
@@ -75,6 +82,11 @@ export function CareScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const t = useT();
+  // Brief 002 (FAB quick-log) - same re-render need as HomeScreen's own copy
+  // of this effect, see that screen's comment for why plain module-state
+  // getters alone no longer cover this screen's cases.
+  const [, forceRerender] = useState(0);
+  useEffect(() => subscribeOnboardingProfile(() => forceRerender((n) => n + 1)), []);
   const birthDate = getOnboardingBirthDate();
   const sleep = getOnboardingSleep();
   const cycle = getOnboardingCycle();

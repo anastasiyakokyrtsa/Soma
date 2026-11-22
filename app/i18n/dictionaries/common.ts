@@ -11,6 +11,7 @@ export const common = {
     allArticles: 'Все статьи',
     close: 'Закрыть',
     swipeLeft: 'Свайпни влево',
+    save: 'Сохранить',
   },
   en: {
     continueButton: 'Continue',
@@ -24,5 +25,6 @@ export const common = {
     allArticles: 'All articles',
     close: 'Close',
     swipeLeft: 'Swipe left',
+    save: 'Save',
   },
 };

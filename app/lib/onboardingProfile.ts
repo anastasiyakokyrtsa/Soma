@@ -1,17 +1,35 @@
 // The onboarding answers that later steps AND Home/Care now depend on.
 // Plain in-memory module state - there is no persistence/state layer in the
 // app yet (see backlog, and brief 001's explicit non-goal: this cycle wires
-// *within-session* answers through, not across app restarts). Everything
-// here is only ever read after the screen that set it has already
-// navigated away (onboarding is a straight-line stack, Home/Care are only
-// reached after it), so plain module state needs no subscribe/notify layer
-// to be "reactive enough" - a screen that reads one of these getters in its
-// render body already sees the latest value on every one of its own
-// mounts/re-renders, which is the only time any of this ever needs to
-// change on screen. Replace with the real profile store (expo-secure-store,
-// per decisions.md 2026-09-18) when persistence is actually built.
+// *within-session* answers through, not across app restarts). Brief 001's own
+// assumption was that these only ever change while the screen reading them is
+// unmounted (onboarding is a straight-line stack, Home/Care only mount after
+// it) - true for onboarding itself, but brief 002's FAB quick-log breaks that
+// assumption on purpose: it edits sleep/cycle from a sheet opened *on top of*
+// an already-mounted, already-focused Home or Care, which needs to see the
+// new number the instant the sheet closes, not on some later unrelated
+// re-render. Hence the small notify/subscribe layer below - still not a real
+// store (no selectors, no persistence), just enough so a screen can ask to be
+// told "something that feeds the energy composite changed." Replace with the
+// real profile store (expo-secure-store, per decisions.md 2026-09-18) when
+// persistence is actually built.
 import type { BirthDate } from './biorhythm';
 import type { CalendarDate } from '../components/CalendarRangePicker';
+
+type Listener = () => void;
+const listeners = new Set<Listener>();
+
+function notify() {
+  listeners.forEach((listener) => listener());
+}
+
+// Home/Care (and anything else reading the energy composite) subscribe here
+// instead of polling - returns an unsubscribe function, the usual
+// useEffect-cleanup shape.
+export function subscribeOnboardingProfile(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
 
 export type Gender = 'female' | 'male';
 export type SleepSchedule = { bedtimeMin: number; waketimeMin: number };
@@ -48,6 +66,17 @@ export function includesCycleStep() {
   return gender === 'female';
 }
 
+// Brief 002 (FAB quick-log) - single source of truth for "does this profile
+// have a cycle component the + button should offer at all." Not just
+// `includesCycleStep()`: a profile that already answered "у меня сейчас нет
+// регулярного цикла" (setOnboardingCycleNotApplicable) is a real, explicit
+// answer too, not a female profile still waiting on cycle data - the FAB
+// shouldn't keep surfacing a Cycle tile for an answer that's already "this
+// doesn't apply to me."
+export function hasRelevantCycle() {
+  return includesCycleStep() && !cycleNotApplicable;
+}
+
 // "Шаг X/N" of the profile mini-flow: date of birth, sleep, [cycle], mood.
 export function profileStepTotal() {
   return includesCycleStep() ? 4 : 3;
@@ -55,6 +84,7 @@ export function profileStepTotal() {
 
 export function setOnboardingBirthDate(value: BirthDate) {
   birthDate = value;
+  notify();
 }
 
 export function getOnboardingBirthDate() {
@@ -63,6 +93,7 @@ export function getOnboardingBirthDate() {
 
 export function setOnboardingSleep(value: SleepSchedule) {
   sleep = value;
+  notify();
 }
 
 export function getOnboardingSleep() {
@@ -72,6 +103,7 @@ export function getOnboardingSleep() {
 export function setOnboardingCycleRange(range: CycleRange) {
   cycleRange = range;
   cycleNotApplicable = false;
+  notify();
 }
 
 // The cycle step's "У меня сейчас нет регулярного цикла" button (brief 001)
@@ -80,6 +112,7 @@ export function setOnboardingCycleRange(range: CycleRange) {
 export function setOnboardingCycleNotApplicable() {
   cycleRange = null;
   cycleNotApplicable = true;
+  notify();
 }
 
 export function getOnboardingCycle(): { range: CycleRange | null; notApplicable: boolean } {

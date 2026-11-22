@@ -5,6 +5,8 @@ import Svg, { Path } from 'react-native-svg';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors, fontFamily } from '../theme';
 import { NavIcon, type NavIconName } from './icons/NavIcon';
+import { QuickLogSheet } from './QuickLogSheet';
+import { hasRelevantCycle } from '../lib/onboardingProfile';
 
 // Ports UI Kit's `.bottombar` (index.html #navigation, style.css ~L605-645) -
 // real SVG dome shape (flat top edge + cubic-bezier taper into the FAB's
@@ -107,6 +109,19 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   // SDK 58 upgrade, not a behavior change.
   const wrapRef = useRef<any>(null);
   const [floatingGap, setFloatingGap] = useState(0);
+
+  // Brief 002 - the FAB was a dead tap ("not yet designed/spec'd... onPress
+  // is a no-op placeholder", its own old comment below). `initialScreen` is
+  // decided fresh on every press, not cached - a profile can only switch
+  // whether it has a relevant cycle via the onboarding cycle step, which
+  // never happens while this bar is on screen, so re-checking right here is
+  // simpler than keeping a second mirror of that state in sync.
+  const [quickLogVisible, setQuickLogVisible] = useState(false);
+  const [quickLogInitialScreen, setQuickLogInitialScreen] = useState<'menu' | 'sleep'>('sleep');
+  const onPressFab = () => {
+    setQuickLogInitialScreen(hasRelevantCycle() ? 'menu' : 'sleep');
+    setQuickLogVisible(true);
+  };
 
   // Re-measures on every real layout pass (onLayout), not once on a timer -
   // the previous rAF-based version may simply have fired before `wrapRef`
@@ -243,9 +258,14 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         })}
       </View>
 
-      {/* FAB opens a quick-action sheet - not yet designed/spec'd beyond the
-          kit's own static "+" reference, so onPress is a no-op placeholder. */}
+      {/* FAB opens the quick-log sheet (brief 002) - straight into the sleep
+          form for a profile with no relevant cycle (male/unset gender, or
+          "нет регулярного цикла" already answered), otherwise the 2-tile
+          Sleep/Cycle menu first. See QuickLogSheet.tsx and
+          decisions.md 2026-11-21/22 #1 for the full reasoning - "Самочувствие
+          сейчас" was in an earlier draft of this menu and was dropped. */}
       <Pressable
+        onPress={onPressFab}
         style={[
           styles.fab,
           { width: 68 * scale, height: 68 * scale, borderRadius: 34 * scale, marginLeft: -34 * scale, marginTop: -34 * scale, top: 50 * scale, left: width / 2 },
@@ -254,6 +274,8 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         <View style={[styles.iconPlusBar, { width: 30 * scale, height: 3 * scale, borderRadius: 2 * scale }]} />
         <View style={[styles.iconPlusBarVertical, { width: 3 * scale, height: 30 * scale, borderRadius: 2 * scale }]} />
       </Pressable>
+
+      <QuickLogSheet visible={quickLogVisible} onClose={() => setQuickLogVisible(false)} initialScreen={quickLogInitialScreen} />
     </View>
   );
 }

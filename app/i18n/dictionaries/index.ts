@@ -6,6 +6,7 @@ import { biorhythms } from './biorhythms';
 import { analytics } from './analytics';
 import { tea } from './tea';
 import { breathing } from './breathing';
+import { quickLog } from './quickLog';
 
 // Namespaced by screen/area so screen files only ever touch their own
 // section - adding a new screen's translations never risks a merge
@@ -20,6 +21,7 @@ export const dictionaries = {
     analytics: analytics.ru,
     tea: tea.ru,
     breathing: breathing.ru,
+    quickLog: quickLog.ru,
   },
   en: {
     common: common.en,
@@ -30,5 +32,6 @@ export const dictionaries = {
     analytics: analytics.en,
     tea: tea.en,
     breathing: breathing.en,
+    quickLog: quickLog.en,
   },
 };

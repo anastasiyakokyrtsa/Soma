@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Platform, useWindowDimensions, type TextLayoutEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
@@ -19,7 +19,7 @@ import { pickDayParagraphTemplate } from '../content/biorhythmInsight';
 import { useT } from '../i18n/useT';
 import { useLanguage } from '../i18n/LanguageContext';
 import { dayParagraphs } from '../i18n/dictionaries/home';
-import { getOnboardingBirthDate } from '../lib/onboardingProfile';
+import { getOnboardingBirthDate, subscribeOnboardingProfile } from '../lib/onboardingProfile';
 import { addDays, getBiorhythmValues } from '../lib/biorhythm';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
@@ -190,6 +190,14 @@ export function HomeScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [infoVisible, setInfoVisible] = useState(false);
+  // Brief 002 (FAB quick-log) - the FAB can edit sleep/cycle from a sheet
+  // opened right on top of this already-mounted, already-focused screen, so
+  // it needs to actually re-render the moment that happens, not wait for
+  // some unrelated state change (see onboardingProfile.ts's own comment on
+  // why plain module state alone isn't "reactive enough" any more). This
+  // value is never read, only bumped, to force that re-render.
+  const [, forceRerender] = useState(0);
+  useEffect(() => subscribeOnboardingProfile(() => forceRerender((n) => n + 1)), []);
   const t = useT();
   const { language } = useLanguage();
   // Capped at 380 (the kit's own reference width) but shrinks on anything
