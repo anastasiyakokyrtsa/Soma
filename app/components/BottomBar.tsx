@@ -7,6 +7,7 @@ import { colors, fontFamily } from '../theme';
 import { NavIcon, type NavIconName } from './icons/NavIcon';
 import { QuickLogSheet } from './QuickLogSheet';
 import { hasRelevantCycle } from '../lib/onboardingProfile';
+import { FEATURE_FAB_QUICK_LOG } from '../lib/featureFlags';
 
 // Ports UI Kit's `.bottombar` (index.html #navigation, style.css ~L605-645) -
 // real SVG dome shape (flat top edge + cubic-bezier taper into the FAB's
@@ -119,6 +120,7 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
   const [quickLogVisible, setQuickLogVisible] = useState(false);
   const [quickLogInitialScreen, setQuickLogInitialScreen] = useState<'menu' | 'sleep'>('sleep');
   const onPressFab = () => {
+    if (!FEATURE_FAB_QUICK_LOG) return;
     setQuickLogInitialScreen(hasRelevantCycle() ? 'menu' : 'sleep');
     setQuickLogVisible(true);
   };
@@ -275,7 +277,9 @@ export function BottomBar({ state, navigation }: BottomTabBarProps) {
         <View style={[styles.iconPlusBarVertical, { width: 3 * scale, height: 30 * scale, borderRadius: 2 * scale }]} />
       </Pressable>
 
-      <QuickLogSheet visible={quickLogVisible} onClose={() => setQuickLogVisible(false)} initialScreen={quickLogInitialScreen} />
+      {FEATURE_FAB_QUICK_LOG ? (
+        <QuickLogSheet visible={quickLogVisible} onClose={() => setQuickLogVisible(false)} initialScreen={quickLogInitialScreen} />
+      ) : null}
     </View>
   );
 }
