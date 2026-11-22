@@ -11,6 +11,8 @@ import { StarsBackground } from '../components/StarsBackground';
 import { TeaIllustrationSway } from '../components/TeaIllustrationSway';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 import { useT } from '../i18n/useT';
+import { getOnboardingBirthDate, getOnboardingSleep, getOnboardingCycle, includesCycleStep } from '../lib/onboardingProfile';
+import { computeEnergy, type EnergySource } from '../lib/energy';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -49,10 +51,49 @@ const GAP = {
   articlesHeaderToList: 20,
 };
 
+// "По биоритму и сну" / "Based on biorhythm and sleep" - a plain natural-
+// language list join, not a fixed key per combination (4 possible subsets
+// once birth date is the hard gate: biorhythm alone, +sleep, +cycle, or
+// all three) - brief 001, decisions.md 2026-11-21/22 #2's "без выделения
+// виноватого источника" means every subset reads the same neutral way, not
+// a special-cased sentence for each.
+function formatEnergySources(sources: EnergySource[], t: (key: string) => string): string {
+  const labelFor = (s: EnergySource) =>
+    s === 'biorhythm' ? t('care.energySourceBiorhythm') : s === 'sleep' ? t('care.energySourceSleep') : t('care.energySourceCycle');
+  const labels = sources.map(labelFor);
+  const and = t('care.energySourcesAnd');
+  const list =
+    labels.length === 1
+      ? labels[0]
+      : labels.length === 2
+        ? `${labels[0]} ${and} ${labels[1]}`
+        : `${labels.slice(0, -1).join(', ')} ${and} ${labels[labels.length - 1]}`;
+  return `${t('care.energySourcesPrefix')} ${list}`;
+}
+
 export function CareScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const t = useT();
+  const birthDate = getOnboardingBirthDate();
+  const sleep = getOnboardingSleep();
+  const cycle = getOnboardingCycle();
+  const energy = computeEnergy({ birthDate, sleep, cycle, today: new Date() });
+  // "Complete" = every source this profile could have is actually present -
+  // cycle only counts as "missing" for a profile the cycle step applies to
+  // at all (male profiles never get a cycle component, that's not a gap to
+  // report - see lib/onboardingProfile.ts's includesCycleStep). Only an
+  // incomplete read gets the small second line (decisions.md 2026-11-21/22
+  // #2: "При частичных данных" specifically).
+  const expectedSources = includesCycleStep() ? 3 : 2;
+  const energyCaption = !energy
+    ? t('care.noDataCaption')
+    : energy.value < 40
+      ? t('care.lowEnergy')
+      : energy.value < 70
+        ? t('care.mediumEnergy')
+        : t('care.highEnergy');
+  const energySourcesLine = energy && energy.sources.length < expectedSources ? formatEnergySources(energy.sources, t) : null;
   // 3 tiles + 2×12px gaps + 2×16px side margins, derived from the real
   // screen width instead of MiniRitualTile's own literal 116 - that only
   // held on the Figma reference width, overflowed on a narrower real
@@ -114,7 +155,13 @@ export function CareScreen({ navigation }: any) {
         </View>
 
         <View style={{ marginTop: GAP.conditionToRing }}>
-          <ResourceRing value={42} caption={t('care.lowEnergy')} />
+          <ResourceRing value={energy?.value ?? 0} caption={energyCaption} ghost={!energy} />
+          {energySourcesLine ? <Text style={styles.energySourcesLine}>{energySourcesLine}</Text> : null}
+          {!energy ? (
+            <View style={styles.missingDataChips}>
+              <NavChip icon="clock" label={t('care.noDataChipBirthDate')} onPress={() => navigation.navigate('ProfileDateOfBirth', { returnTo: 'Care' })} />
+            </View>
+          ) : null}
         </View>
 
         <View style={[styles.whatHelps, { marginTop: GAP.ringToWhatHelps }]}>
@@ -220,6 +267,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 18 * 1.1,
     color: colors.textPrimary,
+  },
+  // Small, quiet, under the ring's own caption - decisions.md 2026-11-21/22
+  // #2's "без выделения виноватого источника" means this reads as a plain
+  // fact, not a warning, so it gets the same muted weight as a caption, not
+  // alert styling.
+  energySourcesLine: {
+    marginTop: 4,
+    textAlign: 'center',
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  missingDataChips: {
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   whatHelps: {},
   // All 3 section titles ("Что поможет сейчас"/"Чай как ритуал"/"О теле и

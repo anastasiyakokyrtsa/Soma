@@ -11,14 +11,16 @@ import {
 } from '../../content/biorhythmInsight';
 import { useT } from '../../i18n/useT';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { getOnboardingBirthDate } from '../../lib/onboardingProfile';
 
-// TEMPORARY, same pattern as ProfileDateOfBirthScreen's FORCE_IOS_WHEEL_PREVIEW:
-// while Home still shows hand-drawn demo curves, the real-formula insight
-// below would contradict it on the same birth date (this screen said
-// "intellect up" while Home right after showed it at the bottom). Her call
-// 2026-09-23: keep it a demo for now, back to the formula later - flip to
-// false then (and restyle the other five templates first, see backlog).
-const USE_HOME_DEMO_INSIGHT = true;
+// Was TEMPORARY-true since 2026-09-23 (same pattern as
+// ProfileDateOfBirthScreen's FORCE_IOS_WHEEL_PREVIEW): while Home showed
+// hand-drawn demo curves, the real-formula insight here would contradict it
+// on the same birth date. Flipped to false 2026-11-22 (brief 001) now that
+// Home runs off the same real formula (see HomeScreen.tsx/BiorhythmChart.tsx)
+// - the two screens can't disagree any more, so the demo text (kept below,
+// unused while this is false) is no longer needed for consistency.
+const USE_HOME_DEMO_INSIGHT = false;
 
 // Small circular crop of a glowing-bulb illustration (swapped from an
 // earlier pendulum image, same day, her call) - a large canvas gave the
@@ -54,7 +56,7 @@ const INSIGHT_BULB = require('../../assets/onboarding/insight-bulb.png');
 export function BiorhythmInsightScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
-  const birth: BirthDate = route?.params?.birth ?? { day: 14, month: 4, year: 1995 };
+  const birth: BirthDate = route?.params?.birth ?? getOnboardingBirthDate() ?? { day: 14, month: 4, year: 1995 };
   const t = useT();
   const { language } = useLanguage();
 

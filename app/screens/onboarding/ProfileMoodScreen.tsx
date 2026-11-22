@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { MoodScale } from '../../components/MoodScale';
-import { profileStepTotal } from '../../lib/onboardingProfile';
+import { profileStepTotal, setTodayMood } from '../../lib/onboardingProfile';
 import { useT } from '../../i18n/useT';
 
 export function ProfileMoodScreen({ navigation }: any) {
@@ -19,7 +19,10 @@ export function ProfileMoodScreen({ navigation }: any) {
       totalSteps={profileStepTotal()}
       title={t('onboarding.moodTitle')}
       buttonDisabled={!touched}
-      onPressNext={() => navigation.replace('Main')}
+      onPressNext={() => {
+        setTodayMood(moodIndex);
+        navigation.replace('Main');
+      }}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >

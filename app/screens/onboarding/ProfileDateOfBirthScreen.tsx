@@ -5,7 +5,7 @@ import { ProfileStepLayout } from './ProfileStepLayout';
 import { colors, fontFamily } from '../../theme';
 import { formatBirthDate, type BirthDate } from '../../lib/biorhythm';
 import { DateWheelPicker } from '../../components/DateWheelPicker';
-import { profileStepTotal } from '../../lib/onboardingProfile';
+import { profileStepTotal, setOnboardingBirthDate } from '../../lib/onboardingProfile';
 import { useT } from '../../i18n/useT';
 
 // Audit finding #13 (platform-conformance): date pickers are one of the
@@ -51,14 +51,36 @@ const MIN_DATE = new Date(today.getFullYear() - 120, today.getMonth(), today.get
 const dateToValue = (d: Date): BirthDate => ({ day: d.getDate(), month: d.getMonth(), year: d.getFullYear() });
 const valueToDate = (v: BirthDate): Date => new Date(v.year, v.month, v.day);
 
-export function ProfileDateOfBirthScreen({ navigation }: any) {
+// Home and Care's own empty-state invites (decisions.md 2026-11-21/22 #2 -
+// Home's "Указать дату рождения" link, Care's "Дата рождения" chip) push
+// this same screen with `route.params.returnTo` set to 'Home' or 'Care'
+// instead of running it as step 1 of the onboarding profile mini-flow. In
+// that mode, Continue stores the date and goes straight back to whichever
+// tab asked, instead of continuing into BiorhythmInsight -> Sleep -> Cycle
+// -> Mood - re-running the rest of that flow from an already-onboarded
+// session would be re-asking questions that were either already answered or
+// already consciously skipped. A full "edit your profile" screen is
+// explicitly out of scope for this brief (see decisions.md 2026-09-14/
+// 2026-11-21) - this is just enough to make those two invites actually lead
+// somewhere and back, not a profile editor.
+export function ProfileDateOfBirthScreen({ navigation, route }: any) {
   const [date, setDate] = useState<BirthDate>({ day: 14, month: 5, year: 1995 });
   const [androidPickerOpen, setAndroidPickerOpen] = useState(false);
   const t = useT();
+  const returnTo: 'Home' | 'Care' | undefined = route?.params?.returnTo;
 
   const onChange = (_event: DateTimePickerEvent, selected?: Date) => {
     if (Platform.OS === 'android') setAndroidPickerOpen(false);
     if (selected) setDate(dateToValue(selected));
+  };
+
+  const onPressNext = () => {
+    setOnboardingBirthDate(date);
+    if (returnTo) {
+      navigation.navigate('Main', { screen: returnTo });
+    } else {
+      navigation.navigate('BiorhythmInsight', { birth: date });
+    }
   };
 
   return (
@@ -67,7 +89,7 @@ export function ProfileDateOfBirthScreen({ navigation }: any) {
       totalSteps={profileStepTotal()}
       title={t('onboarding.dateOfBirthTitle')}
       description={t('onboarding.dateOfBirthDescription')}
-      onPressNext={() => navigation.navigate('BiorhythmInsight', { birth: date })}
+      onPressNext={onPressNext}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >

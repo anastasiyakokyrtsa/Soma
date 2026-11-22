@@ -88,7 +88,7 @@ const MOCK_BIRTH_DATE: BirthDate = { day: 14, month: 5, year: 1995 };
 export function BiorhythmsScreen({ navigation }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const [selectedDay, setSelectedDay] = useState(14);
+  const [selectedOffset, setSelectedOffset] = useState(0);
   const [infoVisible, setInfoVisible] = useState(false);
   const chartWidth = Math.min(screenWidth - 40, 380);
   const t = useT();
@@ -116,7 +116,7 @@ export function BiorhythmsScreen({ navigation }: any) {
             </Pressable>
           </View>
 
-          <BiorhythmChart width={chartWidth} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
+          <BiorhythmChart width={chartWidth} birthDate={MOCK_BIRTH_DATE} selectedOffset={selectedOffset} onSelectOffset={setSelectedOffset} />
 
           <View style={styles.tabsRow}>
             <Text style={[styles.tab, styles.tabActive]}>{t('biorhythms.tabDay')}</Text>

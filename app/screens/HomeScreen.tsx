@@ -15,9 +15,12 @@ import { InfoSheet } from '../components/InfoSheet';
 import { MoodCheckIn } from '../components/MoodCheckIn';
 import { BAR_VIEWBOX_W, BAR_VIEWBOX_H } from '../components/BottomBar';
 import { BIORHYTHM_INFO_TITLE, BIORHYTHM_INFO_PARAGRAPHS } from '../content/biorhythmInfo';
+import { pickDayParagraphTemplate } from '../content/biorhythmInsight';
 import { useT } from '../i18n/useT';
 import { useLanguage } from '../i18n/LanguageContext';
 import { dayParagraphs } from '../i18n/dictionaries/home';
+import { getOnboardingBirthDate } from '../lib/onboardingProfile';
+import { addDays, getBiorhythmValues } from '../lib/biorhythm';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -99,6 +102,17 @@ const USER_NAME: Record<'ru' | 'en', string> = { ru: 'Анастасия', en: '
 // above) - only the factual/hedged framing changed, not the substance.
 // English translation (2026-11-21) keeps this exact hedging - moved to
 // i18n/dictionaries/home.ts (dayParagraphs) now that it is bilingual.
+//
+// 2026-11-22 (brief 001, real-data reactivity): these 9 texts themselves are
+// unchanged, but which one shows is no longer "look up calendar day
+// `selectedDay`" - there's no calendar day 10-18 any more, the chart below
+// now plots real offsets around today's real date. Instead,
+// content/biorhythmInsight.ts's pickDayParagraphTemplate matches today's
+// actual computed (physical, emotional, intellect) values against whichever
+// of these 9 templates' own original pattern is numerically closest, and
+// that's the one shown - see that function's own comment for why reusing
+// these 9 as a pattern library (rather than writing new copy per possible
+// reading) satisfies this brief's success criterion without over-building.
 
 // "Доброе утро, {имя}" needs real dynamic line-wrapping (the name's length
 // varies) with a gradient fill - unlike the fixed 2-line headings elsewhere,
@@ -191,8 +205,13 @@ export function HomeScreen({ navigation }: any) {
   // "если ширина экрана 412, а ширина карточки 336... край карточки
   // не видно, чтобы его увидеть надо скроллить").
   const cardWidth = Math.min(screenWidth - SIDE_MARGIN - 60, 336);
-  const [selectedDay, setSelectedDay] = useState(14);
-  const paragraph = dayParagraphs[language][selectedDay] ?? dayParagraphs[language][14];
+  // -4..4, 0 = today - see BiorhythmChart.tsx's own comment for why this
+  // replaced the old fixed "day 10-18" demo selection.
+  const [selectedOffset, setSelectedOffset] = useState(0);
+  const birthDate = getOnboardingBirthDate();
+  const today = new Date();
+  const todaysValues = birthDate ? getBiorhythmValues(birthDate, addDays(today, selectedOffset)) : null;
+  const paragraph = todaysValues ? dayParagraphs[language][pickDayParagraphTemplate(todaysValues)] : null;
   // Real bar height + insets.bottom + a 60px clearance above it - was a flat
   // 160 (2026-08-26, matching Care's own flat number), but a flat value
   // can't track BottomBar's own height, which *grows* by insets.bottom
@@ -249,10 +268,22 @@ export function HomeScreen({ navigation }: any) {
         </View>
 
         <View style={{ marginTop: GAP.titleToChart }}>
-          <BiorhythmChart width={chartWidth} selectedDay={selectedDay} onSelectDay={setSelectedDay} />
+          <BiorhythmChart width={chartWidth} birthDate={birthDate} selectedOffset={selectedOffset} onSelectOffset={setSelectedOffset} today={today} />
         </View>
 
-        <Text style={[styles.paragraph, { marginTop: GAP.chartToParagraph }]}>{paragraph}</Text>
+        {paragraph ? (
+          <Text style={[styles.paragraph, { marginTop: GAP.chartToParagraph }]}>{paragraph}</Text>
+        ) : (
+          // No date of birth entered this session (decisions.md 2026-11-21/22
+          // #2) - an inviting line + a real link to the one screen that
+          // unblocks the chart, instead of the old demo paragraph.
+          <View style={{ marginTop: GAP.chartToParagraph }}>
+            <Text style={styles.paragraph}>{t('home.noBirthDateText')}</Text>
+            <Pressable onPress={() => navigation.navigate('ProfileDateOfBirth', { returnTo: 'Home' })} hitSlop={6}>
+              <Text style={styles.noBirthDateLink}>{t('home.noBirthDateLink')}</Text>
+            </Pressable>
+          </View>
+        )}
 
         <ScrollView
           horizontal
@@ -391,6 +422,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 16 * 1.2,
     color: colors.textPrimary,
+  },
+  noBirthDateLink: {
+    marginTop: 8,
+    fontFamily: fontFamily.medium,
+    fontSize: 16,
+    lineHeight: 16 * 1.5,
+    color: colors.violet300,
+    textDecorationLine: 'underline',
   },
   // no paddingRight here: this ScrollView already lives inside `content`
   // (paddingHorizontal:SIDE_MARGIN), so its own viewport right edge is

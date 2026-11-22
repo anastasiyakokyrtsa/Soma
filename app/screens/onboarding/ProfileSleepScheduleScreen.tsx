@@ -3,7 +3,7 @@ import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { ProfileStepLayout } from './ProfileStepLayout';
 import { SleepWheelPicker } from '../../components/SleepWheelPicker';
 import { spacing } from '../../theme';
-import { includesCycleStep, profileStepTotal } from '../../lib/onboardingProfile';
+import { includesCycleStep, profileStepTotal, setOnboardingSleep } from '../../lib/onboardingProfile';
 import { useT } from '../../i18n/useT';
 
 export function ProfileSleepScheduleScreen({ navigation }: any) {
@@ -25,7 +25,10 @@ export function ProfileSleepScheduleScreen({ navigation }: any) {
       totalSteps={profileStepTotal()}
       title={t('onboarding.sleepScheduleTitle')}
       description={t('onboarding.sleepScheduleDescription')}
-      onPressNext={() => navigation.navigate(includesCycleStep() ? 'ProfileMenstrualCycle' : 'ProfileMood')}
+      onPressNext={() => {
+        setOnboardingSleep({ bedtimeMin, waketimeMin });
+        navigation.navigate(includesCycleStep() ? 'ProfileMenstrualCycle' : 'ProfileMood');
+      }}
       onPressBack={() => navigation.goBack()}
       onPressSkip={() => navigation.replace('Main')}
     >

@@ -5,6 +5,21 @@ export const care = {
     headingA11y: 'Твое состояние сегодня изменчиво',
     subtitle: 'Дай себе мягкое восстановление',
     lowEnergy: 'Низкий ресурс',
+    mediumEnergy: 'Средний ресурс',
+    highEnergy: 'Высокий ресурс',
+
+    // Brief 001 / decisions.md 2026-11-21/22 #2 - без даты рождения
+    // ResourceRing становится "призрачным" (трек без цветной дуги).
+    noDataCaption: 'Пока недостаточно данных',
+    noDataChipBirthDate: 'Дата рождения',
+    // Вторая строка под подписью, когда дата рождения есть, но сон и/или
+    // цикл ещё не введены - нейтрально перечисляет, что реально учтено
+    // сегодня, без выделения "виноватого" источника.
+    energySourcesPrefix: 'По',
+    energySourceBiorhythm: 'биоритму',
+    energySourceSleep: 'сну',
+    energySourceCycle: 'циклу',
+    energySourcesAnd: 'и',
 
     whatHelpsTitle: 'Что поможет сейчас',
     tileBreathing: 'Дыхание',
@@ -39,6 +54,16 @@ export const care = {
     headingA11y: 'Your energy shifts today.',
     subtitle: 'Give yourself space to recover.',
     lowEnergy: 'Low energy',
+    mediumEnergy: 'Medium energy',
+    highEnergy: 'High energy',
+
+    noDataCaption: 'Not enough data yet',
+    noDataChipBirthDate: 'Date of birth',
+    energySourcesPrefix: 'Based on',
+    energySourceBiorhythm: 'biorhythm',
+    energySourceSleep: 'sleep',
+    energySourceCycle: 'cycle',
+    energySourcesAnd: 'and',
 
     whatHelpsTitle: 'What might help right now',
     tileBreathing: 'Breathing',

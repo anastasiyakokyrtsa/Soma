@@ -2,6 +2,13 @@ import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 
+// `ghost` (brief 001, decisions.md 2026-11-21/22 #2) - no date of birth
+// entered this session, so there's no energy number to show at all, not
+// even a low one. Track only (no colored arc, like the old always-full
+// decorative spin this ring used to have before 2026-10-01's real arc, but
+// with the arc genuinely absent rather than genuinely full) + "—" in place
+// of the number, same contour language as BiorhythmChart's own ghost mode.
+
 // Ports UI Kit's "Resource Meter" (.resource-ring/.rr-*, style.css ~L843) for
 // WF's Home screen "42% Низкий ресурс" card.
 //
@@ -27,7 +34,17 @@ const RING_STROKE = 2;
 // genuine 0 (floor only kicks in strictly above it).
 const MIN_VISIBLE_ARC_PCT = 1.5;
 
-export function ResourceRing({ value, caption, size = 244 }: { value: number; caption: string; size?: number }) {
+export function ResourceRing({
+  value,
+  caption,
+  size = 244,
+  ghost = false,
+}: {
+  value: number;
+  caption: string;
+  size?: number;
+  ghost?: boolean;
+}) {
   const r = size / 2 - RING_STROKE;
   const circumference = 2 * Math.PI * r;
   const pct = value <= 0 ? 0 : Math.max(value, MIN_VISIBLE_ARC_PCT);
@@ -46,7 +63,7 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
           кругу"). Full 4-layer recipe ported now too (previously only the
           2 outward layers were here, the 2 inset ones were missing
           entirely). */}
-      <View style={[styles.halo, { width: size, height: size, borderRadius: size / 2 }]} />
+      {!ghost && <View style={[styles.halo, { width: size, height: size, borderRadius: size / 2 }]} />}
       {/* Rotated -90deg so the arc starts at 12 o'clock and sweeps clockwise
           as `value` grows - the same convention BiorhythmChart's rings and
           MoodScale's thumb-coordinate system already use everywhere else in
@@ -65,25 +82,31 @@ export function ResourceRing({ value, caption, size = 244 }: { value: number; ca
             BiorhythmChart's own ring track - without it, a low value's short
             arc would read as floating on nothing. */}
         <Circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(139,124,246,0.14)" strokeWidth={RING_STROKE} fill="none" />
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke="url(#rrGrad)"
-          strokeWidth={RING_STROKE + 0.5}
-          strokeLinecap="round"
-          fill="none"
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={dashoffset}
-        />
+        {!ghost && (
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            stroke="url(#rrGrad)"
+            strokeWidth={RING_STROKE + 0.5}
+            strokeLinecap="round"
+            fill="none"
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={dashoffset}
+          />
+        )}
       </Svg>
 
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <View style={styles.valueRow}>
-          <Text style={styles.value}>{value}</Text>
-          <Text style={styles.pct}>%</Text>
-        </View>
-        <Text style={styles.caption}>{caption}</Text>
+        {ghost ? (
+          <Text style={[styles.value, styles.valueGhost]}>—</Text>
+        ) : (
+          <View style={styles.valueRow}>
+            <Text style={styles.value}>{value}</Text>
+            <Text style={styles.pct}>%</Text>
+          </View>
+        )}
+        <Text style={[styles.caption, ghost && styles.captionGhost]}>{caption}</Text>
       </View>
     </View>
   );
@@ -132,11 +155,17 @@ const styles = StyleSheet.create({
     lineHeight: 64 * 1.1,
     color: colors.textPrimary,
   },
+  valueGhost: {
+    color: colors.textDisabled,
+  },
   caption: {
     marginTop: 8,
     fontFamily: fontFamily.regular,
     fontSize: 16,
     lineHeight: 16 * 1.1,
     color: colors.textPrimary,
+  },
+  captionGhost: {
+    color: colors.textDisabled,
   },
 });

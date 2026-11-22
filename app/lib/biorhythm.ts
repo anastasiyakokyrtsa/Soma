@@ -17,11 +17,15 @@ export type BiorhythmValues = { physical: number; emotional: number; intellect: 
 // Scale: 0-100, 50 = the cycle's zero-crossing, not a negative/positive
 // split - matches BiorhythmChart's own established "no negatives" convention
 // (see that file's yToPct comment, 2026-08-19: "уберу минусы").
-export function getBiorhythmValues(birth: BirthDate, on: Date = new Date()): BiorhythmValues {
-  const birthUTC = Date.UTC(birth.year, birth.month, birth.day);
-  const onUTC = Date.UTC(on.getFullYear(), on.getMonth(), on.getDate());
-  const daysSinceBirth = Math.floor((onUTC - birthUTC) / 86400000);
-
+//
+// Fractional-day variant (2026-11-22, real-data reactivity brief 001) -
+// `daysSinceBirth` doesn't have to be an integer here, unlike
+// `getBiorhythmValues` below. Needed by BiorhythmChart.tsx to sample a
+// genuinely continuous curve (the underlying model IS a sum of sines, so a
+// real curve between two calendar days doesn't need bezier-fitting or any
+// other approximation - just evaluating this same formula at in-between
+// offsets).
+export function getBiorhythmValuesAtDayOffset(birth: BirthDate, daysSinceBirth: number): BiorhythmValues {
   const cyclePct = (periodDays: number) => {
     const phase = (2 * Math.PI * daysSinceBirth) / periodDays;
     return ((Math.sin(phase) + 1) / 2) * 100;
@@ -32,6 +36,26 @@ export function getBiorhythmValues(birth: BirthDate, on: Date = new Date()): Bio
     emotional: cyclePct(28),
     intellect: cyclePct(33),
   };
+}
+
+export function daysSinceBirthOn(birth: BirthDate, on: Date): number {
+  const birthUTC = Date.UTC(birth.year, birth.month, birth.day);
+  const onUTC = Date.UTC(on.getFullYear(), on.getMonth(), on.getDate());
+  return Math.floor((onUTC - birthUTC) / 86400000);
+}
+
+export function getBiorhythmValues(birth: BirthDate, on: Date = new Date()): BiorhythmValues {
+  return getBiorhythmValuesAtDayOffset(birth, daysSinceBirthOn(birth, on));
+}
+
+// Plain calendar-day arithmetic, local time (not UTC like the two functions
+// above - those need UTC specifically to avoid DST ever shifting which
+// day a timestamp falls on; this one is just "n days from this date" for
+// building a real axis of real calendar days around today).
+export function addDays(date: Date, n: number): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
 }
 
 const MONTHS_GENITIVE = [

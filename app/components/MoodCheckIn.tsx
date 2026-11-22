@@ -16,6 +16,7 @@ import { colors, fontFamily, gradients, radius } from '../theme';
 import { getMoods } from './MoodScale';
 import { useT } from '../i18n/useT';
 import { useLanguage } from '../i18n/LanguageContext';
+import { getTodayMood, setTodayMood } from '../lib/onboardingProfile';
 
 // A soft violet glow that hugs the mood icon's own silhouette (star points,
 // the flower's scalloped edge, etc.), not a bounding box - 2026-09-29, her
@@ -146,7 +147,15 @@ function GradientMoodWord({ text }: { text: string }) {
 }
 
 export function MoodCheckIn() {
-  const [selected, setSelected] = useState<number | null>(null);
+  // Brief 001 (real-data reactivity) - lifted into the shared onboarding
+  // profile store (lib/onboardingProfile.ts) alongside birth date/sleep/
+  // cycle, so it's no longer stranded in this component's own local state
+  // and any other screen can read "has today's mood been answered" if it
+  // ever needs to. Still initialized from the store (not always null) so a
+  // mood already set earlier this session - e.g. during the onboarding
+  // mini-flow's own ProfileMoodScreen - shows up here already collapsed into
+  // the chip instead of asking the same question twice in one session.
+  const [selected, setSelected] = useState<number | null>(getTodayMood());
   const t = useT();
   const { language } = useLanguage();
   const MOODS = getMoods(language);
@@ -207,7 +216,10 @@ export function MoodCheckIn() {
           {MOODS.map((m, i) => (
             <Pressable
               key={i}
-              onPress={() => setSelected(i)}
+              onPress={() => {
+                setTodayMood(i);
+                setSelected(i);
+              }}
               hitSlop={4}
               style={styles.option}
               accessibilityRole="button"

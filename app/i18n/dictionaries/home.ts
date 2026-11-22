@@ -7,6 +7,12 @@ export const home = {
     biorhythmsDetails: 'Подробнее',
     biorhythmsA11y: 'Что означают биоритмы',
 
+    // Brief 001 / decisions.md 2026-11-21/22 #2 - без даты рождения график
+    // рисуется приглушённым контуром, а не демо-кривыми; эта строка и ссылка
+    // заменяют обычный текст-инсайт под графиком.
+    noBirthDateText: 'Чтобы увидеть свой биоритм, укажи дату рождения',
+    noBirthDateLink: 'Указать дату рождения',
+
     demoDate: '14 марта, 18:07',
     moonCardTitle: 'Лунная активность',
     moonPhase: 'Убывающая луна',
@@ -48,6 +54,9 @@ export const home = {
     biorhythmsTitle: 'Biorhythms',
     biorhythmsDetails: 'Details',
     biorhythmsA11y: 'What biorhythms mean',
+
+    noBirthDateText: 'Add your date of birth to see your biorhythm',
+    noBirthDateLink: 'Add date of birth',
 
     demoDate: 'March 14, 6:07 PM',
     moonCardTitle: 'Lunar activity',

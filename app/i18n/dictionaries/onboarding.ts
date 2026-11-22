@@ -54,6 +54,10 @@ export const onboarding = {
 
     cycleTitle: 'Укажи даты последнего менструального цикла',
     cycleDescription: 'Так мы сможем примерно\nпонять, на каком ты этапе\nцикла, и лучше отслеживать,\nкак меняются настроение и энергия',
+    // Brief 001 / decisions.md 2026-11-21/22 #3 - равнозначный календарю
+    // вариант ответа для беременности, менопаузы, гормональных препаратов,
+    // нерегулярного цикла - без списка причин, одна нейтральная формулировка.
+    noCycleOption: 'У меня сейчас нет регулярного цикла',
 
     moodTitle: 'Как ты чувствуешь себя сегодня?',
 
@@ -115,6 +119,7 @@ export const onboarding = {
 
     cycleTitle: 'Enter the dates of your last menstrual cycle',
     cycleDescription: "This helps us roughly understand\nwhat stage of your cycle\nyou're on, and better track\nhow your mood and energy change",
+    noCycleOption: "I don't have a regular cycle right now",
 
     moodTitle: 'How are you feeling today?',
 

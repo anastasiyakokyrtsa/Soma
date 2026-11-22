@@ -2,34 +2,52 @@ import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import Svg, { Line, Path, Circle, Defs, Filter, FeGaussianBlur } from 'react-native-svg';
 import { colors, fontFamily } from '../theme';
 import { useLanguage, type Language } from '../i18n/LanguageContext';
+import { addDays, daysSinceBirthOn, getBiorhythmValues, getBiorhythmValuesAtDayOffset, type BirthDate, type BiorhythmValues } from '../lib/biorhythm';
 
 // Ports UI Kit's "Biorhythm Chart" (.biorhythm/.biorhythm-axis/.biorhythm-chart/
-// .biorhythm-rings, style.css ~L811-833) - curve paths are the kit's own
-// already-tuned demo data, not re-derived from the Figma screenshot, per her
-// explicit "bere iz kita" instruction (2026-08-17). Ring size/glow/cap style
-// and the value scale below are her own explicit 2026-08-19 deviations from
-// the kit's literal numbers - not kit fidelity issues, real creative calls.
+// .biorhythm-rings, style.css ~L811-833) - ring size/glow/cap style and the
+// 0-100 value scale are her own explicit 2026-08-19 deviations from the
+// kit's literal numbers.
+//
+// 2026-11-22 (brief 001, real-data reactivity): this used to plot the kit's
+// own hand-authored 9-day demo curve (bezier paths for calendar days
+// "10-18", a coincidence of whatever month the kit was built in) against a
+// fixed table of invented values. That's gone - the axis is now a real
+// 9-day window of *today's* actual calendar days (today-4..today+4, offsets
+// -4..4), and the 3 curves are sampled directly from lib/biorhythm.ts's own
+// formula instead of approximated by hand-tuned bezier anchors. This was a
+// smaller rewrite than it sounds: the model IS a sum of sines, so a smooth
+// curve between two calendar days doesn't need curve-fitting, just
+// evaluating the same formula at fine-grained fractional offsets
+// (getBiorhythmValuesAtDayOffset) and connecting the samples with short
+// line segments - at this resolution (72 samples across 360px) that's
+// visually indistinguishable from a true bezier curve. Decided to keep the
+// chart interactive (tap any of the 9 days) rather than collapse it to one
+// static day, since nothing about making the data real required giving up
+// that interaction - the per-day values it already read off were never the
+// hard part, the fixed calendar-day labels were.
+//
+// `birthDate: null` (no date of birth entered this session) renders a
+// distinct muted/contour state instead - see `GHOST` below - rather than
+// reusing the old demo curve as a fallback, which is exactly what
+// decisions.md 2026-11-21/22 #2 ruled out ("не демо-кривыми").
 //
 // `width` is a real responsive prop (same pattern as SleepWheelPicker's
-// `size`/the astrolabe's sizing), default 380 only as a cap. Curve/gridline
-// coordinates are untouched (still authored in their original 360x200
-// space) - scaling is done for free by setting each inner <Svg>'s rendered
-// width/height to `space * scale` while keeping its `viewBox` at the
-// original space, not by rewriting any point math. Axis labels are plain RN
-// Text (not SVG), so those genuinely need their position/size scaled by hand.
-//
-// Axis days are tappable (selectedDay/onSelectDay). The 3 curves' raw y
-// values at each marked day were read directly off each curve's own path
-// data (every marked day 10-18 lands exactly on a real bezier anchor point
-// at x=(day-10)*45 - no sampling/curve-fitting needed).
-const DAYS = [10, 11, 12, 13, 14, 15, 16, 17, 18] as const;
-const FIRST_DAY = DAYS[0];
-const LAST_DAY = DAYS[DAYS.length - 1];
-const DAY_TO_X = (day: number) => (day - 10) * 45;
+// `size`), default 380 only as a cap.
+const OFFSETS = [-4, -3, -2, -1, 0, 1, 2, 3, 4] as const;
+const FIRST_OFFSET = OFFSETS[0];
+const LAST_OFFSET = OFFSETS[OFFSETS.length - 1];
+const OFFSET_TO_X = (offset: number) => (offset - FIRST_OFFSET) * 45;
 
+// Read off the original hand-authored demo curves' own anchor points
+// (unchanged since 2026-08-19) - no longer the chart's live rendering
+// source (see the big comment above), but kept as a small library of 9
+// "shapes" a real day's values can be matched against for HomeScreen's
+// insight text (content/biorhythmInsight.ts's pickDayParagraphTemplate) -
+// those 9 hand-written paragraphs were each written to describe one of
+// these specific patterns, so they're still worth keeping as a lookup
+// table, just not as the thing physically drawn on screen any more.
 type CurveYs = { physical: number; emotional: number; intellect: number };
-// Raw SVG y (0-200, top-to-bottom) at each marked day, read off the curve
-// paths below - green=physical, pink=emotional, violet=intellect.
 const DAY_Y: Record<number, CurveYs> = {
   10: { physical: 150.2, emotional: 77.9, intellect: 162.8 },
   11: { physical: 106.0, emotional: 114.6, intellect: 183.7 },
@@ -43,11 +61,12 @@ const DAY_Y: Record<number, CurveYs> = {
 };
 
 // Her scale, simplified same-day (2026-08-19): no negative numbers at all -
-// bottom (y=200) = 0, middle (y=100) = 50, top (y=0) = 100. A plain single
-// linear map, not the asymmetric two-segment one this used for about an
-// hour ("уберу минусы... получается от 0 до 100 просто").
+// bottom (y=200) = 0, middle (y=100) = 50, top (y=0) = 100.
 function yToPct(y: number): number {
   return 100 - y / 2;
+}
+function pctToY(pct: number): number {
+  return 200 - pct * 2;
 }
 
 export function getDayValues(day: number): CurveYs {
@@ -60,37 +79,39 @@ function formatPct(v: number, language: Language) {
   return `${language === 'ru' ? fixed.replace('.', ',') : fixed}%`;
 }
 
-const CURVES = [
-  {
-    id: 'green',
-    color: '#5BC4A0',
-    d: 'M0.0,150.2 C3.8,146.6 15.0,136.2 22.5,128.8 C30.0,121.4 37.5,113.7 45.0,106.0 C52.5,98.3 60.0,90.4 67.5,82.8 C75.0,75.2 82.5,67.6 90.0,60.5 C97.5,53.4 105.0,46.5 112.5,40.3 C120.0,34.1 127.5,28.3 135.0,23.4 C142.5,18.5 150.0,14.1 157.5,10.7 C165.0,7.2 172.5,4.5 180.0,2.7 C187.5,0.9 195.0,0.0 202.5,0.0 C210.0,0.0 217.5,0.9 225.0,2.7 C232.5,4.5 240.0,7.2 247.5,10.7 C255.0,14.1 262.5,18.5 270.0,23.4 C277.5,28.3 285.0,34.1 292.5,40.3 C300.0,46.5 307.5,53.4 315.0,60.5 C322.5,67.6 330.0,75.2 337.5,82.8 C345.0,90.4 356.2,102.1 360.0,106.0',
-  },
-  {
-    id: 'pink',
-    color: '#FFC6F1',
-    d: 'M0.0,77.9 C3.8,81.0 15.0,90.1 22.5,96.2 C30.0,102.3 37.5,108.5 45.0,114.6 C52.5,120.7 60.0,126.8 67.5,132.6 C75.0,138.4 82.5,144.1 90.0,149.4 C97.5,154.7 105.0,159.9 112.5,164.6 C120.0,169.3 127.5,173.6 135.0,177.5 C142.5,181.4 150.0,184.9 157.5,187.8 C165.0,190.7 172.5,193.2 180.0,195.1 C187.5,197.0 195.0,198.4 202.5,199.2 C210.0,200.0 217.5,200.2 225.0,199.8 C232.5,199.5 240.0,198.6 247.5,197.1 C255.0,195.6 262.5,193.6 270.0,191.1 C277.5,188.6 285.0,185.5 292.5,182.0 C300.0,178.5 307.5,174.4 315.0,170.0 C322.5,165.6 330.0,160.8 337.5,155.7 C345.0,150.6 356.2,142.2 360.0,139.5',
-  },
-  {
-    id: 'violet',
-    color: '#8B7CF6',
-    d: 'M0.0,162.8 C3.8,164.7 15.0,170.7 22.5,174.2 C30.0,177.7 37.5,180.9 45.0,183.7 C52.5,186.5 60.0,189.1 67.5,191.2 C75.0,193.3 82.5,195.1 90.0,196.5 C97.5,197.9 105.0,198.8 112.5,199.4 C120.0,200.0 127.5,200.2 135.0,199.9 C142.5,199.7 150.0,199.0 157.5,197.9 C165.0,196.8 172.5,195.4 180.0,193.6 C187.5,191.8 195.0,189.6 202.5,187.0 C210.0,184.4 217.5,181.4 225.0,178.2 C232.5,175.0 240.0,171.4 247.5,167.6 C255.0,163.8 262.5,159.6 270.0,155.3 C277.5,151.0 285.0,146.3 292.5,141.6 C300.0,136.9 307.5,131.9 315.0,126.9 C322.5,121.9 330.0,116.8 337.5,111.6 C345.0,106.4 356.2,98.6 360.0,96.0',
-  },
+const CYCLE_META: { id: keyof BiorhythmValues; color: string }[] = [
+  { id: 'physical', color: '#5BC4A0' },
+  { id: 'emotional', color: '#FFC6F1' },
+  { id: 'intellect', color: '#8B7CF6' },
 ];
 
+// Fine enough that 3 gentle sine curves over an 8-day span (far less than
+// one full period of even the shortest 23-day cycle) read as smooth curves,
+// not a polyline - see the file-level comment on why sampling replaces
+// bezier-fitting here.
+const CURVE_SAMPLES = 72;
+
+function buildCurvePath(birth: BirthDate, anchorDays: number, cycleId: keyof BiorhythmValues): string {
+  const points: string[] = [];
+  for (let i = 0; i <= CURVE_SAMPLES; i++) {
+    const frac = i / CURVE_SAMPLES;
+    const offset = FIRST_OFFSET + (LAST_OFFSET - FIRST_OFFSET) * frac;
+    const values = getBiorhythmValuesAtDayOffset(birth, anchorDays + offset);
+    const x = frac * 360;
+    const y = pctToY(values[cycleId]);
+    points.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return points.join(' ');
+}
+
 // dashoffset = circumference * (100 - pct) / 100 - ring reads empty at
-// pct=0, full at pct=100, now that pct itself is a plain 0-100 value (no
-// more folding a signed -100..100 range through Math.abs).
+// pct=0, full at pct=100.
 const RING_R = 34;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_R;
 const RING_DASHARRAY: [number, number] = [RING_CIRCUMFERENCE, RING_CIRCUMFERENCE];
 // A round strokeLinecap bulges ~strokeWidth (8) into the gap from each of
-// its two ends - at a high pct like 98.7% the true gap (~2.9 units) is
-// smaller than that bulge, so the ring rendered as fully closed even though
-// the number underneath said 98.7%, not 100 (caught 2026-08-20 on real
-// day-14/15 data). Clamping the gap to a floor comfortably bigger than the
-// cap's own encroachment keeps a real sliver visible at any pct < 100,
-// without giving up the rounded caps she asked for.
+// its two ends - floors the visible gap so a near-100% ring never reads as
+// fully closed (caught 2026-08-20).
 const MIN_VISIBLE_GAP = 16;
 const dashoffsetForPct = (pct: number) => {
   if (pct >= 100) return 0;
@@ -98,10 +119,6 @@ const dashoffsetForPct = (pct: number) => {
 };
 
 const RING_LABELS: Record<Language, { physical: string; emotional: string; intellect: string }> = {
-  // Matches the day paragraphs' own "Physical/Emotional/Intellectual
-  // biorhythm" wording (i18n/dictionaries/home.ts) rather than a literal
-  // "Physiology/Emotions/Intellect" - cross-screen consistency, confirmed
-  // with the english-editor agent 2026-11-21.
   ru: { physical: 'Физика', emotional: 'Эмоции', intellect: 'Интеллект' },
   en: { physical: 'Physical', emotional: 'Emotional', intellect: 'Intellectual' },
 };
@@ -114,113 +131,125 @@ function getRingMeta(language: Language) {
     { id: 'intellect' as const, colors: ['#B6ABFF', colors.violet400, '#7060E8'], glow: colors.violet400, label: labels.intellect },
   ];
 }
-// 100, not the kit's literal 84 - her explicit ask to size these up past
-// the kit's own reference (2026-08-19, "прогресс бары... сделать побольше").
 const RING_BOX = 100;
-// The ring's own <Svg> canvas is 84x84 (viewBox), but the ring's outer stroke
-// edge (RING_R 34 + half the 8px strokeWidth = 38) sits only 4 units from
-// that canvas's own edge - not enough room for the glow filter's blur to
-// fully fade before hitting the SVG's own canvas boundary, so at the ring's
-// top (where a low-value ring's whole visible arc is just a short bright dot)
-// the glow's soft falloff gets hard-clipped into a flat edge on iOS (her
-// 2026-09-29 screenshot). Exact same root cause/fix as the curves' own
-// viewBox padding above - RN-SVG clips to the declared canvas regardless of
-// `overflow: visible` on the wrapping style, so the real fix is giving the
-// canvas itself more room, not the View around it. Padding both dimensions
-// symmetrically keeps the ring centered without touching its cx/cy.
 const RING_GLOW_PAD = 10;
 const RING_VIEWBOX = 84;
 const RING_CANVAS = RING_VIEWBOX + RING_GLOW_PAD * 2;
-// Android's own glow read weaker than the reference even after the last
-// bump - iOS didn't get this complaint, only Android, so this stays a
-// platform split rather than a shared bump (2026-09-29: "только для версии
-// на андроид: прибавь чуть чуть свечение").
 const RING_GLOW_STD = Platform.OS === 'android' ? 6 : 4;
 
 export function BiorhythmChart({
   width = 380,
-  selectedDay,
-  onSelectDay,
+  birthDate,
+  selectedOffset,
+  onSelectOffset,
+  today = new Date(),
 }: {
   width?: number;
-  selectedDay: number;
-  onSelectDay: (day: number) => void;
+  // null = no date of birth entered this session (decisions.md 2026-11-21/22
+  // #2) - renders the muted/contour "nothing plotted yet" state below
+  // instead of any curve.
+  birthDate: BirthDate | null;
+  selectedOffset: number;
+  onSelectOffset: (offset: number) => void;
+  today?: Date;
 }) {
   const { language } = useLanguage();
   const RING_META = getRingMeta(language);
   const scale = Math.min(width, 380) / 380;
   const chartW = 360 * scale;
   const chartH = 200 * scale;
-  const chartInset = 10 * scale; // kit's own 10px inset (380-360)/2, applied explicitly instead of via alignSelf so it can't drift out of sync with the axis labels' own math
+  const chartInset = 10 * scale;
   const ringBoxSize = RING_BOX * scale;
-  const values = getDayValues(selectedDay);
-  const selectedX = DAY_TO_X(selectedDay);
+  const selectedX = OFFSET_TO_X(selectedOffset);
+  const ghost = birthDate === null;
+  const values = birthDate ? getBiorhythmValues(birthDate, addDays(today, selectedOffset)) : null;
+  const anchorDays = birthDate ? daysSinceBirthOn(birthDate, today) : 0;
 
   return (
     <View style={[styles.wrap, { width: width }]}>
       <View style={[styles.axis, { width }]}>
-        {DAYS.map((day) => {
-          const isSelected = day === selectedDay;
-          const fontSize = (isSelected ? 20 : 16) * scale;
+        {OFFSETS.map((offset) => {
+          const isSelected = offset === selectedOffset;
+          const fontSize = (isSelected && !ghost ? 20 : 16) * scale;
           const lineHeight = fontSize * 1.1;
-          const boxWidth = (isSelected ? 36 : 28) * scale;
-          // The two ends are edge-anchored to the axis row's own edges (=16px
-          // from the screen wall, via HomeScreen's own side margin) instead
-          // of centered on their gridline - centering AND a fixed 16px wall
-          // clearance can't both hold at once once the label grows on
-          // selection, and the 16px clearance was her explicit, more recent
-          // ask (2026-08-19) for these two specifically. Days 11-17 stay
-          // centered on their real gridline.
+          const boxWidth = (isSelected && !ghost ? 36 : 28) * scale;
+          const dayLabel = String(addDays(today, offset).getDate());
           const posStyle =
-            day === FIRST_DAY
+            offset === FIRST_OFFSET
               ? { left: 0 }
-              : day === LAST_DAY
+              : offset === LAST_OFFSET
                 ? { right: 0 }
-                : { left: (10 + DAY_TO_X(day)) * scale, marginLeft: -boxWidth / 2 };
-          return (
+                : { left: (10 + OFFSET_TO_X(offset)) * scale, marginLeft: -boxWidth / 2 };
+          const label = (
+            <Text
+              style={[
+                styles.axisLabel,
+                isSelected && !ghost && styles.axisLabelSelected,
+                ghost && styles.axisLabelGhost,
+                { fontSize, lineHeight },
+              ]}
+            >
+              {dayLabel}
+            </Text>
+          );
+          // Ghost mode: no real per-day reading exists yet to switch to, so
+          // the axis isn't tappable - a Pressable that visibly does nothing
+          // on press would read as broken, not as "not available yet."
+          return ghost ? (
+            <View key={offset} style={[{ position: 'absolute', top: '50%', marginTop: -lineHeight / 2, width: boxWidth }, posStyle]}>
+              {label}
+            </View>
+          ) : (
             <Pressable
-              key={day}
-              onPress={() => onSelectDay(day)}
+              key={offset}
+              onPress={() => onSelectOffset(offset)}
               hitSlop={8}
               style={[{ position: 'absolute', top: '50%', marginTop: -lineHeight / 2, width: boxWidth }, posStyle]}
             >
-              <Text style={[styles.axisLabel, isSelected && styles.axisLabelSelected, { fontSize, lineHeight }]}>{day}</Text>
+              {label}
             </Pressable>
           );
         })}
       </View>
 
-      {/* viewBox padded 4 units above/below the real 0-200 content range -
-          the green curve's peak touches y=0 exactly, and a 2px stroke +
-          glow blur bleeding past that edge got clipped by the SVG's own
-          canvas (overflow:visible on the <Svg> style doesn't prevent this on
-          every platform the way it does on web) - real fix is giving the
-          content actual room inside the viewBox, not just declaring
-          overflow visible (2026-08-17: "горки... немного срезаются"). */}
       <Svg width={chartW} height={chartH} viewBox="0 -4 360 208" style={[styles.chart, { marginLeft: chartInset }]}>
         <Defs>
-          {CURVES.map((c) => (
+          {CYCLE_META.map((c) => (
             <Filter key={c.id} id={`curveGlow-${c.id}`} x="-50%" y="-50%" width="200%" height="200%">
-              {/* stdDeviation bumped 3 -> 6 (2026-08-19: "прибавим свечения у линий") */}
               <FeGaussianBlur stdDeviation={6} />
             </Filter>
           ))}
         </Defs>
         <Gridlines selectedX={selectedX} />
-        {/* real glow (Gaussian blur on a duplicate underneath, same technique
-            as SleepWheelPicker's arc) - CSS drop-shadow isn't a valid RN
-            style prop, unlike the web reference's filter:drop-shadow(). */}
-        {CURVES.map((c) => (
-          <Path key={`${c.id}-glow`} d={c.d} fill="none" stroke={c.color} strokeWidth={2} filter={`url(#curveGlow-${c.id})`} />
-        ))}
-        {CURVES.map((c) => (
-          <Path key={c.id} d={c.d} fill="none" stroke={c.color} strokeWidth={2} />
-        ))}
+        {ghost ? (
+          // Muted contour, not the old demo curve and not empty (decisions.md
+          // 2026-11-21/22 #2) - a single flat, dim, dashed line signals "a
+          // chart will go here" without drawing anything that could be read
+          // as a real measurement. No glow - glow in this app's visual
+          // language means "here's a real signal."
+          <Line x1={0} y1={100} x2={360} y2={100} stroke={colors.textDisabled} strokeOpacity={0.5} strokeWidth={1.5} strokeDasharray="6 8" />
+        ) : (
+          <>
+            {CYCLE_META.map((c) => (
+              <Path
+                key={`${c.id}-glow`}
+                d={buildCurvePath(birthDate!, anchorDays, c.id)}
+                fill="none"
+                stroke={c.color}
+                strokeWidth={2}
+                filter={`url(#curveGlow-${c.id})`}
+              />
+            ))}
+            {CYCLE_META.map((c) => (
+              <Path key={c.id} d={buildCurvePath(birthDate!, anchorDays, c.id)} fill="none" stroke={c.color} strokeWidth={2} />
+            ))}
+          </>
+        )}
       </Svg>
 
       <View style={[styles.rings, { width: chartW, marginLeft: chartInset, marginTop: 40 * scale }]}>
         {RING_META.map((r) => {
-          const pct = values[r.id];
+          const pct = values ? values[r.id] : 0;
           const dashoffset = dashoffsetForPct(pct);
           return (
             <View key={r.id} style={styles.ringItem}>
@@ -233,50 +262,50 @@ export function BiorhythmChart({
                 >
                   <Defs>
                     <Filter id={`ringGlow-${r.id}`} x="-50%" y="-50%" width="200%" height="200%">
-                      {/* stdDeviation bumped 2.5 -> 4 (2026-08-19: same glow ask, applied to the rings too) */}
                       <FeGaussianBlur stdDeviation={RING_GLOW_STD} />
                     </Filter>
                   </Defs>
-                  {/* faint full-circle track behind the arc, so the ring
-                      doesn't read as floating with nothing under it
-                      (2026-08-19: "чтобы если они не совсем в воздухе
-                      висели"). Started as violet400@27%, same as
-                      SleepWheelPicker's own track - then made about half as
-                      opaque again on request ("прозрачность повысим... на
-                      половину"), landing at 14%, roughly half of 27%. */}
                   <Circle cx={42} cy={42} r={RING_R} fill="none" stroke="rgba(139,124,246,0.14)" strokeWidth={8} />
-                  {/* strokeLinecap="round" on both - was "butt" (a deliberate
-                      earlier kit decision to keep a near-full ring's tiny gap
-                      legible), explicitly overridden here per her ask for
-                      soft rounded arc ends (2026-08-19: "конечики... красивые
-                      закругленные а не такие острые"). */}
-                  <Circle
-                    cx={42}
-                    cy={42}
-                    r={RING_R}
-                    fill="none"
-                    stroke={r.glow}
-                    strokeWidth={8}
-                    strokeLinecap="round"
-                    strokeDasharray={RING_DASHARRAY}
-                    strokeDashoffset={dashoffset}
-                    filter={`url(#ringGlow-${r.id})`}
-                  />
-                  <Circle
-                    cx={42}
-                    cy={42}
-                    r={RING_R}
-                    fill="none"
-                    stroke={r.colors[1]}
-                    strokeWidth={8}
-                    strokeLinecap="round"
-                    strokeDasharray={RING_DASHARRAY}
-                    strokeDashoffset={dashoffset}
-                  />
+                  {/* Ghost mode: track only, no colored arc at all (same
+                      "призрачное кольцо" language as CareScreen's
+                      ResourceRing in its own empty state) - not a 0%-filled
+                      real arc, which would still read as a measurement of
+                      something. */}
+                  {!ghost && (
+                    <>
+                      <Circle
+                        cx={42}
+                        cy={42}
+                        r={RING_R}
+                        fill="none"
+                        stroke={r.glow}
+                        strokeWidth={8}
+                        strokeLinecap="round"
+                        strokeDasharray={RING_DASHARRAY}
+                        strokeDashoffset={dashoffset}
+                        filter={`url(#ringGlow-${r.id})`}
+                      />
+                      <Circle
+                        cx={42}
+                        cy={42}
+                        r={RING_R}
+                        fill="none"
+                        stroke={r.colors[1]}
+                        strokeWidth={8}
+                        strokeLinecap="round"
+                        strokeDasharray={RING_DASHARRAY}
+                        strokeDashoffset={dashoffset}
+                      />
+                    </>
+                  )}
                 </Svg>
-                <Text style={[styles.ringPct, { fontSize: 16 * scale }]}>{formatPct(pct, language)}</Text>
+                <Text style={[styles.ringPct, { fontSize: 16 * scale }, ghost && styles.ringPctGhost]}>
+                  {ghost || !values ? '—' : formatPct(pct, language)}
+                </Text>
               </View>
-              <Text style={[styles.ringLabel, { fontSize: 16 * scale, marginTop: 8 * scale }]}>{r.label}</Text>
+              <Text style={[styles.ringLabel, { fontSize: 16 * scale, marginTop: 8 * scale }, ghost && styles.ringLabelGhost]}>
+                {r.label}
+              </Text>
             </View>
           );
         })}
@@ -313,6 +342,9 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.bold,
     color: colors.violet400,
   },
+  axisLabelGhost: {
+    color: colors.textDisabled,
+  },
   chart: {
     overflow: 'visible',
   },
@@ -336,8 +368,14 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.medium,
     color: colors.textPrimary,
   },
+  ringPctGhost: {
+    color: colors.textDisabled,
+  },
   ringLabel: {
     fontFamily: fontFamily.regular,
     color: colors.textPrimary,
+  },
+  ringLabelGhost: {
+    color: colors.textDisabled,
   },
 });
