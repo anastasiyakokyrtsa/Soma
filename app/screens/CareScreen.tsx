@@ -20,6 +20,7 @@ import {
   subscribeOnboardingProfile,
 } from '../lib/onboardingProfile';
 import { computeEnergy, type EnergySource } from '../lib/energy';
+import { FEATURE_CARE_PRACTICES } from '../lib/featureFlags';
 
 // WF "Care" (Figma node 488:438, "How to do better") - 1:1 from get_design_context
 // + the kit's already-finished components (Resource Meter, Mini Ritual Tile,
@@ -209,12 +210,32 @@ export function CareScreen({ navigation }: any) {
               shows a cloud+wind glyph for "Дыхание" here, not the
               concentric-circles icon Mini Ritual Tile uses for the same
               word - different context, different kit icon (2026-08-20:
-              "иконки такие же к словам, бери из кита"). */}
-          <NavChip icon="windyWeather" label={t('care.chipBreathing')} />
-          <NavChip icon="largeTree" label={t('care.chipNature')} />
-          <NavChip icon="meditationFigure" label={t('care.chipMeditations')} />
-          <NavChip icon="pegasus" label={t('care.chipStories')} />
-          <NavChip icon="cello" label={t('care.chipMusic')} />
+              "иконки такие же к словам, бери из кита"). Brief 003 - this
+              chip was the dead tap findings.md #1 called out even though
+              the practice itself already existed (the Mini Ritual Tile
+              above already leads to it) - same destination, now from both
+              places. */}
+          <NavChip icon="windyWeather" label={t('care.chipBreathing')} onPress={() => navigation.navigate('BreathingInfo')} />
+          {/* No real audio file in the project yet (decisions.md
+              2026-11-21/22 #6 - player interface is next cycle's work,
+              once real audio exists) - honest "Скоро" state, not a silent
+              dead tap and not a fake player with nothing to play. */}
+          <NavChip icon="largeTree" label={t('care.chipNature')} available={false} soonLabel={t('tea.soonBadge')} />
+          <NavChip
+            icon="meditationFigure"
+            label={t('care.chipMeditations')}
+            onPress={FEATURE_CARE_PRACTICES ? () => navigation.navigate('MeditationList') : undefined}
+            available={FEATURE_CARE_PRACTICES}
+            soonLabel={t('tea.soonBadge')}
+          />
+          <NavChip
+            icon="pegasus"
+            label={t('care.chipStories')}
+            onPress={FEATURE_CARE_PRACTICES ? () => navigation.navigate('StoriesList') : undefined}
+            available={FEATURE_CARE_PRACTICES}
+            soonLabel={t('tea.soonBadge')}
+          />
+          <NavChip icon="cello" label={t('care.chipMusic')} available={false} soonLabel={t('tea.soonBadge')} />
         </View>
 
         <View style={[styles.section, { marginTop: GAP.chipsToTea }]}>
@@ -250,8 +271,26 @@ export function CareScreen({ navigation }: any) {
               subtitle={t('care.article1Subtitle')}
               onPress={() => navigation.navigate('ArticleWater')}
             />
-            <ArticleLinkRow icon="moonSymbol" title={t('care.article2Title')} subtitle={t('care.article2Subtitle')} />
-            <ArticleLinkRow icon="battery" title={t('care.article3Title')} subtitle={t('care.article3Subtitle')} />
+            {/* Both rows below were rendered with a no-op Pressable and a
+                placeholder icon (moonSymbol/battery - unrelated to either
+                article's real topic) since neither screen existed yet.
+                Brief 003 builds the screens; icons swapped to match each
+                article's actual topic (sun = light, clock = pauses/rest -
+                same icons used as ArticleReaderScreen's own fallback cover
+                glyph for each, see content/articleLight.ts/
+                articlePauses.ts) instead of keeping the old placeholders. */}
+            <ArticleLinkRow
+              icon="sun"
+              title={t('care.article2Title')}
+              subtitle={t('care.article2Subtitle')}
+              onPress={() => navigation.navigate('ArticleLight')}
+            />
+            <ArticleLinkRow
+              icon="clock"
+              title={t('care.article3Title')}
+              subtitle={t('care.article3Subtitle')}
+              onPress={() => navigation.navigate('ArticlePauses')}
+            />
             <Pressable>
               <Text style={styles.allArticles}>{t('care.allArticles')}</Text>
             </Pressable>

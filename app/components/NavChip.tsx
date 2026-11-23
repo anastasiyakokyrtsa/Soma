@@ -9,7 +9,29 @@ import { GradientIcon, type GradientIconName } from './icons/GradientIcon';
 // Успокаивающая музыка). Border only appears on press in the kit (no
 // standing ring at rest) - RN-safe transparent->borderVioletFlat swap,
 // same pattern as OptionRow/SelectChip/MiniRitualTile.
-export function NavChip({ icon, label, onPress }: { icon: GradientIconName; label: string; onPress?: () => void }) {
+export function NavChip({
+  icon,
+  label,
+  onPress,
+  available = true,
+  soonLabel,
+}: {
+  icon: GradientIconName;
+  label: string;
+  onPress?: () => void;
+  // Brief 003 - "Звуки природы"/"Музыка" have no real audio file in the
+  // project yet (decisions.md 2026-11-21/22 #6: player interface is next
+  // cycle's work, once real audio exists), so they need the same "visible
+  // unavailable state, not a silent dead tap" treatment
+  // TeaCategoriesScreen/AnalyticsScreen already use elsewhere, not a third
+  // ad-hoc style for the same problem. `true` (every other chip) renders
+  // exactly as before this prop existed.
+  available?: boolean;
+  // Caller passes its own already-translated string (same "chip knows
+  // nothing about i18n" contract this component already had for `label`),
+  // not a hardcoded default here.
+  soonLabel?: string;
+}) {
   // Real --card-fill port (was colors.cardFillFallback, the same flat
   // stand-in MoonSunCard/MiniRitualTile had before their own fixes -
   // 2026-08-20). This chip's width is intrinsic (hugs its own label, no
@@ -27,7 +49,12 @@ export function NavChip({ icon, label, onPress }: { icon: GradientIconName; labe
   };
 
   return (
-    <Pressable style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]} onPress={onPress} onLayout={onLayout}>
+    <Pressable
+      disabled={!available}
+      style={({ pressed }) => [styles.chip, !available && styles.chipUnavailable, pressed && available && styles.chipPressed]}
+      onPress={available ? onPress : undefined}
+      onLayout={onLayout}
+    >
       {size ? (
         <Svg width={size.width} height={size.height} style={StyleSheet.absoluteFill}>
           <Defs>
@@ -44,7 +71,10 @@ export function NavChip({ icon, label, onPress }: { icon: GradientIconName; labe
           wash on top of the radial one) - same 2-layer recipe as MoonSunCard. */}
       <View style={styles.whiteWash} pointerEvents="none" />
       <GradientIcon name={icon} size={20} />
-      <Text style={styles.label}>{label}</Text>
+      <View>
+        <Text style={styles.label}>{label}</Text>
+        {!available && soonLabel ? <Text style={styles.soonLabel}>{soonLabel}</Text> : null}
+      </View>
     </Pressable>
   );
 }
@@ -67,6 +97,17 @@ const styles = StyleSheet.create({
   chipPressed: {
     borderColor: colors.borderVioletFlat,
     transform: [{ scale: 0.98 }],
+  },
+  // Same opacity-only dimming TeaCategoriesScreen/AnalyticsScreen already
+  // use for an unavailable card, not a new treatment invented for chips.
+  chipUnavailable: {
+    opacity: 0.55,
+  },
+  soonLabel: {
+    marginTop: 1,
+    fontFamily: fontFamily.regular,
+    fontSize: 10,
+    color: colors.textSecondary,
   },
   whiteWash: {
     ...StyleSheet.absoluteFill,

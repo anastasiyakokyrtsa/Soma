@@ -26,8 +26,17 @@ import { BreathingSessionScreen } from '../screens/BreathingSessionScreen';
 import { BreathingCompleteScreen } from '../screens/BreathingCompleteScreen';
 import { TeaCategoriesScreen } from '../screens/TeaCategoriesScreen';
 import { TeaCeremonyScreen } from '../screens/TeaCeremonyScreen';
+import { TeaIntuitiveChoiceScreen } from '../screens/TeaIntuitiveChoiceScreen';
 import { BiorhythmsScreen } from '../screens/BiorhythmsScreen';
 import { ArticleWaterScreen } from '../screens/ArticleWaterScreen';
+import { ArticleLightScreen } from '../screens/ArticleLightScreen';
+import { ArticlePausesScreen } from '../screens/ArticlePausesScreen';
+import { MeditationListScreen } from '../screens/MeditationListScreen';
+import { MeditationInfoScreen } from '../screens/MeditationInfoScreen';
+import { MeditationSessionScreen } from '../screens/MeditationSessionScreen';
+import { MeditationCompleteScreen } from '../screens/MeditationCompleteScreen';
+import { StoriesListScreen } from '../screens/StoriesListScreen';
+import { StoryReaderScreen } from '../screens/StoryReaderScreen';
 
 // Single stack for the whole app: splash -> onboarding -> "Main" (the tab
 // navigator). Splash auto-advances (see SplashScreen.tsx); AboutApp3 calls
@@ -90,17 +99,36 @@ export function RootNavigator() {
         <Stack.Screen name="BreathingInfo" component={BreathingInfoScreen} />
         <Stack.Screen name="BreathingSession" component={BreathingSessionScreen} />
         <Stack.Screen name="BreathingComplete" component={BreathingCompleteScreen} />
-        {/* Pushed from Care's "Начать чайную церемонию" button - WF29. Only
-            its first category ("Успокоение на вечер") leads anywhere real. */}
+        {/* Pushed from Care's "Начать чайную церемонию" button - WF29. All 5
+            cards are real destinations behind FEATURE_TEA_FULL_CATEGORIES
+            (TeaCategoriesScreen.tsx); flag off keeps only the first category
+            ("Успокоение на вечер") available. */}
         <Stack.Screen name="TeaCategories" component={TeaCategoriesScreen} />
-        {/* Pushed from TeaCategories' one available card - WF30-35. */}
+        {/* Pushed from TeaCategories with a `categoryId` param - WF30-35,
+            now parametrized across all 4 real categories (TeaCeremonyScreen.tsx). */}
         <Stack.Screen name="TeaCeremony" component={TeaCeremonyScreen} />
+        {/* Pushed from TeaCategories' "Интуитивный выбор" card (no
+            categoryId - it's a mechanic, not a category). */}
+        <Stack.Screen name="TeaIntuitiveChoice" component={TeaIntuitiveChoiceScreen} />
         {/* Pushed from Analytics' "Биоритмы" card - WF38. */}
         <Stack.Screen name="Biorhythms" component={BiorhythmsScreen} />
         {/* Was a broken route (Care already called navigate('ArticleWater'),
             no screen existed) - built 2026-09-16 now that she supplied the
             real full text. */}
         <Stack.Screen name="ArticleWater" component={ArticleWaterScreen} />
+        {/* Brief 003 - the other two "Основы восстановления" articles, same
+            broken-route situation Water had before 2026-09-16. */}
+        <Stack.Screen name="ArticleLight" component={ArticleLightScreen} />
+        <Stack.Screen name="ArticlePauses" component={ArticlePausesScreen} />
+        {/* Pushed from Care's "Медитации" chip - brief 003 / decisions.md
+            2026-11-21/22 #6, gated by FEATURE_CARE_PRACTICES. */}
+        <Stack.Screen name="MeditationList" component={MeditationListScreen} />
+        <Stack.Screen name="MeditationInfo" component={MeditationInfoScreen} />
+        <Stack.Screen name="MeditationSession" component={MeditationSessionScreen} />
+        <Stack.Screen name="MeditationComplete" component={MeditationCompleteScreen} />
+        {/* Pushed from Care's "Сказки" chip - same brief/flag. */}
+        <Stack.Screen name="StoriesList" component={StoriesListScreen} />
+        <Stack.Screen name="StoryReader" component={StoryReaderScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

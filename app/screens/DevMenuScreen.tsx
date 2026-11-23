@@ -38,7 +38,11 @@ const ROUTES: { label: string; screen: string; params?: object }[] = [
   { label: 'BreathingSession', screen: 'BreathingSession' },
   { label: 'BreathingComplete', screen: 'BreathingComplete' },
   { label: 'TeaCategories', screen: 'TeaCategories' },
-  { label: 'TeaCeremony', screen: 'TeaCeremony' },
+  { label: 'TeaCeremony → Успокоение на вечер', screen: 'TeaCeremony', params: { categoryId: 'calming' } },
+  { label: 'TeaCeremony → Мягкая энергия', screen: 'TeaCeremony', params: { categoryId: 'softEnergy' } },
+  { label: 'TeaCeremony → Фокус и ясность', screen: 'TeaCeremony', params: { categoryId: 'focus' } },
+  { label: 'TeaCeremony → Тепло и восстановление', screen: 'TeaCeremony', params: { categoryId: 'warmth' } },
+  { label: 'TeaIntuitiveChoice', screen: 'TeaIntuitiveChoice' },
   { label: 'Biorhythms', screen: 'Biorhythms' },
 ];
 
