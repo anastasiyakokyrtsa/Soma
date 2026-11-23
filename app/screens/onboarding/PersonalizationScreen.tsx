@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import Animated, {
@@ -129,14 +129,27 @@ export function PersonalizationScreen({ navigation }: any) {
         ? t('onboarding.personalizationTitleStep2')
         : t('onboarding.personalizationTitleDone');
 
-  const illustrationWidth = width - spacing.screenPadding * 2;
+  // Web-only: the desktop phone-frame (App.tsx's DesktopPhoneFrame) fixes
+  // width at 390 but caps height at `min(844, browserWindowHeight - 48)` -
+  // on a browser window shorter than ~892px that's less than a real
+  // phone's height, while this screen's content (title + illustration +
+  // 2 step rows) stays the same size regardless. The result: the bottom
+  // button's `marginTop: 'auto'` gap collapses to almost nothing - looks
+  // fine on an actual phone (always gets the full height), cramped on a
+  // shorter desktop window (her catch, 2026-11-23: "в приложении все ок
+  // по расстояниям, а тут прям налеплено"). Shrinking the illustration
+  // specifically (her own suggestion) frees the room without touching
+  // native layout at all - `IS_WEB` gates it so iOS/Android render exactly
+  // as before.
+  const IS_WEB = Platform.OS === 'web';
+  const illustrationWidth = (width - spacing.screenPadding * 2) * (IS_WEB ? 0.7 : 1);
 
   return (
     <Animated.View
       style={styles.container}
       entering={FadeIn.duration(550).easing(Easing.inOut(Easing.cubic))}
     >
-      <View style={[styles.top, { paddingTop: insets.top + 40 }]}>
+      <View style={[styles.top, { paddingTop: insets.top + (IS_WEB ? 24 : 40) }]}>
         {phase === 'done' ? (
           <Svg width="100%" height={32}>
             <Defs>
