@@ -128,6 +128,27 @@ export const onboarding = {
   },
 };
 
+// Stable ids, same order as the two label arrays below - what actually gets
+// stored (onboardingProfile.ts's `setOnboardingSupportAreas`) instead of the
+// displayed string, so a saved selection doesn't depend on which language
+// was active when it was made, and so later work (matching a selection to a
+// recommendation) has a real key to match on rather than localized text.
+export const supportOptionIds = [
+  'physicalTension',
+  'sleepQuality',
+  'anxiety',
+  'moodSwings',
+  'stressLevels',
+  'wellBeing',
+  'emotionalBalance',
+  'fatigue',
+  'difficultyFocusing',
+  'lackOfMotivation',
+  'irritability',
+  'procrastination',
+] as const;
+export type SupportOptionId = (typeof supportOptionIds)[number];
+
 export const supportOptions: Record<'ru' | 'en', string[]> = {
   ru: [
     'Телесное напряжение',

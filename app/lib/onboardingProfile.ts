@@ -15,6 +15,7 @@
 // persistence is actually built.
 import type { BirthDate } from './biorhythm';
 import type { CalendarDate } from '../components/CalendarRangePicker';
+import type { SupportOptionId } from '../i18n/dictionaries/onboarding';
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
@@ -53,6 +54,15 @@ let cycleNotApplicable = false;
 // sleep + cycle, mood isn't one of its inputs. This exists so any screen can
 // ask "did today get a mood answer yet" without re-deriving it.
 let todayMoodIndex: number | null = null;
+// SupportScreen's "Где тебе нужна поддержка больше всего?" (находка №18,
+// 2026-11-23) - was collected into the screen's own local useState and
+// discarded the moment it navigated onward, the only onboarding step whose
+// answer never made it here. Stored as stable ids (SupportOptionId), not the
+// displayed strings, same reasoning as the comment on supportOptionIds. Not
+// consumed by anything yet (FocusCard personalization is separate, follow-up
+// work) - this only stops the answer from being thrown away before that
+// work exists to read it.
+let supportAreas: SupportOptionId[] = [];
 
 export function setOnboardingGender(value: Gender) {
   gender = value;
@@ -117,6 +127,15 @@ export function setOnboardingCycleNotApplicable() {
 
 export function getOnboardingCycle(): { range: CycleRange | null; notApplicable: boolean } {
   return { range: cycleRange, notApplicable: cycleNotApplicable };
+}
+
+export function setOnboardingSupportAreas(ids: SupportOptionId[]) {
+  supportAreas = ids;
+  notify();
+}
+
+export function getOnboardingSupportAreas() {
+  return supportAreas;
 }
 
 export function setTodayMood(index: number) {
