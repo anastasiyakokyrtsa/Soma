@@ -58,7 +58,7 @@ export const MEDITATIONS: Meditation[] = [
         'Let your attention slowly rise higher, to your calves, your knees, your thighs.',
         'Take your time.',
         'If you find tension, don\'t fight it, just notice it ("yes, there\'s tension here") and move on.',
-        'Your stomach, your chest, your shoulders, this is often where the most tension collects.',
+        'Your stomach, your chest, your shoulders. This is often where the most tension collects.',
         'Your arms, your neck, your face.',
         'And finally, your whole body, all at once.',
         'Stay with that feeling for a few breaths, then slowly open your eyes.',
@@ -99,7 +99,7 @@ export const MEDITATIONS: Meditation[] = [
         "If at some point you notice your thoughts carried you off and you lost count, that's normal, it happens to everyone.",
         'Just gently bring your attention back and start counting from one again.',
         "The point isn't to never lose count.",
-        "It's to keep calmly coming back.",
+        "It's to keep coming back calmly.",
       ],
     },
     whyItHelps: {
@@ -131,12 +131,12 @@ export const MEDITATIONS: Meditation[] = [
       en: [
         'Place a hand on your chest or your stomach, wherever feels comfortable.',
         'Take a few slow breaths.',
-        "Remind yourself: this is hard right now, and that's not a reason to be harder on yourself, if anything, it's the opposite.",
+        "Remind yourself: this is hard right now. That's not a reason to be harder on yourself. If anything, it's the opposite.",
         'Silently or in a whisper, say: "This is a hard moment."',
-        'Then: "Difficulty is part of everyone\'s life, I\'m not alone in this."',
+        'Then: "Difficulty is part of everyone\'s life. I\'m not alone in this."',
         'And finally: "May I be kind to myself right now."',
         "You can say these in your own words, the way you'd speak to someone you love.",
-        "You don't have to believe them completely, it's enough to say them and let yourself sit with that feeling for a few breaths.",
+        "You don't have to believe them completely. It's enough to say them and let yourself sit with that feeling for a few breaths.",
       ],
     },
     whyItHelps: {

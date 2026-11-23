@@ -253,7 +253,7 @@ export const tea = {
 
     seaBuckthornTitle: 'Sea buckthorn',
     seaBuckthornDesc:
-      'Sea buckthorn tea is warm, a little tangy, with a gentle tartness. Good for starting the day gently, without feeling sluggish.',
+      'Sea buckthorn tea is warm, with a gentle tartness. Good for starting the day gently, without feeling sluggish.',
     seaBuckthornSpoon: '1 tsp per cup',
     seaBuckthornKettle: 'Hot water',
     seaBuckthornClock: 'Steep for 7–10 minutes',
@@ -270,7 +270,7 @@ export const tea = {
 
     tulsiTitle: 'Tulsi (holy basil)',
     tulsiDesc:
-      'Tulsi (holy basil) has a long tradition of being brewed in the morning or before an important task, for that feeling of a clear head.',
+      'Tulsi (holy basil) has long been brewed in the morning or before an important task, for that feeling of a clear head.',
     tulsiSpoon: '1–2 tsp per cup',
     tulsiKettle: 'Boiling water',
     tulsiClock: 'Steep for 5–7 minutes',
@@ -282,14 +282,14 @@ export const tea = {
     lemonVerbenaClock: 'Steep for 5 minutes',
 
     peppermintTitle: 'Peppermint',
-    peppermintDesc: 'Peppermint tea feels refreshing and clears your head. A simple way to feel more alert without extra stimulation.',
+    peppermintDesc: 'Peppermint tea feels cool and refreshing. A simple way to feel a little more alert without extra stimulation.',
     peppermintSpoon: '1 tsp per cup',
     peppermintKettle: 'Hot water',
     peppermintClock: 'Steep for 5 minutes',
 
     cat4IntroTitleLine1: 'Warmth',
     cat4IntroTitleLine2: 'and restoration',
-    cat4IntroDesc: 'A tea for when you want to take care of yourself and simply feel warm, in body and in feeling.',
+    cat4IntroDesc: 'A tea for when you want to take care of yourself and simply feel warm, inside and out.',
 
     gingerTitle: 'Ginger',
     gingerDesc: 'Ginger tea warms you up almost right away: a sharp, vivid taste that feels especially good on a cold day.',
@@ -298,7 +298,7 @@ export const tea = {
     gingerClock: 'Steep for 10 minutes',
 
     cinnamonTitle: 'Cinnamon',
-    cinnamonDesc: 'Cinnamon tea smells like coziness and baking. Good to brew when you want a little homely warmth.',
+    cinnamonDesc: 'Cinnamon tea smells like coziness and baking. Good to brew when you want a little homey warmth.',
     cinnamonSpoon: '1 stick or ½ tsp',
     cinnamonKettle: 'Boiling water',
     cinnamonClock: 'Steep for 7–10 minutes',
@@ -310,7 +310,7 @@ export const tea = {
     cloveClock: 'Steep for 5–7 minutes',
 
     turmericTitle: 'Turmeric',
-    turmericDesc: 'Turmeric tea is warm and earthy, with a gentle bitterness. Many drink it as part of an evening ritual of taking care of the body.',
+    turmericDesc: 'Turmeric tea is warm and earthy, with a gentle bitterness. Many drink it as part of an evening self-care ritual.',
     turmericSpoon: '½ tsp',
     turmericKettle: 'Hot water',
     turmericClock: 'Steep for 5–7 minutes',

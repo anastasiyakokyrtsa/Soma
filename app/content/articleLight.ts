@@ -109,7 +109,7 @@ export const ARTICLE_LIGHT_PAGES: Record<Language, ArticlePage[]> = {
       blocks: [
         h('Why light is more than just light'),
         p(
-          "The body runs on circadian clocks, an internal rhythm of roughly a day, that governs not just sleep but body temperature, hormone production, and even attention. The main signal these clocks use to check themselves against the real time of day is light reaching the eyes. Artificial lighting is a very recent arrival in evolutionary terms, and the body still expects simpler, more clear-cut signals from light than what a city evening actually gives it.",
+          "The body runs on circadian clocks, an internal rhythm of roughly a day that governs not just sleep but body temperature, hormone production, and even attention. The main signal these clocks use to check themselves against the real time of day is light reaching the eyes. Artificial lighting is a very recent arrival in evolutionary terms, and the body still expects simpler, more clear-cut signals from light than what a city evening actually gives it.",
         ),
       ],
     },
@@ -124,7 +124,7 @@ export const ARTICLE_LIGHT_PAGES: Record<Language, ArticlePage[]> = {
     {
       blocks: [
         h('Listen to your body'),
-        p('General advice about exact lux levels or timing rarely fits everyone the same way. It helps more to notice your own patterns:'),
+        p('General advice about exact lux levels or timing rarely works the same way for everyone. It helps more to notice your own patterns:'),
         bullets([
           'whether you wake up easily in the morning or your body feels stuck',
           'whether bright light in the evening still leaves you feeling sleepy earlier than expected',

@@ -97,7 +97,7 @@ export const ARTICLE_PAUSES_PAGES: Record<Language, ArticlePage[]> = {
       blocks: [
         h("Why a pause isn't wasted time"),
         p(
-          'The nervous system works in cycles. Periods of focus and activity are naturally followed by periods of low energy, usually every 90 to 120 minutes. If you ignore those signals and keep pushing your concentration through sheer effort, recovery still happens eventually. It just arrives later and more abruptly: as irritability, scattered attention, or sudden exhaustion.',
+          'The nervous system works in cycles. Periods of focus and activity are naturally followed by periods of low energy, usually every 90 to 120 minutes. If you ignore those signals and keep pushing your concentration through sheer effort, the body still forces a break eventually. It just shows up later and rougher: as irritability, scattered attention, or sudden exhaustion.',
         ),
       ],
     },
@@ -125,7 +125,7 @@ export const ARTICLE_PAUSES_PAGES: Record<Language, ArticlePage[]> = {
         h('A small practice'),
         sh('A pause with no purpose'),
         p(
-          "Once during the day, stop for 2 to 3 minutes and don't deliberately do anything: don't pick up your phone, don't start a new task. You can just sit, look out the window, or close your eyes.",
+          "At some point during the day, stop for 2 to 3 minutes and don't deliberately do anything: don't pick up your phone, don't start a new task. You can just sit, look out the window, or close your eyes.",
         ),
       ],
     },
