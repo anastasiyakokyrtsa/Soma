@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, TextInputProps, Platform } from 'react-native';
+import { useEffect, useRef, useState, type ElementRef } from 'react';
+import { Pressable, TextInput, StyleSheet, TextInputProps, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -53,6 +53,7 @@ export function TextField({
   onBlur,
   ...rest
 }: TextInputProps & { label: string }) {
+  const inputRef = useRef<ElementRef<typeof TextInput>>(null);
   const [focused, setFocused] = useState(false);
   const hasValue = !!(value && String(value).length > 0);
   const floated = focused || hasValue;
@@ -72,12 +73,21 @@ export function TextField({
   const labelColor = focused ? colors.violet300 : colors.borderDefault;
 
   return (
-    <View
+    // Pressable, not View - her catch (2026-11-23): the actual <TextInput>
+    // only takes up its own natural single-line height (~24px) centered
+    // inside this 64px-tall box, so the ~20px of border/background above
+    // and below it was never part of the input at all - tapping there hit
+    // nothing and did nothing, which reads as "only the middle/some part of
+    // the field works". The visible bordered box is the field as far as
+    // anyone looking at it is concerned, so the whole box - not just the
+    // text line's own tiny hit area - needs to focus the input.
+    <Pressable
       style={[
         styles.wrapper,
         { borderColor, justifyContent: focused ? 'flex-end' : 'center' },
         style,
       ]}
+      onPress={() => inputRef.current?.focus()}
     >
       <Animated.Text
         style={[
@@ -94,6 +104,7 @@ export function TextField({
       </Animated.Text>
       <TextInput
         {...rest}
+        ref={inputRef}
         value={value}
         style={[styles.input, { paddingBottom: focused ? 12 : 0 }]}
         onFocus={(e) => {
@@ -105,7 +116,7 @@ export function TextField({
           onBlur?.(e);
         }}
       />
-    </View>
+    </Pressable>
   );
 }
 
