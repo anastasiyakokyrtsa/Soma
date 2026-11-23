@@ -5,60 +5,70 @@ import { colors, fontFamily, radius } from '../theme';
 import { StarsBackground } from '../components/StarsBackground';
 import { BackIcon } from '../components/icons/BackIcon';
 import { useT } from '../i18n/useT';
+import { FEATURE_TEA_FULL_CATEGORIES } from '../lib/featureFlags';
+import type { TeaCategoryId } from '../content/teaCategories';
 
 type Category = {
   titleKey: string;
   descKey: string;
   image: ImageSourcePropType;
   ratio: number;
-  available: boolean;
+  // Present for the 4 real categories - TeaCeremony is parametrized by this
+  // id (content/teaCategories.ts). Absent only for "Интуитивный выбор"
+  // (cat5), which isn't a category with its own herb list - it's a
+  // mechanic (TeaIntuitiveChoiceScreen) that draws from all 4 others.
+  categoryId?: TeaCategoryId;
 };
 
 // WF 29 "Tea categories" - the real entry point of "Чай как ритуал", her
 // correction 2026-09-07: Care's "Начать церемонию" was going straight into
 // the "Успокоение на вечер" stories, skipping this picker screen entirely -
-// "мы же изначально должны попасть на экран где категории чаев". Only that
-// one category has real herb content behind it (see TeaCeremonyScreen.tsx's
-// own note on this), so the other 4 are shown but marked "Скоро" and not
-// tappable - same "visible unavailable state, not a silent dead tap"
-// treatment the scenario audit already called for on Care's own dead
-// elements (docs/state/findings.md #1), applied here from the start instead
-// of shipping another one of those.
+// "мы же изначально должны попасть на экран где категории чаев".
+//
+// Originally only "Успокоение на вечер" had real herb content behind it, so
+// the other 4 were shown but marked "Скоро" and not tappable - same
+// "visible unavailable state, not a silent dead tap" treatment the scenario
+// audit already called for on Care's own dead elements
+// (docs/state/findings.md #1). ADR 001 "3. Чай ×4 категории" /
+// decisions.md 2026-11-21/22 #6 build out the other 4 (text+recipes real,
+// illustrations a placeholder until she sends real art) behind
+// FEATURE_TEA_FULL_CATEGORIES - flag off keeps the exact original
+// "only cat1 available" behavior.
 const CATEGORIES: Category[] = [
   {
     titleKey: 'tea.cat1Title',
     descKey: 'tea.cat1Desc',
     image: require('../assets/tea/category-calming.png'),
     ratio: 686 / 686,
-    available: true,
+    categoryId: 'calming',
   },
   {
     titleKey: 'tea.cat2Title',
     descKey: 'tea.cat2Desc',
     image: require('../assets/tea/category-soft-energy.png'),
     ratio: 734 / 686,
-    available: false,
+    categoryId: 'softEnergy',
   },
   {
     titleKey: 'tea.cat3Title',
     descKey: 'tea.cat3Desc',
     image: require('../assets/tea/category-focus.png'),
     ratio: 686 / 686,
-    available: false,
+    categoryId: 'focus',
   },
   {
     titleKey: 'tea.cat4Title',
     descKey: 'tea.cat4Desc',
     image: require('../assets/tea/category-warmth.png'),
     ratio: 686 / 686,
-    available: false,
+    categoryId: 'warmth',
   },
   {
     titleKey: 'tea.cat5Title',
     descKey: 'tea.cat5Desc',
     image: require('../assets/tea/category-intuitive-choice.png'),
     ratio: 662 / 686,
-    available: false,
+    // No categoryId - see the type's own comment above.
   },
 ];
 
@@ -86,31 +96,38 @@ export function TeaCategoriesScreen({ navigation }: any) {
         </View>
 
         <View style={styles.list}>
-          {CATEGORIES.map((c) => (
-            <Pressable
-              key={c.titleKey}
-              disabled={!c.available}
-              onPress={() => navigation.navigate('TeaCeremony')}
-              style={({ pressed }) => [
-                styles.card,
-                !c.available && styles.cardUnavailable,
-                c.available && pressed && styles.cardPressed,
-              ]}
-            >
-              {!c.available ? (
-                <View style={styles.soonBadge}>
-                  <Text style={styles.soonBadgeLabel}>{t('tea.soonBadge')}</Text>
-                </View>
-              ) : null}
-              <Text style={styles.cardTitle}>{t(c.titleKey)}</Text>
-              <Image
-                source={c.image}
-                resizeMode="contain"
-                style={{ width: IMAGE_SIZE * c.ratio, height: IMAGE_SIZE, marginTop: 20 }}
-              />
-              <Text style={styles.cardDescription}>{t(c.descKey)}</Text>
-            </Pressable>
-          ))}
+          {CATEGORIES.map((c) => {
+            // Flag off: only "Успокоение на вечер" (calming) is available,
+            // exactly the previous behavior. Flag on: all 5 cards are real
+            // destinations - the 4 categories push TeaCeremony with their
+            // id, "Интуитивный выбор" (no categoryId) pushes the picker
+            // mechanic instead.
+            const available = FEATURE_TEA_FULL_CATEGORIES || c.categoryId === 'calming';
+            return (
+              <Pressable
+                key={c.titleKey}
+                disabled={!available}
+                onPress={() => {
+                  if (c.categoryId) navigation.navigate('TeaCeremony', { categoryId: c.categoryId });
+                  else navigation.navigate('TeaIntuitiveChoice');
+                }}
+                style={({ pressed }) => [styles.card, !available && styles.cardUnavailable, available && pressed && styles.cardPressed]}
+              >
+                {!available ? (
+                  <View style={styles.soonBadge}>
+                    <Text style={styles.soonBadgeLabel}>{t('tea.soonBadge')}</Text>
+                  </View>
+                ) : null}
+                <Text style={styles.cardTitle}>{t(c.titleKey)}</Text>
+                <Image
+                  source={c.image}
+                  resizeMode="contain"
+                  style={{ width: IMAGE_SIZE * c.ratio, height: IMAGE_SIZE, marginTop: 20 }}
+                />
+                <Text style={styles.cardDescription}>{t(c.descKey)}</Text>
+              </Pressable>
+            );
+          })}
         </View>
       </ScrollView>
     </Animated.View>

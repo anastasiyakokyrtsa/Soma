@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet, useWindowDimensions, type ImageSourcePropType, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, Easing } from 'react-native-reanimated';
@@ -8,6 +8,7 @@ import { StoryProgress } from '../components/StoryProgress';
 import { TeaRecipeRow } from '../components/TeaRecipeRow';
 import { BackIcon } from '../components/icons/BackIcon';
 import { useT } from '../i18n/useT';
+import { TEA_CATEGORIES, type TeaCategoryContent, type TeaCategoryId } from '../content/teaCategories';
 
 type Slide = {
   titleKey: string;
@@ -20,95 +21,59 @@ type Slide = {
   // visual size instead of just the same bounding box.
   imageRatio: number;
   recipe?: { icon: 'spoon' | 'kettle' | 'clock'; labelKey: string }[];
+  // Categories 2-4 have no real per-herb illustration yet (see
+  // content/teaCategories.ts's header note) - shows a small "illustration
+  // coming later" caption under the image instead of silently passing off a
+  // reused category thumbnail as the real thing.
+  isPlaceholderImage?: boolean;
 };
 
 // WF 29-35 "Чай как ритуал", her own drawn screens (Claude AI/v2/.../Calming
-// teas screens) - copy ported verbatim from those, not reworded (only
-// glued with non-breaking spaces per the project's standing "hanging
-// prepositions" rule - see feedback_rn_app_ui_defaults.md). Only one
-// category is actually designed content-wise ("Успокоение на вечер"); the
-// other 4 category cards on WF29 have no herb screens behind them yet, so
-// this screen goes straight there - her explicit framing 2026-09-06: "в
-// наших условиях сейчас, если учитывать что у человека ресурс не очень и
-// надо успокоиться" - not a real state->category engine, just today's one
-// real path. The WF29 category-picker screen itself is skipped entirely.
+// teas screens) - "Успокоение на вечер" copy ported verbatim from those, not
+// reworded. Originally this screen only ever knew that one category -
+// ADR 001 "3. Чай ×4 категории" / decisions.md 2026-11-21/22 #6 turned it
+// into a real per-category renderer: slides are now built from whichever
+// category content/teaCategories.ts's TEA_CATEGORIES has for the
+// `categoryId` nav param (TeaCategoriesScreen passes it for all 4 real
+// categories), defaulting to "calming" when absent (feature flag off, or an
+// older dev-menu entry/deep link with no param at all).
 //
-// Image files were originally a Figma "image fill" export: every plant sat
-// on the same fixed 941x1672 canvas regardless of how much of it the actual
-// drawing used, so a fixed display box made some plants (e.g. the intro's
-// tall multi-sprig composition) look much bigger than others (e.g. one
-// single herb) even at the identical box size - invisible on an opaque
-// background, but obvious once the background was made transparent
-// (2026-09-06: "увеличь сами изображения трав так, чтобы они визуально были
-// такой же высоты как трава на экране 'Успокоение на вечер'"). Cropped each
-// PNG to its own real alpha bounding box (+6px breathing room) instead, so
-// `imageRatio` below is each plant's own true width/height.
-const SLIDES: Slide[] = [
-  {
+// Image files for "Успокоение на вечер" were originally a Figma "image fill"
+// export: every plant sat on the same fixed 941x1672 canvas regardless of
+// how much of it the actual drawing used, so a fixed display box made some
+// plants (e.g. the intro's tall multi-sprig composition) look much bigger
+// than others (e.g. one single herb) even at the identical box size -
+// invisible on an opaque background, but obvious once the background was
+// made transparent (2026-09-06: "увеличь сами изображения трав так, чтобы
+// они визуально были такой же высоты как трава на экране 'Успокоение на
+// вечер'"). Cropped each PNG to its own real alpha bounding box (+6px
+// breathing room) instead, so `imageRatio` is each plant's own true
+// width/height - categories 2-4's placeholder images (a shrunk category
+// thumbnail) carry their own already-correct ratio instead.
+function buildSlides(category: TeaCategoryContent): Slide[] {
+  const introSlide: Slide = {
     // titleKey unused for the intro slide - its title is built specially
-    // from introTitleLine1/2 below (see `introTitle` in the component), so
-    // this is a placeholder.
+    // from introTitleLine1/2Key below (see `introTitle` in the component).
     titleKey: '',
-    descKey: 'tea.introDesc',
-    image: require('../assets/tea/intro.png'),
-    imageRatio: 358 / 669,
-  },
-  {
-    titleKey: 'tea.camomileTitle',
-    descKey: 'tea.camomileDesc',
-    image: require('../assets/tea/camomille.png'),
-    imageRatio: 228 / 468,
+    descKey: category.introDescKey,
+    image: category.introImage,
+    imageRatio: category.introImageRatio,
+    isPlaceholderImage: category.introIsPlaceholderImage,
+  };
+  const herbSlides: Slide[] = category.herbs.map((h) => ({
+    titleKey: h.titleKey,
+    descKey: h.descKey,
+    image: h.image,
+    imageRatio: h.imageRatio,
+    isPlaceholderImage: h.isPlaceholderImage,
     recipe: [
-      { icon: 'spoon', labelKey: 'tea.camomileSpoon' },
-      { icon: 'kettle', labelKey: 'tea.camomileKettle' },
-      { icon: 'clock', labelKey: 'tea.camomileClock' },
+      { icon: 'spoon', labelKey: h.spoonKey },
+      { icon: 'kettle', labelKey: h.kettleKey },
+      { icon: 'clock', labelKey: h.clockKey },
     ],
-  },
-  {
-    titleKey: 'tea.melissaTitle',
-    descKey: 'tea.melissaDesc',
-    image: require('../assets/tea/melissa.png'),
-    imageRatio: 235 / 514,
-    recipe: [
-      { icon: 'spoon', labelKey: 'tea.melissaSpoon' },
-      { icon: 'kettle', labelKey: 'tea.melissaKettle' },
-      { icon: 'clock', labelKey: 'tea.melissaClock' },
-    ],
-  },
-  {
-    titleKey: 'tea.lavenderTitle',
-    descKey: 'tea.lavenderDesc',
-    image: require('../assets/tea/lavender.png'),
-    imageRatio: 144 / 489,
-    recipe: [
-      { icon: 'spoon', labelKey: 'tea.lavenderSpoon' },
-      { icon: 'kettle', labelKey: 'tea.lavenderKettle' },
-      { icon: 'clock', labelKey: 'tea.lavenderClock' },
-    ],
-  },
-  {
-    titleKey: 'tea.valerianTitle',
-    descKey: 'tea.valerianDesc',
-    image: require('../assets/tea/valeriana.png'),
-    imageRatio: 146 / 406,
-    recipe: [
-      { icon: 'spoon', labelKey: 'tea.valerianSpoon' },
-      { icon: 'kettle', labelKey: 'tea.valerianKettle' },
-      { icon: 'clock', labelKey: 'tea.valerianClock' },
-    ],
-  },
-  {
-    titleKey: 'tea.lindenTitle',
-    descKey: 'tea.lindenDesc',
-    image: require('../assets/tea/linden.png'),
-    imageRatio: 157 / 406,
-    recipe: [
-      { icon: 'spoon', labelKey: 'tea.lindenSpoon' },
-      { icon: 'kettle', labelKey: 'tea.lindenKettle' },
-      { icon: 'clock', labelKey: 'tea.lindenClock' },
-    ],
-  },
-];
+  }));
+  return [introSlide, ...herbSlides];
+}
 
 // Fixed from the safe area instead of vertically centering the whole
 // (variable-height) content block - centering made herb slides' title sit
@@ -136,13 +101,20 @@ const IMAGE_HEIGHT = 244 * 0.8;
 const INTRO_TITLE_HEIGHT = 30 * 1.15 * 2; // always exactly 2 lines (both languages' intro titles are 2 lines)
 const INTRO_BOTTOM_GAP = 160;
 
-export function TeaCeremonyScreen({ navigation }: any) {
+export function TeaCeremonyScreen({ navigation, route }: any) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const t = useT();
+  // Defaults to "calming" ("Успокоение на вечер") for the feature-flag-off
+  // path and any older entry point with no param at all (e.g. a stale
+  // dev-menu shortcut) - see TeaCategoriesScreen.tsx's own available-category
+  // gating.
+  const categoryId: TeaCategoryId = route?.params?.categoryId ?? 'calming';
+  const category = TEA_CATEGORIES[categoryId];
+  const SLIDES = useMemo(() => buildSlides(category), [category]);
   const slide = SLIDES[index];
-  const introTitle = `${t('tea.introTitleLine1')}\n${t('tea.introTitleLine2')}`;
+  const introTitle = `${t(category.introTitleLine1Key)}\n${t(category.introTitleLine2Key)}`;
 
   // No completion screen exists for this flow yet (unlike breathing's own
   // BreathingComplete) - advancing past the last herb just returns to Care,
@@ -205,6 +177,11 @@ export function TeaCeremonyScreen({ navigation }: any) {
           resizeMode="contain"
           style={{ width: imageHeight * slide.imageRatio, height: imageHeight, marginTop: 20 }}
         />
+        {/* Categories 2-4 reuse the category thumbnail in place of a real
+            per-herb illustration (content/teaCategories.ts's header note) -
+            this caption keeps that honest instead of letting it pass as
+            finished art. */}
+        {slide.isPlaceholderImage ? <Text style={styles.placeholderCaption}>{t('tea.illustrationPlaceholder')}</Text> : null}
         <Text style={styles.description}>{t(slide.descKey)}</Text>
         {slide.recipe ? (
           <View style={styles.recipeList}>
@@ -245,7 +222,7 @@ export function TeaCeremonyScreen({ navigation }: any) {
         style={[styles.description, styles.hiddenMeasure, { width: screenWidth - 48 }]}
         onLayout={(e: LayoutChangeEvent) => setIntroDescHeight(e.nativeEvent.layout.height)}
       >
-        {t('tea.introDesc')}
+        {t(category.introDescKey)}
       </Text>
 
       {/* Visible only on the entry slide, matching her own drawn screens
@@ -299,6 +276,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 18 * 1.4,
     color: 'rgba(255,255,255,0.75)',
+    textAlign: 'center',
+  },
+  // Small, visibly secondary - a caption admitting the image above is a
+  // stand-in, not a mislabeled attempt at real art.
+  placeholderCaption: {
+    marginTop: 8,
+    fontFamily: fontFamily.regular,
+    fontSize: 12,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   // No card/border - round 2 after a bordered card still read wrong to her
