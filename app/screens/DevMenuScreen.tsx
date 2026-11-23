@@ -44,6 +44,15 @@ const ROUTES: { label: string; screen: string; params?: object }[] = [
   { label: 'TeaCeremony → Тепло и восстановление', screen: 'TeaCeremony', params: { categoryId: 'warmth' } },
   { label: 'TeaIntuitiveChoice', screen: 'TeaIntuitiveChoice' },
   { label: 'Biorhythms', screen: 'Biorhythms' },
+  { label: 'ArticleWater', screen: 'ArticleWater' },
+  { label: 'ArticleLight', screen: 'ArticleLight' },
+  { label: 'ArticlePauses', screen: 'ArticlePauses' },
+  { label: 'MeditationList', screen: 'MeditationList' },
+  { label: 'MeditationInfo (bodyScan)', screen: 'MeditationInfo', params: { id: 'bodyScan' } },
+  { label: 'MeditationSession (bodyScan)', screen: 'MeditationSession', params: { id: 'bodyScan' } },
+  { label: 'MeditationComplete', screen: 'MeditationComplete' },
+  { label: 'StoriesList', screen: 'StoriesList' },
+  { label: 'StoryReader (houseByTheSea)', screen: 'StoryReader', params: { id: 'houseByTheSea' } },
 ];
 
 export function DevMenuScreen({ navigation }: any) {
