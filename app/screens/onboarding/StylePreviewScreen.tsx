@@ -216,23 +216,39 @@ export function StylePreviewScreen({ navigation, route }: any) {
 
         {/* Same recipe as OnboardingStepLayout's/OnboardingSlide's primary
             button — this is now the 3rd copy of it. Worth extracting into a
-            shared PrimaryButton if a 4th screen needs it. */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            {
-              backgroundColor: mood.accent,
-              borderRadius: mood.buttonRadius,
-              boxShadow: mood.glow ? `0px 0px ${glow.btnSoft.blur}px ${glow.btnSoft.color}` : 'none',
-            },
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={() => navigation.replace('Personalization')}
-        >
-          <Text style={[styles.buttonLabel, { fontFamily: mood.buttonFont, color: mood.onAccent }]}>
-            {t('onboarding.applyStyle')}
-          </Text>
-        </Pressable>
+            shared PrimaryButton if a 4th screen needs it.
+            Her catch (2026-11-23): this button, themed in the previewed
+            style's own accent/fonts, said "Применить стиль" and then just
+            navigated onward exactly like Cosmos would — for Focus/Nature/
+            Dawn that's the single most convincing-looking dead end in this
+            whole screen (looks fully committed, does nothing). Disabled for
+            anything but the one real theme, using OnboardingStepLayout's
+            own disabled-button look (outline-only, no fill) rather than a
+            themed-but-fake "Apply". */}
+        {style.id === 'cosmos' ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              {
+                backgroundColor: mood.accent,
+                borderRadius: mood.buttonRadius,
+                boxShadow: mood.glow ? `0px 0px ${glow.btnSoft.blur}px ${glow.btnSoft.color}` : 'none',
+              },
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={() => navigation.replace('Personalization')}
+          >
+            <Text style={[styles.buttonLabel, { fontFamily: mood.buttonFont, color: mood.onAccent }]}>
+              {t('onboarding.applyStyle')}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={[styles.button, styles.buttonUnavailable, { borderRadius: mood.buttonRadius }]}>
+            <Text style={[styles.buttonLabel, styles.buttonLabelUnavailable, { fontFamily: mood.buttonFont }]}>
+              {t('tea.soonBadge')}
+            </Text>
+          </View>
+        )}
       </View>
     </Animated.View>
   );
@@ -337,5 +353,15 @@ const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: 20,
     lineHeight: 20 * 1.15,
+  },
+  // OnboardingStepLayout's own disabled-button look (outline-only, no
+  // fill), ported here rather than inventing a second "disabled" recipe.
+  buttonUnavailable: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: colors.borderSoft,
+  },
+  buttonLabelUnavailable: {
+    color: colors.textSecondary,
   },
 });

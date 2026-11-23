@@ -33,20 +33,36 @@ export function RadioChoiceCard({
   description,
   selected,
   onPress,
+  available = true,
+  soonLabel,
 }: {
   title: string;
   description: string;
   selected: boolean;
   onPress: () => void;
+  // Her catch (2026-11-23, ChooseApproachScreen): picking "Астрологический"
+  // or "Синтез двух систем" looked like a real choice but led to exactly
+  // the same screens as "Научно-практический" - only that one is actually
+  // built. Same honest-unavailable-state convention as NavChip/
+  // TeaCategoriesScreen (dim + a small "Скоро" caption), not a new pattern.
+  available?: boolean;
+  soonLabel?: string;
 }) {
   return (
-    <Pressable style={[styles.card, selected && styles.cardSelected]} onPress={onPress}>
+    <Pressable
+      disabled={!available}
+      style={[styles.card, selected && styles.cardSelected, !available && styles.cardUnavailable]}
+      onPress={available ? onPress : undefined}
+    >
       <View style={styles.row}>
         <View style={[styles.radio, selected && styles.radioSelected]}>
           {selected ? <View style={styles.radioDot} /> : null}
         </View>
         <View style={styles.textCol}>
-          <Text style={styles.title}>{title}</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{title}</Text>
+            {!available && soonLabel ? <Text style={styles.soonBadgeText}>{soonLabel}</Text> : null}
+          </View>
           <Text style={styles.description}>{description}</Text>
         </View>
       </View>
@@ -68,6 +84,11 @@ const styles = StyleSheet.create({
     borderColor: colors.borderVioletFlat,
     backgroundColor: 'rgba(139,124,246,0.12)',
   },
+  // Same opacity-only dimming NavChip/TeaCategoriesScreen already use for
+  // an unavailable card, not a new treatment.
+  cardUnavailable: {
+    opacity: 0.55,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -76,6 +97,18 @@ const styles = StyleSheet.create({
   textCol: {
     flex: 1,
     gap: TEXT_GAP,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  // Plain text, no pill background - matches NavChip's own soonLabel
+  // treatment exactly, not a new badge style.
+  soonBadgeText: {
+    fontFamily: fontFamily.regular,
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   radio: {
     width: RADIO_SIZE,

@@ -17,6 +17,8 @@ export function StyleGridTile({
   selected,
   onPress,
   onPressPreview,
+  available = true,
+  soonLabel,
 }: {
   styleId: VisualStyleId;
   name: string;
@@ -24,11 +26,21 @@ export function StyleGridTile({
   selected: boolean;
   onPress: () => void;
   onPressPreview: () => void;
+  // Her catch (2026-11-23): picking Focus/Nature/Dawn here looked like a
+  // real style change but doesn't actually re-theme the app yet (only
+  // Cosmos is a real built theme, see theme/visualStyles.ts's own comment).
+  // Selection disabled for these, same honest-unavailable convention as
+  // NavChip/TeaCategoriesScreen/RadioChoiceCard - preview stays tappable on
+  // purpose (looking costs nothing and isn't a false promise the way
+  // letting someone "pick" it would be).
+  available?: boolean;
+  soonLabel?: string;
 }) {
   return (
     <Pressable
-      style={[styles.wrap, { width: size, height: size }, selected && styles.wrapSelected]}
-      onPress={onPress}
+      disabled={!available}
+      style={[styles.wrap, { width: size, height: size }, selected && styles.wrapSelected, !available && styles.wrapUnavailable]}
+      onPress={available ? onPress : undefined}
     >
       <StyleSwatch styleId={styleId} width={size} height={size} />
       {/* A self-contained pill reads more deliberate than a bottom gradient
@@ -38,6 +50,7 @@ export function StyleGridTile({
           pastel sky), since it carries its own background either way. */}
       <View style={styles.labelChip}>
         <Text style={styles.label}>{name}</Text>
+        {!available && soonLabel ? <Text style={styles.soonLabel}>{soonLabel}</Text> : null}
       </View>
       {/* Replaces the screen-level "Предпросмотр" button (2026-09-20, "много
           места все это занимает") — same translucent-dark backdrop recipe as
@@ -67,6 +80,12 @@ const styles = StyleSheet.create({
     borderColor: colors.violet400,
     boxShadow: '0px 0px 15px rgba(139,124,246,0.6)',
   },
+  // Opacity-only, same convention as NavChip/TeaCategoriesScreen/
+  // RadioChoiceCard's own unavailable state - the swatch itself (not just
+  // the label chip) dims too, since it's the whole tile that isn't real yet.
+  wrapUnavailable: {
+    opacity: 0.55,
+  },
   labelChip: {
     position: 'absolute',
     left: 10,
@@ -80,6 +99,12 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.semiBold,
     fontSize: 15,
     color: colors.textPrimary,
+  },
+  soonLabel: {
+    marginTop: 1,
+    fontFamily: fontFamily.regular,
+    fontSize: 11,
+    color: colors.textSecondary,
   },
   previewButton: {
     position: 'absolute',
