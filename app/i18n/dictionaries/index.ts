@@ -8,6 +8,7 @@ import { tea } from './tea';
 import { breathing } from './breathing';
 import { quickLog } from './quickLog';
 import { practices } from './practices';
+import { focusRecommendations } from './focusRecommendations';
 
 // Namespaced by screen/area so screen files only ever touch their own
 // section - adding a new screen's translations never risks a merge
@@ -24,6 +25,7 @@ export const dictionaries = {
     breathing: breathing.ru,
     quickLog: quickLog.ru,
     practices: practices.ru,
+    focusRecommendations: focusRecommendations.ru,
   },
   en: {
     common: common.en,
@@ -36,5 +38,6 @@ export const dictionaries = {
     breathing: breathing.en,
     quickLog: quickLog.en,
     practices: practices.en,
+    focusRecommendations: focusRecommendations.en,
   },
 };

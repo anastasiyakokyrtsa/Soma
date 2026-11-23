@@ -21,6 +21,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { dayParagraphs } from '../i18n/dictionaries/home';
 import { getOnboardingBirthDate, subscribeOnboardingProfile } from '../lib/onboardingProfile';
 import { addDays, getBiorhythmValues } from '../lib/biorhythm';
+import { pickFocusCards } from '../lib/focusRecommendations';
 
 const MOON_IMAGE = require('../assets/illustrations/moon-cutout.png');
 const SUN_IMAGE = require('../assets/illustrations/sun-cutout.png');
@@ -220,6 +221,12 @@ export function HomeScreen({ navigation }: any) {
   const today = new Date();
   const todaysValues = birthDate ? getBiorhythmValues(birthDate, addDays(today, selectedOffset)) : null;
   const paragraph = todaysValues ? dayParagraphs[language][pickDayParagraphTemplate(todaysValues)] : null;
+  // находка №18 follow-up (2026-11-23) - "Фокус дня" used to be the same 3
+  // static cards for everyone; now picked per docs/content/правила-
+  // рекомендаций.md's registry (mood/cycle/sleep/biorhythm/composite, in
+  // that priority order) - see lib/focusRecommendations.ts for the actual
+  // condition checks, not duplicated here.
+  const focusCards = pickFocusCards({ birthDate, today });
   // Real bar height + insets.bottom + a 60px clearance above it - was a flat
   // 160 (2026-08-26, matching Care's own flat number), but a flat value
   // can't track BottomBar's own height, which *grows* by insets.bottom
@@ -336,24 +343,20 @@ export function HomeScreen({ navigation }: any) {
           style={{ marginTop: GAP.focusTitleToCards }}
           contentContainerStyle={styles.focusScroll}
         >
-          {/* Text reworded 2026-08-27, take 3. Take 2 fixed the orphaned
-              last word on cards 1/3 but shortened them enough to fall
-              short of card 2's own line count - "в первой карточке не
-              хватает одной строки, а в последней целых две, некрасиво
-              когда пустота" (uneven card heights in this horizontally-
-              scrolling row read as broken). Simulated real word-wrap at
-              this card width's measured ~34-char/line budget (calibrated
-              off her actual screenshot) for all 3 texts: card 2 (untouched
-              throughout) wraps to 6 lines, card 1 was only 5, card 3 only
-              4 - exactly matching what she reported (short by 1 and 2
-              lines respectively). Lengthened cards 1 and 3 just enough to
-              also land at 6 lines each, re-simulated to confirm, and kept
-              each ending on a multi-word final line (not reintroducing the
-              orphan-word problem take 2 had just fixed). Card 2 still
-              untouched. */}
-          <FocusCard width={cardWidth} icon="lotus" title={t('home.focus1Title')} text={t('home.focus1Text')} />
-          <FocusCard width={cardWidth} icon="idea" title={t('home.focus2Title')} text={t('home.focus2Text')} />
-          <FocusCard width={cardWidth} icon="broom" title={t('home.focus3Title')} text={t('home.focus3Text')} />
+          {/* Text for the no-signal fallback (home.ts's focus1/2/3, now
+              lib/focusRecommendations.ts's P8) was reworded 2026-08-27,
+              take 3, specifically to all land on 6 wrapped lines at this
+              card width (~34-char/line budget, calibrated off her actual
+              screenshot) - "в первой карточке не хватает одной строки, а в
+              последней целых две, некрасиво когда пустота". That tuning
+              is P8-only; the other scenarios' text (находка №18 follow-up,
+              2026-11-23) wasn't wrapped-line-matched against each other the
+              same way since they're never shown side by side with each
+              other by design (the algorithm picks at most 3 cards total,
+              mixing scenarios only when several signals are each low). */}
+          {focusCards.map((card, index) => (
+            <FocusCard key={`${card.titleKey}-${index}`} width={cardWidth} icon={card.icon} title={t(card.titleKey)} text={t(card.textKey)} />
+          ))}
         </ScrollView>
 
         <View style={{ marginTop: GAP.cardsToQuote }}>

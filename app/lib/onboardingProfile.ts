@@ -48,11 +48,14 @@ let cycleRange: CycleRange | null = null;
 // both currently mean "skip the cycle component of the energy composite."
 let cycleNotApplicable = false;
 // Set by MoodCheckIn.tsx (see its own comment) - lifted up here so it's not
-// stranded in that one component's local useState, per this brief's ask,
-// even though the Home/Care energy composite itself doesn't use it (see
-// lib/energy.ts) - product.md's "energy of the day" formula is biorhythm +
-// sleep + cycle, mood isn't one of its inputs. This exists so any screen can
-// ask "did today get a mood answer yet" without re-deriving it.
+// stranded in that one component's local useState, per this brief's ask.
+// product.md's "energy of the day" formula (biorhythm + sleep + cycle)
+// still doesn't read this - but lib/focusRecommendations.ts's P1 now does
+// (находка №18 follow-up, 2026-11-23: mood is Tier A, highest-priority
+// signal for Home's "Фокус дня" cards), so `notify()` on set is no longer
+// optional the way the original comment here assumed - without it, marking
+// today's mood wouldn't make Home's focus cards update until something
+// else happened to re-render the screen.
 let todayMoodIndex: number | null = null;
 // SupportScreen's "Где тебе нужна поддержка больше всего?" (находка №18,
 // 2026-11-23) - was collected into the screen's own local useState and
@@ -140,6 +143,7 @@ export function getOnboardingSupportAreas() {
 
 export function setTodayMood(index: number) {
   todayMoodIndex = index;
+  notify();
 }
 
 export function getTodayMood() {
