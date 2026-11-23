@@ -131,18 +131,26 @@ function SpacedText({
   );
 }
 
-// Exact gap (her ask, 2026-11-23) between the ring's own bottom edge and the
-// tagline's top, measured on a real screenshot via DOM rects, not eyeballed -
-// independent of `size`/language since it's derived below, not a fixed
-// marginTop (a fixed number would only hit 40px at one specific `size`).
-const TAGLINE_GAP = 40;
+// Exact gap (her ask, 2026-11-23, first set to 40 then corrected to 32)
+// between the ring's own bottom edge and the tagline's top, measured on a
+// real screenshot via DOM rects, not eyeballed - independent of
+// `size`/language since it's derived below, not a fixed marginTop (a fixed
+// number would only hit the target at one specific `size`).
+const TAGLINE_GAP = 32;
 
 export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: number; animationKey?: number }) {
   const scale = size / DESIGN;
-  // Canvas-local y of the ring's bottom edge; tagline sits `size` below the
-  // canvas's own top by default (next flex sibling), so pulling it up by
-  // (size - ringBottomLocal - TAGLINE_GAP) lands its top exactly
-  // TAGLINE_GAP below the ring, whatever `size` is.
+  // The ring (R=115 inside a 480 design square centered on it) sits inset
+  // from the Canvas's own edges by the same blank amount top and bottom -
+  // that blank was invisible but still counted in the flex box this and
+  // the tagline get centered as, so "the ring" sat visibly lower than
+  // centered (more empty space above the ring than below the tagline - her
+  // catch, 2026-11-23, confirmed by measuring both gaps against screen
+  // top/bottom, not just the canvas's own box). Pulling the Canvas itself
+  // up by that same blank amount makes the ring's own top edge the
+  // effective top of the whole centered block, so the visible ring+tagline
+  // group - not the invisible canvas padding - is what's actually centered.
+  const ringEdgeBlank = (CY - R) * scale;
   const ringBottomLocal = (CY + R) * scale;
   const taglineMarginTop = TAGLINE_GAP - size + ringBottomLocal;
   const { language } = useLanguage();
@@ -227,7 +235,7 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
 
   return (
     <View style={[styles.wrap, { width: size }]}>
-      <Canvas style={{ width: size, height: size }}>
+      <Canvas style={{ width: size, height: size, marginTop: -ringEdgeBlank }}>
         <Group transform={[{ scale }]}>
           {/* Outer halo — trimmed to the same arc as the dot's progress, not a full faint circle
               from frame 0, so the glow visibly leads/trails the dot instead of "already being there" */}
