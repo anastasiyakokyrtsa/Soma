@@ -35,6 +35,24 @@
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
       }
+      /* Chrome paints its own light background on an <input> the moment you
+         pick a value from its autofill/autocomplete suggestions, overriding
+         any author background - web-only (no such thing happens on a real
+         device, there's no browser autocomplete dropdown there), her catch
+         2026-11-23 on the email field. The box-shadow-inset trick is the
+         standard way to override it (background-color itself can't win
+         against the browser's autofill styling, but an inset shadow painted
+         over the same area can) - matches TextField.tsx's own colors
+         (bg0 #050816, textPrimary #FFFFFF) so the field doesn't flash to a
+         different look than every other state it has. */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:focus,
+      input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 1000px #050816 inset !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+        caret-color: #FFFFFF;
+      }
     </style>
   </head>
 
