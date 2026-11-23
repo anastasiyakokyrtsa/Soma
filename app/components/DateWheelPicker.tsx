@@ -9,6 +9,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 import { colors, fontFamily } from '../theme';
+import { useLanguage, type Language } from '../i18n/LanguageContext';
 
 // iOS-style scrolling wheel picker (WF17 "Дата рождения" — 3 columns: day /
 // month / year). No native picker component gives this exact "fading rows
@@ -96,20 +97,16 @@ function WheelColumn({
 }
 
 const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1));
-const MONTHS = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-];
+// Находка (2026-11-23, её же ask): month names were the one spot in this
+// whole app's otherwise-complete 2026-11-21 i18n pass that stayed
+// Russian-only (CalendarRangePicker had the same gap, see its own MONTHS
+// below). RU stays genitive ("14 ... мая ... 1995" reads as a normal
+// Russian date); EN just uses the plain month name - no genitive case to
+// match in English, "14 May 1995" is already natural.
+const MONTHS: Record<Language, string[]> = {
+  ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+};
 const YEAR_LIST = Array.from({ length: 2015 - 1940 + 1 }, (_, i) => String(1940 + i));
 
 export type DateValue = { day: number; month: number; year: number };
@@ -121,6 +118,7 @@ export function DateWheelPicker({
   value: DateValue;
   onChange: (v: DateValue) => void;
 }) {
+  const { language } = useLanguage();
   return (
     <View style={styles.wrap}>
       <View pointerEvents="none" style={styles.hairlineTop} />
@@ -133,7 +131,7 @@ export function DateWheelPicker({
         align="flex-end"
       />
       <WheelColumn
-        data={MONTHS}
+        data={MONTHS[language]}
         index={value.month}
         onIndexChange={(i) => onChange({ ...value, month: i })}
         width={140}

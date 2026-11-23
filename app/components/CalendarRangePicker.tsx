@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, type LayoutChangeEvent } from 'react-native';
 import { colors, fontFamily, radius } from '../theme';
 import { ChevronIcon } from './icons/ChevronIcon';
+import { useLanguage, type Language } from '../i18n/LanguageContext';
 
 // WF19 "Укажи даты последнего менструального цикла" — no finished Figma
 // frame, built from the wireframe (Вайрфреймы/19 WF Profile - Menstrual
@@ -12,23 +13,51 @@ import { ChevronIcon } from './icons/ChevronIcon';
 
 export type CalendarDate = { year: number; month: number; day: number }; // month is 0-indexed
 
-const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+// Находка (2026-11-23, её же ask): this was the other spot (with
+// DateWheelPicker.tsx) that stayed Russian-only through the 2026-11-21
+// i18n pass. English has no genitive case to match the RU nominative/
+// genitive split below, so EN reuses one plain set for both the header and
+// the a11y label.
+const WEEKDAYS: Record<Language, string[]> = {
+  ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+};
 // dayCircle's own box - the pill's edges are inset to this width (not the
 // full, wider cell width) so it lines up with the actual start/end square
 // instead of overhanging past it (2026-08-17: "подложка... вылазит немного
 // за первую и последнюю цифру").
 const DAY_SIZE = 36;
-const MONTH_NAMES = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
-];
+const MONTH_NAMES: Record<Language, string[]> = {
+  ru: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+};
 
 // For screen-reader labels ("15 июня 2026"), where the nominative names
-// above would read wrong.
-const MONTH_NAMES_GENITIVE = [
-  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
-];
+// above would read wrong. EN has no such distinction, so it's the same
+// list as MONTH_NAMES.en.
+const MONTH_NAMES_GENITIVE: Record<Language, string[]> = {
+  ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+  en: MONTH_NAMES.en,
+};
+
+const A11Y: Record<Language, { prevMonth: string; nextMonth: string; today: string; rangeStart: string; rangeEnd: string; inRange: string }> = {
+  ru: {
+    prevMonth: 'Предыдущий месяц',
+    nextMonth: 'Следующий месяц',
+    today: ', сегодня',
+    rangeStart: ', начало периода',
+    rangeEnd: ', конец периода',
+    inRange: ', в выбранном периоде',
+  },
+  en: {
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    today: ', today',
+    rangeStart: ', range start',
+    rangeEnd: ', range end',
+    inRange: ', within the selected range',
+  },
+};
 
 function dayNumber(d: CalendarDate) {
   return Math.round(Date.UTC(d.year, d.month, d.day) / 86400000);
@@ -102,6 +131,7 @@ export function CalendarRangePicker({
   // end is being picked: days further from the start than this are disabled.
   maxRangeDays?: number;
 }) {
+  const { language } = useLanguage();
   const [cellWidth, setCellWidth] = useState(0);
   const rows = buildGrid(year, month);
 
@@ -148,12 +178,12 @@ export function CalendarRangePicker({
           onPress={goPrev}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel="Предыдущий месяц"
+          accessibilityLabel={A11Y[language].prevMonth}
         >
           <ChevronIcon direction="left" size={16} color={colors.textSecondary} />
         </Pressable>
         <Text style={styles.headerLabel} accessibilityRole="header">
-          {MONTH_NAMES[month]} {year}
+          {MONTH_NAMES[language][month]} {year}
         </Text>
         <Pressable
           style={styles.navButton}
@@ -161,7 +191,7 @@ export function CalendarRangePicker({
           disabled={nextMonthDisabled}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel="Следующий месяц"
+          accessibilityLabel={A11Y[language].nextMonth}
           accessibilityState={{ disabled: nextMonthDisabled }}
         >
           <ChevronIcon direction="right" size={16} color={nextMonthDisabled ? colors.textDisabled : colors.textSecondary} />
@@ -169,7 +199,7 @@ export function CalendarRangePicker({
       </View>
 
       <View style={styles.weekdayRow}>
-        {WEEKDAYS.map((w) => (
+        {WEEKDAYS[language].map((w) => (
           <Text key={w} style={[styles.weekdayLabel, { width: cellWidth || undefined, flex: cellWidth ? undefined : 1 }]}>
             {w}
           </Text>
@@ -215,10 +245,11 @@ export function CalendarRangePicker({
                 const endpoint = start || end;
                 const disabled = isDisabled(cell);
                 const today = sameDate(cell, todayDate);
+                const a11y = A11Y[language];
                 const label =
-                  `${cell.day} ${MONTH_NAMES_GENITIVE[cell.month]} ${cell.year}` +
-                  (today ? ', сегодня' : '') +
-                  (start ? ', начало периода' : end ? ', конец периода' : inRange(cell) ? ', в выбранном периоде' : '');
+                  `${cell.day} ${MONTH_NAMES_GENITIVE[language][cell.month]} ${cell.year}` +
+                  (today ? a11y.today : '') +
+                  (start ? a11y.rangeStart : end ? a11y.rangeEnd : inRange(cell) ? a11y.inRange : '');
                 return (
                   <Pressable
                     key={ci}
