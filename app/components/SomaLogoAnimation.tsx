@@ -131,8 +131,20 @@ function SpacedText({
   );
 }
 
+// Exact gap (her ask, 2026-11-23) between the ring's own bottom edge and the
+// tagline's top, measured on a real screenshot via DOM rects, not eyeballed -
+// independent of `size`/language since it's derived below, not a fixed
+// marginTop (a fixed number would only hit 40px at one specific `size`).
+const TAGLINE_GAP = 40;
+
 export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: number; animationKey?: number }) {
   const scale = size / DESIGN;
+  // Canvas-local y of the ring's bottom edge; tagline sits `size` below the
+  // canvas's own top by default (next flex sibling), so pulling it up by
+  // (size - ringBottomLocal - TAGLINE_GAP) lands its top exactly
+  // TAGLINE_GAP below the ring, whatever `size` is.
+  const ringBottomLocal = (CY + R) * scale;
+  const taglineMarginTop = TAGLINE_GAP - size + ringBottomLocal;
   const { language } = useLanguage();
   const font = useFont(require('@expo-google-fonts/nunito-sans/300Light/NunitoSans_300Light.ttf'), 30);
 
@@ -263,23 +275,16 @@ export function SomaLogoAnimation({ size = 260, animationKey = 0 }: { size?: num
           )}
         </Group>
       </Canvas>
-      <Animated.Text style={[styles.tagline, { width: size }, taglineStyle]}>{TAGLINE[language]}</Animated.Text>
+      <Animated.Text style={[styles.tagline, { width: size, marginTop: taglineMarginTop }, taglineStyle]}>{TAGLINE[language]}</Animated.Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
-  // Negative margin pulls it up into the Canvas's own bottom whitespace
-  // (the ring sits well above the canvas's true edge) instead of adding
-  // visible gap below the logo.
-  // Generous clear space above it on purpose (real logo-lockup practice:
-  // the tagline is a separate, quieter credit line, not something crowding
-  // the mark) - tuned against a real screenshot of the ring's own glow,
-  // not guessed; see the component's own history for the earlier, tighter
-  // number this replaced.
+  // marginTop is computed per-instance above (`taglineMarginTop`) from
+  // TAGLINE_GAP, not a fixed number here - it depends on `size`.
   tagline: {
-    marginTop: -50,
     fontFamily: fontFamily.semiBold,
     fontSize: 11,
     lineHeight: 11 * 1.7,
