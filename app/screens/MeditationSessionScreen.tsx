@@ -3,7 +3,6 @@ import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   FadeIn,
-  FadeOut,
   Easing,
   useSharedValue,
   useAnimatedStyle,
@@ -103,7 +102,13 @@ export function MeditationSessionScreen({ navigation, route }: any) {
       </View>
 
       <View style={styles.textWrap}>
-        <Animated.Text key={revealed} entering={FadeIn.duration(700)} exiting={FadeOut.duration(400)} style={styles.sentence}>
+        {/* No `exiting` animation on purpose: a crossfade (old sentence
+            fading out while the new one fades in) left both overlapping
+            and unreadable for ~400ms whenever the two sentences wrapped to
+            different line counts/heights (caught via a real screenshot,
+            not assumed) - the previous text vanishing the instant the next
+            one starts fading in reads calm enough on its own. */}
+        <Animated.Text key={revealed} entering={FadeIn.duration(700)} style={styles.sentence}>
           {sentences[revealed - 1]}
         </Animated.Text>
       </View>
