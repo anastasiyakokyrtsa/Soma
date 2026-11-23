@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   interpolate,
   Extrapolation,
+  runOnJS,
   type SharedValue,
 } from 'react-native-reanimated';
 import { colors, fontFamily } from '../theme';
@@ -56,18 +57,52 @@ function WheelColumn({
   align?: 'flex-start' | 'center' | 'flex-end';
 }) {
   const scrollY = useSharedValue(index * ROW_HEIGHT);
+
+  const commitFromOffset = useCallback(
+    (offsetY: number) => {
+      const i = Math.max(0, Math.min(data.length - 1, Math.round(offsetY / ROW_HEIGHT)));
+      onIndexChange(i);
+    },
+    [data.length, onIndexChange]
+  );
+
+  // Her catch (2026-11-23): picking a different birth date never changed
+  // the onboarding insight that follows it - traced to this wheel's commit
+  // path (`onIndexChange`, feeding `ProfileDateOfBirthScreen`'s `date`
+  // state) only ever firing from `onMomentumScrollEnd`/`onScrollEndDrag`'s
+  // velocity heuristic. Both are genuinely unreliable on web - a mouse
+  // drag or a trackpad/wheel scroll doesn't generate the same native
+  // momentum-deceleration event sequence a real touch swipe does, so the
+  // visible wheel could settle on a new row while the actual committed
+  // value silently stayed at its initial default (confirmed: several
+  // different automated scroll methods all moved the wheel visually but
+  // never fired a commit). Fix: a plain debounce on every `onScroll` frame
+  // - commits whatever row is nearest 150ms after scrolling actually
+  // stops, regardless of which input method caused it to stop. Kept the
+  // two original handlers too (harmless - they just re-commit the same
+  // already-correct index a little earlier when they do fire).
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleCommit = useCallback(
+    (offsetY: number) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => commitFromOffset(offsetY), 150);
+    },
+    [commitFromOffset]
+  );
+
   const handler = useAnimatedScrollHandler({
     onScroll: (e) => {
       scrollY.value = e.contentOffset.y;
+      runOnJS(scheduleCommit)(e.contentOffset.y);
     },
   });
 
   const snap = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const i = Math.max(0, Math.min(data.length - 1, Math.round(e.nativeEvent.contentOffset.y / ROW_HEIGHT)));
-      onIndexChange(i);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      commitFromOffset(e.nativeEvent.contentOffset.y);
     },
-    [data.length, onIndexChange]
+    [commitFromOffset]
   );
 
   return (
@@ -116,7 +151,27 @@ export function DateWheelPicker({
   onChange,
 }: {
   value: DateValue;
-  onChange: (v: DateValue) => void;
+  // Her catch (2026-11-23): picking a different birth date never changed
+  // the onboarding insight that followed it. Root cause (confirmed with a
+  // temporary console.log, not guessed): each column's `onIndexChange`
+  // below merged its one changed field into a `value` snapshot captured by
+  // closure at render time - `{ ...value, day: i + 1 }` and `{ ...value,
+  // month: i }` etc. If she scrolled two columns close together (exactly
+  // how anyone actually uses a 3-wheel date picker - set month, then year,
+  // before either edit has re-rendered this component with fresh props),
+  // both closures captured the SAME stale `value`, so the second `onChange`
+  // call's spread silently clobbered the first column's edit with its own
+  // stale copy of that field. Logged proof: scrolling month to January
+  // then year to 2000 committed month=0 correctly in isolation, but the
+  // date actually submitted was `{day:14, month:5 (untouched original),
+  // year:2000}` - the month edit was overwritten by year's stale spread.
+  // Fix: `onChange` now takes an updater function (`(prev) => next`, same
+  // shape React's own `setState` accepts) instead of a finished object, so
+  // the caller can pass its state setter directly (see
+  // ProfileDateOfBirthScreen's `onChange={setDate}`) and every edit merges
+  // from the *latest* state, however many fire in the same tick - not a
+  // snapshot frozen at this component's last render.
+  onChange: (updater: (prev: DateValue) => DateValue) => void;
 }) {
   const { language } = useLanguage();
   return (
@@ -126,20 +181,20 @@ export function DateWheelPicker({
       <WheelColumn
         data={DAYS}
         index={value.day - 1}
-        onIndexChange={(i) => onChange({ ...value, day: i + 1 })}
+        onIndexChange={(i) => onChange((prev) => ({ ...prev, day: i + 1 }))}
         width={64}
         align="flex-end"
       />
       <WheelColumn
         data={MONTHS[language]}
         index={value.month}
-        onIndexChange={(i) => onChange({ ...value, month: i })}
+        onIndexChange={(i) => onChange((prev) => ({ ...prev, month: i }))}
         width={140}
       />
       <WheelColumn
         data={YEAR_LIST}
         index={value.year - 1940}
-        onIndexChange={(i) => onChange({ ...value, year: 1940 + i })}
+        onIndexChange={(i) => onChange((prev) => ({ ...prev, year: 1940 + i }))}
         width={80}
         align="flex-start"
       />
