@@ -1,13 +1,13 @@
 export const onboarding = {
   ru: {
     aboutApp1Title: 'Твоё состояние — это система',
-    aboutApp1Description: 'Энергия, настроение и внимание движутся по своим траекториям. И их можно научиться читать.',
+    aboutApp1Description: 'Энергия, настроение и внимание движутся по своим траекториям. И их можно научиться читать.',
     aboutApp1Button: 'Далее',
     aboutApp2Title: 'Замечай закономерности',
     aboutApp2Description: 'Soma отслеживает твои ритмы, реакции и привычки и показывает, что влияет на твоё состояние.',
     aboutApp2Button: 'Далее',
     aboutApp3Title: 'Живи в своём ритме',
-    aboutApp3Description: 'Наблюдай фазы напряжения и восстановления, настраивай нагрузку под свой ритм.',
+    aboutApp3Description: 'Наблюдай фазы напряжения и восстановления, настраивай нагрузку под свой ритм.',
     aboutApp3Button: 'Начать исследование',
 
     nameTitle: 'Как тебя зовут?',
@@ -66,7 +66,7 @@ export const onboarding = {
   },
   en: {
     aboutApp1Title: 'Your state is a system',
-    aboutApp1Description: 'Energy, mood, and focus move along their own patterns. You can learn to read them.',
+    aboutApp1Description: 'Energy, mood, and focus move along their own patterns. You can learn to read them.',
     aboutApp1Button: 'Next',
     aboutApp2Title: 'Notice the patterns',
     aboutApp2Description: "Soma tracks your rhythms, reactions, and habits, and shows you what's shaping your state.",
